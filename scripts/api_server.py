@@ -14,6 +14,7 @@ import collections
 import json
 import mimetypes
 import os
+import random
 import sys
 import time
 import urllib.parse
@@ -34,6 +35,8 @@ PROBE_TIMEOUT = 8                 # 单个区间查询超时（秒），12306 �
 TOTAL_BUDGET = 240                # 整个查询的总时间预算（秒），到点就收尾
 BEAM = 8                          # 每层保留的候选枢纽数（分层 beam 搜索，控制请求量）
 MAX_CONSEC_FAIL = 24              # 连续多少个区间无响应就判定被限流，提前收尾
+BACKOFF_AFTER = 6                 # 连续失败到这个数就开始放慢节奏（退避重试）
+BACKOFF_SEC = 2.5                 # 每次退避等待秒数
 
 # 全国性主要枢纽。请求数与枢纽数的平方成正比，且容易触发 12306 限流，
 # 因此默认只用这批核心枢纽（约 20 个），而不是 ZTK_HUBS 的全部 34 个。
@@ -139,47 +142,106 @@ def enrich_route(route, idx):
 
 
 async def run_query(frm, to, date, types, hops, top, emit):
+    # 起终点都支持多站（城市级搜索：北京 -> 昆明 会展开成 北京/北京南/北京西 -> 昆明/昆明南）。
+    # 用 "|" 分隔，服务端一次 BFS 覆盖全部组合，中转站的探测结果可共享。
+    from_names = [x.strip() for x in frm.split("|") if x.strip()]
+    to_names = [x.strip() for x in to.split("|") if x.strip()]
+
     async with sse_client(url=MCP_URL) as (r, w):
         async with ClientSession(r, w) as s:
             await s.initialize()
             emit("progress", {"phase": "init", "msg": "已连接 12306 服务"})
 
-            from_code = await tq.get_station_code(s, frm)
-            to_code = await tq.get_station_code(s, to)
-            if not from_code or not to_code:
+            f_pairs, t_pairs = [], []
+            for n in from_names:
+                c = await tq.get_station_code(s, n)
+                if c:
+                    f_pairs.append((n, c))
+            for n in to_names:
+                c = await tq.get_station_code(s, n)
+                if c:
+                    t_pairs.append((n, c))
+            if not f_pairs or not t_pairs:
                 emit("error", {"msg": f"无法识别车站：{frm} / {to}"})
                 return
-            emit("progress", {"phase": "init", "msg": f"{frm}({from_code}) → {to}({to_code})",
-                              "from_code": from_code, "to_code": to_code})
+            f_code = {n: c for n, c in f_pairs}
+            t_code = {n: c for n, c in t_pairs}
+            to_codes = set(t_code.values())
+            multi = len(f_pairs) > 1 or len(t_pairs) > 1
+            emit("progress", {
+                "phase": "init",
+                "msg": ("城市级搜索：" + "/".join(n for n, _ in f_pairs[:4])
+                        + ("…" if len(f_pairs) > 4 else "")
+                        + " → " + "/".join(n for n, _ in t_pairs[:4])
+                        + ("…" if len(t_pairs) > 4 else "")
+                        + f"（{len(f_pairs)}×{len(t_pairs)} 个起终点组合）")
+                      if multi else
+                      f"{from_names[0]}({f_pairs[0][1]}) → {to_names[0]}({t_pairs[0][1]})",
+                "from_code": f_pairs[0][1], "to_code": t_pairs[0][1],
+                "from_stations": [n for n, _ in f_pairs],
+                "to_stations": [n for n, _ in t_pairs],
+            })
 
             # 1) 直达（不限车型）作为价格基准
-            emit("progress", {"phase": "direct", "msg": "查询直达车次…"})
+            #    多站时只查前若干个组合，避免请求量爆炸
+            combos = [(fn, fc, tn, tc) for fn, fc in f_pairs[:3] for tn, tc in t_pairs[:3]]
+            emit("progress", {"phase": "direct",
+                              "msg": f"查询直达车次…（{len(combos)} 个起终点组合）" if multi
+                                     else "查询直达车次…"})
             direct_trains = []
-            try:
-                raw = await tq.query_direct(s, from_code, to_code, date, None)
-                for blk in tq.parse_direct_blocks(raw)[:12]:
-                    direct_trains.extend(ed.parse_trains(blk))
-            except Exception as e:
-                emit("progress", {"phase": "direct", "msg": f"直达查询失败：{e}"})
+            dsem = asyncio.Semaphore(2)
+
+            async def one_direct(fn, fc, tn, tc):
+                # 12306 限流时直达经常一次查不回来，失败后隔一会重试一次
+                async with dsem:
+                    for attempt in range(2):
+                        try:
+                            raw = await asyncio.wait_for(
+                                tq.query_direct(s, fc, tc, date, None), timeout=PROBE_TIMEOUT)
+                            blks = tq.parse_direct_blocks(raw)[:8] if raw else []
+                            if blks:
+                                out = []
+                                for blk in blks:
+                                    for t in ed.parse_trains(blk):
+                                        t["_from"] = fn
+                                        t["_to"] = tn
+                                        out.append(t)
+                                return out
+                        except Exception:
+                            pass
+                        await asyncio.sleep(0.9)
+                    return []
+
+            for lst in await asyncio.gather(*[one_direct(*c) for c in combos]):
+                direct_trains.extend(lst)
+            if not direct_trains:
+                emit("progress", {"phase": "direct",
+                                  "msg": "没查到直达车次（可能本身没有直达，或 12306 限流）"})
+            direct_trains.sort(key=lambda t: (t.get("price") is None, t.get("price") or 0))
             d_prices = [t["price"] for t in direct_trains if t.get("price")]
-            direct = {"trains": direct_trains,
-                      "min_price": min(d_prices) if d_prices else None}
-            emit("direct", {"trains": direct_trains, "min_price": direct["min_price"],
+            direct = {"trains": direct_trains[:24],
+                      "min_price": min(d_prices) if d_prices else None,
+                      "from": frm, "to": to}
+            emit("direct", {"trains": direct["trains"], "min_price": direct["min_price"],
                             "from": frm, "to": to})
 
             # 2) 分层 beam 搜索：段内只查直达，换乘由搜索组合。
             #    每层只保留累计票价最低的 BEAM 个枢纽继续展开，
             #    把请求量从 O(hubs²) 压到可控范围，同时不容易触发 12306 限流。
             hubs = dict(CORE_HUBS)
-            hubs[frm] = from_code
-            hubs[to] = to_code
+            for n, c in f_pairs + t_pairs:
+                hubs.setdefault(n, c)          # 起终点也要参与中转组合
             code_to_name = {v: k for k, v in hubs.items()}
-            visited = {from_code}
+            f_codes = set(f_code.values())
+            visited = set(f_codes)
             found = []
             scanned = 0
-            total_work = len(hubs) * (1 + BEAM * hops)
+            cache_hits = 0      # 命中本地缓存图的区间数（余票是缓存时刻的状态）
+            total_work = len(f_pairs) * len(hubs) * (1 + BEAM * hops)
             sem = asyncio.Semaphore(CONCURRENCY)
-            deadline = time.time() + min(TOTAL_BUDGET, 60 + 45 * hops)
+            # 城市级搜索要探测的区间成倍增加，预算相应放宽
+            budget = min(TOTAL_BUDGET, 60 + 45 * hops) * (2.2 if multi else 1)
+            deadline = time.time() + budget
             stopped = False
 
             def build_legs(steps):
@@ -208,16 +270,24 @@ async def run_query(frm, to, date, types, hops, top, emit):
                   2) 再查直达
                   3) 最后查 12306 官方中转换乘方案
                 每一步都带超时，12306 限流时不会把整个查询拖死。
+
+                缓存里的车次时刻与票价是按出发日期存的、比较稳定，可以直接用；
+                但「有票/无票」是缓存那一刻的状态，不能当实时余票看，
+                所以命中缓存的区间要计数，最后在页面上提示。
                 """
+                nonlocal cache_hits
                 if hub_code == cur_code:
                     return None
                 async with sem:
+                    # 轻微打散请求节奏：一股脑打过去更容易被 12306 判定为爬虫
+                    await asyncio.sleep(random.uniform(0, 0.25))
                     # 1) 缓存
                     try:
                         edges = tq.cache_graph.get_edges(cur_code, hub_code, date, types)
                     except Exception:
                         edges = None
                     if edges:
+                        cache_hits += 1
                         blk = tq.format_cached_edge(edges[0], cur_code, hub_code)
                         return mk_step(cur_code, hub_name, hub_code, "direct", [blk])
 
@@ -251,7 +321,7 @@ async def run_query(frm, to, date, types, hops, top, emit):
                                            "interline", sblocks[:3])
                 return None
 
-            layer = [(from_code, [], 0.0)]
+            layer = [(c, [], 0.0) for _, c in f_pairs]
             consec_fail = 0
             throttled = False
             for depth in range(hops):
@@ -262,7 +332,8 @@ async def run_query(frm, to, date, types, hops, top, emit):
                 cands = []
                 for cur_code, path, cost in layer:
                     tasks = [(hn, hc, asyncio.create_task(probe(cur_code, hn, hc)))
-                             for hn, hc in hubs.items() if hc != cur_code]
+                             for hn, hc in hubs.items()
+                             if hc != cur_code and hc not in f_codes]
                     for hn, hc, tk in tasks:
                         remain = deadline - time.time()
                         if remain <= 0:
@@ -284,6 +355,18 @@ async def run_query(frm, to, date, types, hops, top, emit):
                             })
                         if not step:
                             consec_fail += 1
+                            # 连续失败说明被限流了：退避一下再试，硬冲只会一路黑到底
+                            if consec_fail >= BACKOFF_AFTER:
+                                if consec_fail == BACKOFF_AFTER:
+                                    emit("progress", {
+                                        "phase": "bfs", "scanned": scanned,
+                                        "total": total_work, "routes": len(found),
+                                        "msg": f"12306 连续 {consec_fail} 个区间无响应"
+                                               f"（多半是限流），放慢节奏继续"})
+                                if time.time() > deadline:
+                                    stopped = True
+                                    break
+                                await asyncio.sleep(BACKOFF_SEC)
                             if consec_fail >= MAX_CONSEC_FAIL:
                                 throttled = True
                                 emit("progress", {
@@ -294,7 +377,7 @@ async def run_query(frm, to, date, types, hops, top, emit):
                                 break
                             continue
                         consec_fail = 0
-                        if hc == to_code:
+                        if hc in to_codes:
                             found.append(path + [step])
                             legs = build_legs(path + [step])
                             prices = [l.get("price") for l in legs if l.get("price") is not None]
@@ -347,6 +430,9 @@ async def run_query(frm, to, date, types, hops, top, emit):
             emit("result", {
                 "meta": {
                     "from": frm, "to": to, "date": date,
+                    "from_stations": [n for n, _ in f_pairs],
+                    "to_stations": [n for n, _ in t_pairs],
+                    "multi": multi,
                     "train_types": types, "max_hops": hops,
                     "total_routes": len(found),
                     "generated_at": __import__("datetime").datetime.now().astimezone()
@@ -355,6 +441,8 @@ async def run_query(frm, to, date, types, hops, top, emit):
                     "truncated": stopped,
                     "throttled": throttled,
                     "live": True,
+                    "cached_segments": cache_hits,
+                    "cache_ttl_days": getattr(tq, "CACHE_EXPIRE_DAYS", 2),
                 },
                 "direct": direct,
                 "best": routes[0] if routes else None,

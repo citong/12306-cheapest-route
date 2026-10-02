@@ -44,14 +44,42 @@ def enrich(data):
     return data
 
 
-def main():
-    with open(os.path.join(ROOT, "data.json"), encoding="utf-8") as f:
-        data = json.load(f)
+def main(no_data=False):
+    """
+    no_data=True 时生成「纯引导页」：不内嵌任何路线数据，只保留车站表与省份，
+    打开就必须启动本地服务才能查。用于发布到 GitHub Pages。
+
+    这样设计的理由：12306 每季度调图、高铁票价按出发日期浮动，
+    任何静态快照都会过期，与其放一份可能误导人的旧数据，不如干脆不放。
+    """
+    if no_data:
+        data = {"meta": None, "best": None, "routes": [],
+                "direct": {"trains": [], "min_price": None}}
+    else:
+        with open(os.path.join(ROOT, "data.json"), encoding="utf-8") as f:
+            data = json.load(f)
     stations = []
     st_path = os.path.join(ROOT, "stations.json")
     if os.path.isfile(st_path):
         with open(st_path, encoding="utf-8") as f:
             stations = json.load(f)
+
+    prov = {}
+    pv_path = os.path.join(ROOT, "stations_prov.json")
+    if os.path.isfile(pv_path):
+        with open(pv_path, encoding="utf-8") as f:
+            prov = json.load(f)
+
+    def load(name):
+        p = os.path.join(ROOT, name)
+        if os.path.isfile(p):
+            with open(p, encoding="utf-8") as f:
+                return json.load(f)
+        print(f"（缺少 {name}，城市级搜索将不可用）")
+        return {}
+
+    city = load("city_stations.json")
+    pcity = load("province_cities.json")
 
     data = enrich(data)
 
@@ -60,13 +88,17 @@ def main():
     html = (html
             .replace("__DATA__", js(data))
             .replace("__STATIONS__", js(stations))
+            .replace("__PROV__", js(prov))
+            .replace("__CITY__", js(city))
+            .replace("__PCITY__", js(pcity))
             .replace('"__API__"', '"%s"' % os.environ.get("SITE_API", DEFAULT_API)))
 
     out = os.path.join(ROOT, "index.html")
     with open(out, "w", encoding="utf-8") as f:
         f.write(html)
     print(f"✓ 已生成 {out}（{len(html) / 1024:.0f} KB · "
-          f"{len(data.get('routes', []))} 条路线 · {len(stations)} 个车站）")
+          f"{len(data.get('routes', []))} 条路线 · {len(stations)} 个车站 · "
+          f"{len(city)} 个城市 / {len(pcity)} 个省份）")
 
 
 if __name__ == "__main__":

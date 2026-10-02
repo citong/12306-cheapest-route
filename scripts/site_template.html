@@ -58,6 +58,60 @@ header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0
 .sug div{padding:7px 12px;cursor:pointer;font-size:13.5px;display:flex;justify-content:space-between;gap:8px}
 .sug div:hover,.sug div.sel{background:var(--soft)}
 .sug span{color:var(--sub);font-size:12px}
+.field input.hasrnd{padding-right:40px}
+.rnd{position:absolute;right:6px;bottom:8px;width:27px;height:27px;
+  border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;
+  color:var(--sub);font-size:14px;line-height:1;padding:0;font-family:inherit}
+.rnd:hover{border-color:var(--green);color:var(--green)}
+
+/* 跨天标记 */
+.nd{display:inline-block;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;
+  border-radius:4px;padding:0 4px;font-size:11px;margin-left:3px;vertical-align:1px;
+  font-weight:600;letter-spacing:-.2px}
+/* 目的地省份后缀 */
+.sug em{font-style:normal;color:#9ca3af;font-size:11.5px;margin-left:4px}
+.prov{color:#9ca3af;font-size:11.5px;margin-left:4px;font-weight:400}
+
+/* 城市 / 省份展开的车站勾选 */
+.pick{display:none;flex-wrap:wrap;gap:6px;margin-top:8px;padding:8px 10px;
+  background:var(--soft);border:1px dashed var(--line);border-radius:10px}
+.pick.on{display:flex}
+.pick .pl{width:100%;font-size:12px;color:var(--sub);display:flex;
+  align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px}
+.pick .pl b{color:var(--ink)}
+.pick .ps{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);
+  background:#fff;border-radius:20px;padding:2px 10px;font-size:12.5px;cursor:pointer;
+  user-select:none;white-space:nowrap}
+.pick .ps:hover{border-color:var(--green)}
+.pick .ps.on{border-color:var(--green);background:var(--green-soft);color:#15803d;font-weight:600}
+.pick .ps i{font-style:normal;color:var(--sub);font-size:11px}
+.pick .pa{border:none;background:none;color:var(--blue);font-size:12px;cursor:pointer;
+  padding:0 4px;font-family:inherit}
+.pick .pa:hover{text-decoration:underline}
+
+/* 售票状态 */
+.ps-tag{display:inline-block;font-size:11px;border-radius:5px;padding:1px 6px;
+  font-weight:600;margin-left:6px;vertical-align:1px}
+.ps-tag.sale{background:var(--green-soft);color:#15803d;border:1px solid var(--green-line)}
+.ps-tag.far{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.ps-tag.past{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca}
+/* 未开售时的预估横幅 */
+.est{background:#eff6ff;border:1px solid #bfdbfe;color:#1e40af;border-radius:12px;
+  padding:12px 14px;margin-bottom:12px;font-size:12.5px;line-height:1.6}
+.est b{color:#1e3a8a}
+.est .hd{font-weight:700;font-size:13.5px;margin-bottom:3px}
+
+/* 数据新鲜度 */
+.fresh{display:flex;align-items:flex-start;gap:9px;border-radius:10px;padding:9px 13px;
+  margin-bottom:12px;font-size:12.5px;line-height:1.55;border:1px solid var(--line);background:#fff}
+.fresh.hide{display:none}
+.fresh b.k{width:7px;height:7px;border-radius:50%;flex:none;margin-top:6px}
+.fresh.ok{border-color:var(--green-line);background:var(--green-soft);color:#15803d}
+.fresh.ok b.k{background:#16a34a}
+.fresh.warn{border-color:#fcd34d;background:#fef3c7;color:#92400e}
+.fresh.warn b.k{background:#d97706}
+.fresh.bad{border-color:#fecaca;background:#fee2e2;color:#b91c1c}
+.fresh.bad b.k{background:#dc2626}
 
 /* progress */
 .prog{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:none}
@@ -126,6 +180,34 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 .legend{font-size:12.5px;color:var(--sub);margin-top:8px}
 .sw{display:inline-block;width:12px;height:12px;background:var(--green-soft);
   border:1px solid var(--green-line);vertical-align:-1px;margin-right:5px}
+
+/* 席别展开 */
+td.sc{cursor:pointer;color:var(--blue);white-space:nowrap}
+td.sc:hover{text-decoration:underline}
+td.sc.no{color:var(--sub)}
+td.sc .more{color:var(--sub);font-size:11.5px;margin-left:4px}
+tr.seatrow{display:none}
+tr.seatrow.on{display:table-row}
+tr.seatrow td{background:#fafbfc;padding:6px 9px 10px;border-bottom:1px solid var(--line)}
+.sps{display:flex;gap:6px;flex-wrap:wrap}
+.sp{border:1px solid var(--green-line);background:var(--green-soft);color:#15803d;
+  border-radius:6px;padding:2px 9px;font-size:12px;white-space:nowrap}
+.sp b{font-variant-numeric:tabular-nums;font-weight:600;margin-left:2px}
+.sp.no{border-color:var(--line);background:#f3f4f6;color:#9ca3af}
+td .na{color:var(--red);font-weight:600}
+
+/* 无票方案折叠 */
+.grp{margin-top:14px;border:1px dashed #d1d5db;border-radius:12px;background:#fafbfc;overflow:hidden}
+.gh{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;
+  font-size:13.5px;color:var(--sub);font-weight:600}
+.gh:hover{background:#f1f2f4}
+.gh b{color:var(--ink)}
+.gh small{font-weight:400;font-size:12px;margin-left:auto;color:#9ca3af}
+.garrow{display:inline-block;transition:transform .15s;color:#9ca3af}
+.grp.on .garrow{transform:rotate(90deg)}
+.gb{display:none;padding:0 10px 10px}
+.grp.on .gb{display:block}
+
 @media(max-width:640px){
   .row{gap:8px}.field{min-width:120px}.kpi .v{font-size:18px}
 }
@@ -135,22 +217,29 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 <header><div class="hd">
   <div class="logo">🚂 12306 最便宜路线</div>
   <div class="status" id="st"><span class="dot off" id="dot"></span><span id="stxt">检测本地服务…</span></div>
+  <a href="map.html" style="font-size:12.5px;white-space:nowrap">🗺 车站地图</a>
 </div></header>
 
 <div class="wrap">
   <div class="hero">
     <div class="row">
-      <div class="field"><label>出发</label>
-        <input id="from" autocomplete="off" placeholder="如 新乡">
+      <div class="field"><label>出发<span class="prov" id="kind-from"></span></label>
+        <input id="from" autocomplete="off" placeholder="车站 / 城市 / 省份，如 北京">
         <div class="sug" id="sug-from"></div></div>
       <button class="swap" id="swap" title="交换起终点">⇄</button>
-      <div class="field"><label>到达</label>
-        <input id="to" autocomplete="off" placeholder="如 昆明">
+      <div class="field"><label>到达<span class="prov" id="prov-to"></span>
+        <span class="prov" id="kind-to"></span></label>
+        <input id="to" class="hasrnd" autocomplete="off" placeholder="车站 / 城市 / 省份，如 云南">
+        <button class="rnd" id="rnd" type="button" title="随机换一个目的地">⟳</button>
         <div class="sug" id="sug-to"></div></div>
-      <div class="field" style="max-width:150px"><label>出发日期</label>
-        <input id="date" type="date"></div>
+      <div class="field" style="max-width:158px"><label>出发日期
+        <span class="prov" id="presale"></span></label>
+        <input id="date" type="date">
+        <div class="sug" id="sug-date"></div></div>
       <button class="btn" id="go">查询</button>
     </div>
+    <div class="pick" id="pick-from"></div>
+    <div class="pick" id="pick-to"></div>
     <div class="opt">
       <label>车型
         <select id="types">
@@ -172,6 +261,8 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
     <div class="hint" id="hint"></div>
   </div>
 
+  <div class="fresh hide" id="fresh"></div>
+
   <div class="prog" id="prog">
     <div id="pmsg" class="msg">准备中…</div>
     <div class="bar indet" id="pbar"><i></i></div>
@@ -181,7 +272,12 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
   <div id="out"></div>
 
   <div class="foot">
+    <b>城市 / 省份搜索</b>：起点或终点填城市名（如「北京」）会展开该市主要车站，一次搜索覆盖全部组合，
+    每条路线标注实际上下车站；填省份名（如「云南」）可勾选该省城市。选的站越多越慢，也越容易触发 12306 限流。<br>
+    <b>未开售日期</b>：预售期按 <b id="ps-foot">15</b> 天计，超出范围的日期会标「未开售」，
+    并自动改用<b>同一星期几、且已开售</b>的日期实查作为预估 —— 车次与票价可参考，余票不同，请以 12306 为准。<br>
     票价取该段有票席别中的最低价；12306 返回 0 元的区间已剔除。<br>
+    点表格里的「席别」可展开该车次的硬座 / 硬卧 / 软卧 / 无座等全部席别与各自票价，灰色的为无票。<br>
     余票与票价实时变动，购票请以 12306 官方为准。
   </div>
 </div>
@@ -189,11 +285,30 @@ td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 <script>
 const BUNDLE = __DATA__;
 const STATIONS = __STATIONS__;
+const PROV = __PROV__;
+const CITY = __CITY__;        // 城市 -> 该市车站（已按重要度排序）
+const PCITY = __PCITY__;      // 省份 -> 该省城市
+// 12306 预售期（天，含当日）。超过这个范围的日期尚未开售，只能给预估。
+const PRESALE = 15;
+// 城市级搜索默认勾选的车站数：多了会把 12306 打限流，少了会漏掉最优方案
+const CITY_PICK = 3;
+// 这些城市人人都知道在哪，不再缀省份；其余小城市才标
+const BIG = new Set(['北京','上海','天津','重庆','广州','深圳','成都','杭州','武汉','西安',
+  '南京','苏州','青岛','大连','宁波','厦门','沈阳','长沙','郑州','济南','合肥','福州','昆明',
+  '南昌','贵阳','南宁','太原','石家庄','哈尔滨','长春','兰州','海口','乌鲁木齐','呼和浩特',
+  '银川','西宁','拉萨','香港','澳门']);
+function provOf(n){
+  const p = PROV && PROV[n];
+  if(!p) return '';
+  const base = String(n).replace(/[东南西北]$/, '');
+  return (BIG.has(n) || BIG.has(base)) ? '' : p;
+}
 // 页面由本地服务托管时走同源；部署在 Pages 上时回落到 127.0.0.1:8787
 const API = (location.port === '8787') ? location.origin : "__API__";
 let LIVE = false, ES = null;
 let RESULT = null;      // {meta, direct, routes, best}
-let FILTER = {trans:'', sort:'price', feasible:false, q:''};
+let EST = null;         // {want, ref}：预售期外，用 ref 日的实查结果预估 want 日
+let FILTER = {trans:'', sort:'price', feasible:false, q:'', seats:false};
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -203,31 +318,283 @@ function dur(min){
   const h = Math.floor(min/60), m = min%60;
   return h>0 ? (h+'小时'+(m?m+'分':'')) : (m+'分');
 }
+/* 时刻 'HH:MM' -> 分钟 */
+function hm2(s){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(s==null?'':s).trim());
+  return m ? (+m[1])*60 + (+m[2]) : null;
+}
+/* 历时 '01:01' -> '01h01m' */
+function fmtDur(s){
+  const m = /^(\d{1,2}):(\d{2})$/.exec(String(s==null?'':s).trim());
+  if(!m) return esc(s || '');
+  return String(+m[1]).padStart(2,'0') + 'h' + m[2] + 'm';
+}
+/* 到达时间相对出发日跨了几天（用运行时长推算，不能用钟点比大小） */
+function dayOff(t){
+  const d = hm2(t.depart), r = hm2(t.duration);
+  if(d==null || r==null) return 0;
+  return Math.floor((d + r) / 1440);
+}
+function ndTag(n){ return n===1 ? '次日' : ('第'+(n+1)+'日'); }
+function arrTxt(t){
+  const n = dayOff(t);
+  return esc(t.arrive||'') + (n ? ' <span class="nd">'+ndTag(n)+'</span>' : '');
+}
+/* chosen 里的 _dep 是绝对分钟，据此判断出发是否也跨天 */
+function depTxt(t){
+  const n = (t._dep==null) ? 0 : Math.floor(t._dep/1440);
+  return esc(t.depart||'') + (n ? ' <span class="nd">'+ndTag(n)+'</span>' : '');
+}
+function timeTxt(t){ return depTxt(t) + ' → ' + arrTxt(t); }
 function today(days){
   const d = new Date(Date.now() + days*86400000);
   return d.toISOString().slice(0,10);
 }
 
-/* ---------- 车站补全 ---------- */
-function suggest(inp, box){
-  const kw = inp.value.trim().toLowerCase();
-  if(!kw){ box.classList.remove('on'); return; }
-  const hit = [];
-  for(const s of STATIONS){
-    if(hit.length>=12) break;
-    if(s.n.indexOf(kw)>=0 || s.i.indexOf(kw)===0 || s.p.indexOf(kw)===0) hit.push(s);
+/* ---------- 起终点选择：车站 / 城市 / 省份 ---------- */
+/* SEL[id] = {kind:'station'|'city'|'prov', label:输入框文本, stations:[实际查询的站]} */
+const SEL = {
+  from: {kind:'station', label:'', stations:[]},
+  to:   {kind:'station', label:'', stations:[]},
+};
+/* 省份名集合（用于判断输入是不是省份） */
+const PROV_NAMES = new Set(Object.keys(PCITY || {}));
+
+function pickList(id){
+  // 当前实际会送去查询的车站列表
+  const s = SEL[id];
+  if(s.stations && s.stations.length) return s.stations.slice();
+  const v = ($( id).value || '').trim();
+  return v ? [v] : [];
+}
+function joinStations(id){
+  const s = pickList(id);
+  return s.slice(0, 8).join('|');
+}
+
+/* 输入一个词，判断它最可能是车站、城市还是省份 */
+function classify(kw){
+  kw = (kw || '').trim();
+  if(!kw) return null;
+  if(CITY && CITY[kw] && CITY[kw].length) return {kind:'city', name:kw, list:CITY[kw]};
+  if(PROV_NAMES.has(kw)) return {kind:'prov', name:kw, list:PCITY[kw] || []};
+  for(const s of STATIONS){ if(s.n === kw) return {kind:'station', name:kw, list:[kw]}; }
+  return null;
+}
+
+/* 选中某个候选项 */
+function applySel(id, kind, name){
+  const sel = SEL[id];
+  sel.kind = kind; sel.label = name;
+  if(kind === 'station'){
+    sel.stations = [name];
+  }else if(kind === 'city'){
+    const list = (CITY && CITY[name]) || [];
+    sel.stations = list.slice(0, CITY_PICK);
+  }else{
+    // 省份：默认取该省前 2 个城市（省会优先）各自的主站
+    const cities = (PCITY && PCITY[name]) || [];
+    const stns = [];
+    for(const c of cities.slice(0, 2)){
+      for(const s of ((CITY && CITY[c]) || []).slice(0, 2)){
+        if(!stns.includes(s)) stns.push(s);
+      }
+    }
+    sel.stations = stns.slice(0, CITY_PICK);
   }
-  if(!hit.length){ box.classList.remove('on'); return; }
-  box.innerHTML = hit.map(s=>`<div data-n="${esc(s.n)}">${esc(s.n)}<span>${esc(s.p)}</span></div>`).join('');
+  $(id).value = name;
+  $('sug-'+id).classList.remove('on');
+  renderPick(id);
+  updProv();
+}
+
+/* 车站勾选区 */
+function renderPick(id){
+  const sel = SEL[id], box = $('pick-'+id);
+  const all = sel.kind === 'city' ? ((CITY && CITY[sel.label]) || [])
+            : sel.kind === 'prov' ? ((PCITY && PCITY[sel.label]) || [])
+            : [];
+  if(!all.length){ box.className = 'pick'; box.innerHTML = ''; return; }
+  const isProv = sel.kind === 'prov';
+  const label = isProv ? '城市' : '车站';
+  let html = `<div class="pl"><b>${esc(sel.label)}</b> 共 ${all.length} 个${label}，`
+           + `已选 ${sel.stations.length} 个`
+           + `<span style="color:#9ca3af">（选得越多越慢，容易触发 12306 限流）</span>`
+           + `<button class="pa" data-act="all">全选</button>`
+           + `<button class="pa" data-act="none">清空</button>`
+           + `<button class="pa" data-act="def">恢复默认</button></div>`;
+  if(isProv){
+    // 省份：先勾城市，再勾该城市下的车站
+    html += all.map(c=>{
+      const list = (CITY && CITY[c]) || [];
+      const on = list.some(s=>sel.stations.includes(s));
+      return `<span class="ps${on?' on':''}" data-city="${esc(c)}">${esc(c)}`
+           + `<i>${list.length} 站</i></span>`;
+    }).join('');
+  }else{
+    html += all.map(s=>
+      `<span class="ps${sel.stations.includes(s)?' on':''}" data-stn="${esc(s)}">${esc(s)}</span>`
+    ).join('');
+  }
+  box.className = 'pick on';
+  box.innerHTML = html;
+  box.querySelectorAll('.ps').forEach(el=>{
+    el.onclick = ()=>{
+      if(isProv){
+        const c = el.dataset.city, list = (CITY && CITY[c]) || [];
+        const has = list.some(s=>sel.stations.includes(s));
+        if(has) sel.stations = sel.stations.filter(s=>!list.includes(s));
+        else for(const s of list.slice(0, 2)) if(!sel.stations.includes(s)) sel.stations.push(s);
+      }else{
+        const s = el.dataset.stn, i = sel.stations.indexOf(s);
+        if(i >= 0) sel.stations.splice(i, 1);
+        else sel.stations.push(s);
+      }
+      sel.stations = sel.stations.slice(0, 8);
+      renderPick(id);
+    };
+  });
+  box.querySelectorAll('.pa').forEach(el=>{
+    el.onclick = ()=>{
+      const act = el.dataset.act;
+      if(act === 'all'){
+        sel.stations = isProv ? all.flatMap(c=>((CITY&&CITY[c])||[]).slice(0,2))
+                              : all.slice();
+      }else if(act === 'none'){
+        sel.stations = [];
+      }else{
+        applySel(id, sel.kind, sel.label); return;
+      }
+      sel.stations = Array.from(new Set(sel.stations)).slice(0, 8);
+      renderPick(id);
+    };
+  });
+}
+
+/* ---------- 补全：车站 / 城市 / 省份 混排 ---------- */
+function suggest(inp, box, id){
+  const kw = inp.value.trim();
+  if(!kw){ box.classList.remove('on'); return; }
+  const low = kw.toLowerCase();
+  const out = [];
+  // 1) 省份（精确前缀优先）
+  for(const p of Object.keys(PCITY || {})){
+    if(p.indexOf(kw) === 0 || p.indexOf(kw) >= 0){
+      out.push({t:'prov', n:p, sub:(PCITY[p]||[]).length + ' 个城市'});
+      if(out.length >= 3) break;
+    }
+  }
+  // 2) 城市
+  let cn = 0;
+  for(const c of Object.keys(CITY || {})){
+    if(cn >= 6) break;
+    if(c.indexOf(kw) === 0 || c.indexOf(kw) >= 0){
+      out.push({t:'city', n:c, sub:(CITY[c]||[]).length + ' 个车站'});
+      cn++;
+    }
+  }
+  // 3) 车站
+  for(const s of STATIONS){
+    if(out.length >= 14) break;
+    if(s.n.indexOf(kw)>=0 || s.i.indexOf(low)===0 || s.p.indexOf(low)===0){
+      out.push({t:'stn', n:s.n, sub:s.p});
+    }
+  }
+  if(!out.length){ box.classList.remove('on'); return; }
+  const icon = {prov:'🏞', city:'🏙', stn:'🚉'};
+  box.innerHTML = out.map(o=>{
+    const pv = o.t==='stn' ? provOf(o.n) : '';
+    return `<div data-t="${o.t}" data-n="${esc(o.n)}">${icon[o.t]} ${esc(o.n)}`
+         + `${pv?'<em>'+esc(pv)+'</em>':''}<span>${esc(o.sub)}</span></div>`;
+  }).join('');
   box.classList.add('on');
-  [...box.children].forEach(d=>d.onclick=()=>{ inp.value=d.dataset.n; box.classList.remove('on'); });
+  [...box.children].forEach(d=>d.onclick=()=>{
+    applySel(id, d.dataset.t==='stn' ? 'station' : d.dataset.t, d.dataset.n);
+  });
 }
 ['from','to'].forEach(id=>{
   const inp=$(id), box=$('sug-'+id);
-  inp.addEventListener('input',()=>suggest(inp,box));
-  inp.addEventListener('blur',()=>setTimeout(()=>box.classList.remove('on'),150));
+  inp.addEventListener('input',()=>{ SEL[id].kind='station'; suggest(inp,box,id); });
+  inp.addEventListener('focus',()=>suggest(inp,box,id));
+  inp.addEventListener('blur',()=>setTimeout(()=>box.classList.remove('on'),180));
 });
-$('swap').onclick = ()=>{ const a=$('from').value; $('from').value=$('to').value; $('to').value=a; };
+$('swap').onclick = ()=>{
+  const a = SEL.from, b = SEL.to;
+  SEL.from = {kind:b.kind, label:b.label, stations:b.stations.slice()};
+  SEL.to   = {kind:a.kind, label:a.label, stations:a.stations.slice()};
+  $('from').value = SEL.from.label || '';
+  $('to').value   = SEL.to.label   || '';
+  renderPick('from'); renderPick('to'); updProv();
+};
+
+function updProv(){
+  const p = provOf($('to').value.trim());
+  $('prov-to').textContent = p ? '（'+p+'）' : '';
+  ['from','to'].forEach(id=>{
+    const el = $('kind-'+id); if(!el) return;
+    const s = SEL[id], n = pickList(id).length;
+    el.textContent = s.kind === 'city' ? ('· 城市，'+n+' 站')
+                   : s.kind === 'prov' ? ('· 省份，'+n+' 站') : '';
+  });
+}
+$('to').addEventListener('input', updProv);
+$('rnd').onclick = ()=>{
+  // 随机换一个「城市」当目的地：城市比单个小站更实用，也顺便演示城市级搜索
+  const cities = Object.keys(CITY || {}).filter(c=>(CITY[c]||[]).length >= 2);
+  const src = cities.length ? cities : (STATIONS || []).map(s=>s.n);
+  if(!src.length) return;
+  let n = src[Math.floor(Math.random()*src.length)];
+  const cur = SEL.from.label || $('from').value.trim();
+  for(let i=0; i<30 && n === cur; i++) n = src[Math.floor(Math.random()*src.length)];
+  applySel('to', cities.length ? 'city' : 'station', n);
+};
+
+/* ---------- 预售期：未开售的日期用「同星期几的可售日期」预估 ---------- */
+function pad(n){ return String(n).padStart(2,'0'); }
+function dstr(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+function parseD(s){
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s||'').trim());
+  return m ? new Date(+m[1], +m[2]-1, +m[3]) : null;
+}
+function today0(){ const d = new Date(); d.setHours(0,0,0,0); return d; }
+function dayDiff(a, b){ return Math.round((a.getTime()-b.getTime())/86400000); }
+const WD = ['周日','周一','周二','周三','周四','周五','周六'];
+function saleState(v){
+  const d = parseD(v); if(!d) return null;
+  const n = dayDiff(d, today0());
+  return n < 0 ? {s:'past', n} : (n >= PRESALE ? {s:'far', n} : {s:'sale', n});
+}
+/* 未开售时找一个参照日：同一星期几、且在预售期内、离目标日期最近 */
+function refDate(v){
+  const d = parseD(v); if(!d) return null;
+  if(dayDiff(d, today0()) < PRESALE) return null;
+  for(let k=1; k<=60; k++){
+    const c = new Date(d.getTime() - k*7*86400000);
+    const n = dayDiff(c, today0());
+    if(n < 0) break;
+    if(n < PRESALE) return dstr(c);
+  }
+  // 同星期几都不可售（日期太远），退而求其次：预售期最后一天
+  return dstr(new Date(today0().getTime() + (PRESALE-1)*86400000));
+}
+function updDate(){
+  const el = $('presale'), v = $('date').value;
+  if(!el) return;
+  if(!v){ el.innerHTML = ''; return; }
+  const st = saleState(v);
+  if(!st){ el.innerHTML = ''; return; }
+  if(st.s === 'sale'){
+    el.innerHTML = '<span class="ps-tag sale">已开售</span>';
+  }else if(st.s === 'past'){
+    el.innerHTML = '<span class="ps-tag past">已过期</span>';
+  }else{
+    const r = refDate(v);
+    el.innerHTML = '<span class="ps-tag far">未开售'
+      + (r ? ' · 按 '+r.slice(5)+' 预估' : '') + '</span>';
+  }
+}
+$('date').addEventListener('change', updDate);
+$('date').addEventListener('input', updDate);
 
 /* ---------- 状态检测 ---------- */
 async function detect(){
@@ -243,32 +610,118 @@ async function detect(){
     ? '实时模式：逐段查询 12306 官方余票，自动穷举中转组合。'
     : (m ? `离线模式：内置数据只有 <b>${esc(m.from)} → ${esc(m.to)}（${esc(m.date)}）</b>。想查任意线路，在本项目目录双击 <b>start.bat</b> 启动本地服务后刷新本页。`
          : '离线模式：暂无内置数据，请启动本地服务。');
-  if(!$('from').value && m){ $('from').value=m.from; $('to').value=m.to; $('date').value=m.date; }
+  if(!$('from').value && m){
+    // 内置线路的起终点可能是城市，用 classify 判定要不要展开成城市级选择
+    ['from','to'].forEach((id, i)=>{
+      const v = i ? m.to : m.from;
+      const c = classify(v);
+      if(c && c.kind !== 'station') applySel(id, c.kind, c.name);
+      else { $(id).value = v; SEL[id] = {kind:'station', label:v, stations:[v]}; }
+    });
+    $('date').value = m.date; updDate();
+  }
+  renderPick('from'); renderPick('to'); updProv();
   $('eta').textContent = LIVE ? '' : '';
+  freshness();
+}
+
+/* ---------- 数据新鲜度 ---------- */
+function fmtAgo(d){
+  const s = (Date.now() - d.getTime()) / 1000;
+  if(s < 60) return '刚刚';
+  if(s < 3600) return Math.round(s/60) + ' 分钟前';
+  if(s < 86400) return Math.round(s/3600) + ' 小时前';
+  return Math.round(s/86400) + ' 天前';
+}
+function freshness(){
+  const el = $('fresh'); if(!el) return;
+  const m = (RESULT && RESULT.meta) || (BUNDLE && BUNDLE.meta) || null;
+  if(LIVE){
+    const t = (RESULT && RESULT.meta && RESULT.meta.generated_at) || '';
+    el.className = 'fresh ok';
+    el.innerHTML = '<b class="k"></b><div>'
+      + (t ? '实时查询 · 本次结果取自 12306，票价与余票为 <b>' + esc(t.slice(11,16))
+             + '</b> 的当前状态'
+           : '实时查询服务已连接 · 票价与余票取自 12306 当前状态')
+      + '</div>';
+    return;
+  }
+  if(!m || !m.generated_at){ el.className = 'fresh hide'; el.innerHTML = ''; return; }
+  const d = new Date(m.generated_at);
+  const days = (Date.now() - d.getTime()) / 86400000;
+  const lv = days < 3 ? 'ok' : (days < 30 ? 'warn' : 'bad');
+  const when = m.generated_at.slice(0, 10);
+  const date = esc(m.date || '');
+  let tip;
+  if(lv === 'ok'){
+    tip = '内置快照 · ' + when + ' 采集（' + fmtAgo(d) + '）· 对应 <b>' + date
+        + '</b> 出发，票价与余票为该时刻状态';
+  }else if(lv === 'warn'){
+    tip = '内置快照 · ' + when + ' 采集（' + fmtAgo(d) + '）· 对应 <b>' + date
+        + '</b> 出发。高铁票价按出发日期浮动、12306 每季度调图，这份数据<b>可能已经变动</b>';
+  }else{
+    tip = '这份数据已是 <b>' + Math.round(days) + ' 天前</b>的快照（' + when + ' 采集）。'
+        + '12306 每季度调图，高铁票价按出发日期浮动 —— 它<b>很可能已经不准</b>，'
+        + '请在本项目目录双击 <b>start.bat</b> 启动本地服务重新查询。';
+  }
+  el.className = 'fresh ' + lv;
+  el.innerHTML = '<b class="k"></b><div>' + tip + '</div>';
 }
 
 /* ---------- 查询 ---------- */
+let CURQ = null;        // 本次查询的日期信息（含「用哪天预估哪天」）
+/* 把本次查询的显示信息补进 meta：城市名、实际查的日期、是否为预估 */
+function mkMeta(base){
+  const out = Object.assign({}, base || {});
+  out.from = labelOf('from');
+  out.to = labelOf('to');
+  out.from_stations = pickList('from');
+  out.to_stations = pickList('to');
+  if(CURQ){
+    out.date = CURQ.date;
+    if(CURQ.est){ out.want_date = CURQ.est.want; out.estimate = true; }
+  }
+  if(!out.generated_at) out.generated_at = new Date().toISOString();
+  return out;
+}
 function setProg(on, msg, sub){
   const p=$('prog'); p.classList.toggle('on',on);
   if(msg!=null) $('pmsg').textContent=msg;
   if(sub!=null) $('psub').textContent=sub;
 }
+/* 显示用的起终点名（城市/省份模式要显示城市名，而不是「北京|北京南」） */
+function labelOf(id){
+  return (SEL[id].label || $(id).value.trim() || '').replace(/\|/g, ' / ');
+}
 $('go').onclick = ()=>{
-  const f=$('from').value.trim(), t=$('to').value.trim(), d=$('date').value;
+  const f=joinStations('from'), t=joinStations('to'), d=$('date').value;
   if(!f||!t){ alert('请填写出发和到达'); return; }
   if(!d){ alert('请选择日期'); return; }
-  location.hash = 'from='+encodeURIComponent(f)+'&to='+encodeURIComponent(t)+'&date='+d
+  location.hash = 'from='+encodeURIComponent(labelOf('from'))
+                + '&to='+encodeURIComponent(labelOf('to'))+'&date='+d
                 + '&types='+$('types').value+'&hops='+$('hops').value;
   run(f,t,d);
 };
 
-function run(f,t,d){
+function run(f,t,want){
   if(ES){ ES.close(); ES=null; }
   RESULT = null; $('out').innerHTML='';
-  if(!LIVE){ offline(f,t,d); return; }
+  if(!LIVE){ offline(f,t,want); return; }
+  // 预售期外的日期：改用「同星期几、且已开售」的参照日期实查，结果明确标注为预估
+  EST = null;
+  let d = want;
+  const st = saleState(want);
+  if(st && st.s === 'far'){
+    const r = refDate(want);
+    if(r){ d = r; EST = {want:want, ref:r}; }
+  }
   const types=$('types').value, hops=$('hops').value;
+  CURQ = {date:d, want:want, est:EST};
+  const nf = f.split('|').length, nt = t.split('|').length;
   $('go').disabled=true;
-  setProg(true,'正在连接 12306…','首次查询需要几十秒到几分钟，取决于换乘次数');
+  setProg(true,'正在连接 12306…',
+    (nf*nt > 1 ? `城市级搜索：${nf} 个出发站 × ${nt} 个到达站，一次 BFS 全部覆盖 · ` : '')
+    + '首次查询需要几十秒到几分钟，取决于换乘次数');
   const url = `${API}/api/query?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`
             + `&date=${d}&types=${encodeURIComponent(types)}&hops=${hops}&top=40`;
   const partial = [];
@@ -285,7 +738,7 @@ function run(f,t,d){
   });
   ES.addEventListener('direct', e=>{
     const d = JSON.parse(e.data);
-    RESULT = {meta:{from:f,to:t,date:d.date||$('date').value}, direct:d, routes:partial, best:null};
+    RESULT = {meta:mkMeta(), direct:d, routes:partial, best:null};
   });
   ES.addEventListener('route', e=>{
     const r = JSON.parse(e.data);
@@ -295,7 +748,9 @@ function run(f,t,d){
     if(RESULT){ RESULT.routes = partial; RESULT.best = partial[0]; render(); }
   });
   ES.addEventListener('result', e=>{
-    RESULT = JSON.parse(e.data); render(); finish();
+    RESULT = JSON.parse(e.data);
+    RESULT.meta = mkMeta(RESULT.meta);
+    render(); finish();
   });
   ES.addEventListener('error', e=>{
     if(e.data){ try{ const d=JSON.parse(e.data); alert('查询出错：'+d.msg); }catch(_){} }
@@ -311,8 +766,9 @@ function finish(){
 
 function offline(f,t,d){
   const m = BUNDLE && BUNDLE.meta;
-  if(m && m.from===f && m.to===t && (m.date===d || !d)){
-    RESULT = BUNDLE; render();
+  const fl = labelOf('from'), tl = labelOf('to');
+  if(m && (m.from===fl || m.from===f) && (m.to===tl || m.to===t) && (m.date===d || !d)){
+    RESULT = BUNDLE; RESULT.meta = mkMeta(m); render();
   }else{
     $('out').innerHTML = `<div class="card"><h2>该线路没有内置数据</h2>
       <div class="meta">离线状态下只能查看已生成的线路。</div>
@@ -342,13 +798,92 @@ function render(){
     `<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${k==='可行路线'? (v==null?'—':v) : money(v)}</div><div class="u">${esc(u||'')}</div></div>`
   ).join('') + '</div>';
 
+  // 城市级搜索：说明实际查了哪些站
+  if(meta && meta.from_stations && (meta.from_stations.length > 1
+     || (meta.to_stations || []).length > 1)){
+    html += '<div class="fresh ok"><b class="k"></b><div>城市级搜索：'
+          + '出发 <b>' + esc(meta.from_stations.join(' / ')) + '</b>'
+          + ' · 到达 <b>' + esc((meta.to_stations||[]).join(' / ')) + '</b>'
+          + '，一次搜索覆盖全部 ' + meta.from_stations.length + '×'
+          + (meta.to_stations||[]).length + ' 个组合。'
+          + '下方每条路线会标出<b>实际的上车站与下车站</b>。</div></div>';
+  }
+  // 预售期外：明确说明这是按参照日期预估的
+  if(meta && meta.estimate){
+    const w = meta.want_date || '';
+    const r = meta.date || '';
+    const dw = parseD(w), dr = parseD(r);
+    html += '<div class="est"><div class="hd">📅 ' + esc(w)
+          + ' 尚未开售，以下是按 ' + esc(r) + ' 的实际车次做的预估</div>'
+          + '12306 预售期为 <b>' + PRESALE + ' 天</b>，'
+          + (dw && dr ? '选了同为<b>' + WD[dr.getDay()] + '</b>、且已开售的 ' + esc(r) + ' 来查询。' : '')
+          + '车次、时刻与票价通常稳定，可作为出行参考；'
+          + '但<b>余票与执行票价一定不同</b>，'
+          + '请在该日期进入预售期后再查一次，以 12306 实际为准。</div>';
+  }
+
+  if(meta && meta.cached_segments){
+    html += '<div class="fresh warn"><b class="k"></b><div>其中 ' + meta.cached_segments
+          + ' 个区间取自本地缓存（' + (meta.cache_ttl_days || 2) + ' 天内）。'
+          + '票价与时刻可用，但<b>余票是缓存那一刻的状态</b>，请以 12306 实时为准。</div></div>';
+  }
   if(best) html += bestCard(best, dm);
   if(direct && direct.trains && direct.trains.length) html += directCard(direct, meta);
   if(routes && routes.length) html += listCard(routes);
 
+  // 一趟车都没有：多半是该日期尚未放票，也可能被限流了
+  if(!best && (!direct || !direct.trains || !direct.trains.length)){
+    const st = saleState(meta && meta.date);
+    const n = st ? st.n : null;
+    let why;
+    if(n != null && n >= PRESALE - 3){
+      why = '这个日期离今天 ' + n + ' 天，<b>很可能还没放票</b>'
+          + '（预售期按 ' + PRESALE + ' 天计，且<b>各车站起售时间不同</b>，'
+          + '热门线路常出现整点分批放票）。';
+    }else if(n != null && n < 0){
+      why = '这是个过去的日期。';
+    }else{
+      why = '可能是 12306 限流导致查询失败，也可能这条线路当天确实没有符合条件的车次。';
+    }
+    html += `<div class="card"><h2>😕 没查到车次</h2><div class="meta">`
+          + `<b>${esc((meta&&meta.from)||'')} → ${esc((meta&&meta.to)||'')}</b> · `
+          + `${esc((meta&&meta.date)||'')}</div>`
+          + `<div class="fresh warn"><b class="k"></b><div>${why}<br>`
+          + `建议：换个更近的日期试试；或放宽「最多换乘」与车型限制；`
+          + `被限流时等 1~2 分钟再查。</div></div></div>`;
+  }
+
   $('out').innerHTML = html;
   bind();
+  applyFilter();
+  freshness();
 }
+
+/* ---------- 席别明细（点开才展开） ---------- */
+let SKEY = 0;
+function seatPills(t){
+  const ss = t.seats || [];
+  if(!ss.length) return '<span class="muted">该车次 12306 未返回席别明细</span>';
+  return '<div class="sps">' + ss.map(s=>
+    `<span class="sp${s.available?'':' no'}" title="${esc(s.status||'')}">${esc(s.seat)}`
+    + `<b>${money(s.price)}</b>${s.available?'':' · 无票'}</span>`).join('') + '</div>';
+}
+function seatCell(t){
+  const ss = t.seats || [];
+  if(!ss.length) return `<td>${esc(t.seat||'—')}</td>`;
+  t._k = 'sk' + (++SKEY);
+  const av = ss.filter(s=>s.available);
+  const label = t.seat || (av.length ? av[0].seat : ss[0].seat);
+  return `<td class="sc${av.length?'':' no'}" onclick="togS('${t._k}')"
+    title="点击查看全部 ${ss.length} 种席别">${esc(label)}`
+    + `<span class="more">▾${ss.length}种</span></td>`;
+}
+function seatRow(t, colspan){
+  if(!(t.seats||[]).length) return '';
+  return `<tr class="seatrow" id="${t._k}"><td colspan="${colspan}">${seatPills(t)}</td></tr>`;
+}
+function togS(k){ const el = $(k); if(el) el.classList.toggle('on'); }
+const availTxt = a => a ? '有票' : '<span class="na">无票</span>';
 
 function bestCard(b, dm){
   const path = (b.path||[]).join(' → ');
@@ -360,10 +895,11 @@ function bestCard(b, dm){
       rows += `<tr class="sec"><td colspan="6">第 ${i+1} 段 · ${esc(c.leg_from||'')} → ${esc(c.leg_to||'')}</td></tr>`;
       const ok = c.available ? 'ok' : '';
       rows += `<tr class="${ok}"><td class="n">${esc(c.code)}</td>
-        <td class="n">${esc(c.depart)} → ${esc(c.arrive)}</td>
-        <td class="n">${esc(c.duration||'')}</td><td>${esc(c.seat||'')}</td>
+        <td class="n">${timeTxt(c)}</td>
+        <td class="n">${fmtDur(c.duration)}</td>${seatCell(c)}
         <td class="r">${money(c.price)}</td>
-        <td>${c.available?'有票':'无票'}</td></tr>`;
+        <td>${availTxt(c.available)}</td></tr>`;
+      rows += seatRow(c, 6);
       if(i<chosen.length-1){
         const w = (chosen[i+1]._dep - c._arr);
         rows += `<tr><td colspan="6" style="color:var(--sub);font-size:12px;padding:4px 9px">
@@ -375,9 +911,10 @@ function bestCard(b, dm){
       rows += `<tr class="sec"><td colspan="6">第 ${i+1} 段 · ${esc(l.from)} → ${esc(l.to)}</td></tr>`;
       (l.trains||[]).slice(0,4).forEach(t=>{
         rows += `<tr class="${t.available?'ok':''}"><td class="n">${esc(t.code)}</td>
-          <td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td><td class="n">${esc(t.duration||'')}</td>
-          <td>${esc(t.seat||'')}</td><td class="r">${money(t.price)}</td>
-          <td>${t.available?'有票':'无票'}</td></tr>`;
+          <td class="n">${timeTxt(t)}</td><td class="n">${fmtDur(t.duration)}</td>
+          ${seatCell(t)}<td class="r">${money(t.price)}</td>
+          <td>${availTxt(t.available)}</td></tr>`;
+        rows += seatRow(t, 6);
       });
     });
   }
@@ -405,14 +942,25 @@ function bestCard(b, dm){
 }
 
 function directCard(d, meta){
-  const rows = d.trains.map(t=>`<tr class="${t.available?'ok':''}">
-    <td class="n">${esc(t.code)}</td><td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td>
-    <td class="n">${esc(t.duration||'')}</td><td>${esc(t.seat||'')}</td>
-    <td class="r">${money(t.price)}</td><td>${t.available?'有票':'无票'}</td></tr>`).join('');
+  // 城市级搜索时直达车次来自多个起终点组合，要标出具体是哪两站之间
+  const multi = !!((meta && meta.from_stations && meta.from_stations.length > 1)
+                || (meta && meta.to_stations && meta.to_stations.length > 1));
+  const colspan = multi ? 7 : 6;
+  let rows = '';
+  d.trains.forEach(t=>{
+    rows += `<tr class="${t.available?'ok':''}">`
+      + `<td class="n">${esc(t.code)}</td>`
+      + (multi ? `<td class="n">${esc(t._from||'')} → ${esc(t._to||'')}</td>` : '')
+      + `<td class="n">${timeTxt(t)}</td>
+      <td class="n">${fmtDur(t.duration)}</td>${seatCell(t)}
+      <td class="r">${money(t.price)}</td><td>${availTxt(t.available)}</td></tr>`;
+    rows += seatRow(t, colspan);
+  });
   return `<div class="card"><h2>🚄 直达车次<span class="badge gray">价格基准</span></h2>
     <div class="meta">${esc(meta.from)} → ${esc(meta.to)} · 最低 ${money(d.min_price)}</div>
-    <div class="legend"><span class="sw"></span>绿色 = 有票</div>
-    <table><tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>${rows}</table>
+    <div class="legend"><span class="sw"></span>绿色 = 有票 · 点击「席别」可展开该车次全部席别与票价</div>
+    <table><tr><th>车次</th>${multi?'<th>区间</th>':''}<th>时刻</th><th>历时</th>
+      <th>席别</th><th>票价</th><th>余票</th></tr>${rows}</table>
   </div>`;
 }
 
@@ -421,7 +969,7 @@ function listCard(routes){
   const chips = ['<div class="chip'+(FILTER.trans===''?' on':'')+'" data-t="">不限</div>']
     .concat(trans.map(t=>`<div class="chip${FILTER.trans==String(t)?' on':''}" data-t="${t}">换乘${t}次</div>`));
   return `<div class="card"><h2>🗺 全部 ${routes.length} 条路线</h2>
-    <div class="meta">点击任一条展开查看车次；默认按可衔接 + 总价排序</div>
+    <div class="meta">点标题展开车次 · 点「席别」看硬座/硬卧等全部票价 · 无票方案折叠在底部</div>
     <div class="filters">
       ${chips.join('')}
       <select id="f-sort">
@@ -431,16 +979,37 @@ function listCard(routes){
       </select>
       <input id="f-q" placeholder="搜中转城市" value="${esc(FILTER.q)}" style="width:120px">
       <label class="chip${FILTER.feasible?' on':''}" id="f-feas" style="cursor:pointer">只看可衔接</label>
+      <label class="chip${FILTER.seats?' on':''}" id="f-seats" style="cursor:pointer">展开全部席别</label>
     </div>
-    <div id="rlist">${routes.map(routeCard).join('')}</div>
+    <div id="rlist"></div>
   </div>`;
 }
+
+/* 有票的放主列表，无票的折进底部一组 */
+const buyable = r => r.plan_available || r.all_available;
+function renderList(list){
+  const el = $('rlist'); if(!el) return;
+  if(!list.length){ el.innerHTML = '<div class="empty">没有符合条件的路线</div>'; return; }
+  const ok  = list.filter(buyable);
+  const bad = list.filter(r=>!buyable(r));
+  let html = ok.map(routeCard).join('');
+  if(bad.length){
+    html += `<div class="grp"><div class="gh" onclick="togG()">
+      <span class="garrow">▸</span>无票 / 需候补的方案 <b>${bad.length}</b> 条
+      <small>票价仍可作参考，点开查看</small></div>
+      <div class="gb">${bad.map(routeCard).join('')}</div></div>`;
+  }
+  el.innerHTML = html;
+  if(FILTER.seats) document.querySelectorAll('.seatrow').forEach(e=>e.classList.add('on'));
+}
+function togG(){ const g = document.querySelector('.grp'); if(g) g.classList.toggle('on'); }
 
 function routeCard(r){
   const price = r.plan_price || r.total_price;
   const tags = [`<span class="tag">换乘 ${r.transfers} 次</span>`];
   if(r.plan_available) tags.push('<span class="tag ok">有票</span>');
   else if(r.all_available) tags.push('<span class="tag amber">部分无票</span>');
+  else tags.push('<span class="tag no">无票</span>');
   if(r.time_feasible===false) tags.push('<span class="tag no">衔接不上</span>');
   if(r.ride_minutes) tags.push(`<span class="tag">在途 ${dur(r.ride_minutes)}</span>`);
   let body = '';
@@ -449,9 +1018,10 @@ function routeCard(r){
     r.chosen.forEach(c=>{
       body += `<tr class="${c.available?'ok':''}"><td class="n">${esc(c.code)}</td>
         <td>${esc(c.leg_from||'')} → ${esc(c.leg_to||'')}</td>
-        <td class="n">${esc(c.depart)} → ${esc(c.arrive)}</td><td class="n">${esc(c.duration||'')}</td>
-        <td>${esc(c.seat||'')}</td><td class="r">${money(c.price)}</td>
-        <td>${c.available?'有票':'无票'}</td></tr>`;
+        <td class="n">${timeTxt(c)}</td><td class="n">${fmtDur(c.duration)}</td>
+        ${seatCell(c)}<td class="r">${money(c.price)}</td>
+        <td>${availTxt(c.available)}</td></tr>`;
+      body += seatRow(c, 7);
     });
     body += '</table>';
   }else{
@@ -460,9 +1030,10 @@ function routeCard(r){
         <tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>`;
       (l.trains||[]).slice(0,5).forEach(t=>{
         body += `<tr class="${t.available?'ok':''}"><td class="n">${esc(t.code)}</td>
-          <td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td><td class="n">${esc(t.duration||'')}</td>
-          <td>${esc(t.seat||'')}</td><td class="r">${money(t.price)}</td>
-          <td>${t.available?'有票':'无票'}</td></tr>`;
+          <td class="n">${timeTxt(t)}</td><td class="n">${fmtDur(t.duration)}</td>
+          ${seatCell(t)}<td class="r">${money(t.price)}</td>
+          <td>${availTxt(t.available)}</td></tr>`;
+        body += seatRow(t, 6);
       });
       body += '</table>';
     });
@@ -486,6 +1057,7 @@ function bind(){
   const s=$('f-sort'); if(s) s.onchange = ()=>{ FILTER.sort=s.value; applyFilter(); };
   const q=$('f-q'); if(q) q.oninput = ()=>{ FILTER.q=q.value.trim(); applyFilter(); };
   const f=$('f-feas'); if(f) f.onclick = ()=>{ FILTER.feasible=!FILTER.feasible; applyFilter(); };
+  const st=$('f-seats'); if(st) st.onclick = ()=>{ FILTER.seats=!FILTER.seats; applyFilter(); };
 }
 function applyFilter(){
   if(!RESULT || !RESULT.routes) return;
@@ -493,33 +1065,41 @@ function applyFilter(){
   if(FILTER.trans!=='') list = list.filter(r=>String(r.transfers)===FILTER.trans);
   if(FILTER.feasible) list = list.filter(r=>r.time_feasible!==false);
   if(FILTER.q) list = list.filter(r=>(r.path||[]).join('').indexOf(FILTER.q)>=0);
+  // 有票 > 可衔接但部分无票 > 衔接不上，与服务端排序保持一致
+  const rank = r => r.plan_available ? 0 : (r.time_feasible===false ? 2 : 1);
   const key = {
-    price: r=>[r.plan_price==null? (r.total_price==null?1e9:r.total_price) : r.plan_price, r.transfers],
-    trans: r=>[r.transfers, r.plan_price||r.total_price||1e9],
-    ride:  r=>[r.ride_minutes==null?1e9:r.ride_minutes, r.plan_price||r.total_price||1e9]
+    price: r=>[rank(r), r.plan_price==null? (r.total_price==null?1e9:r.total_price) : r.plan_price, r.transfers],
+    trans: r=>[rank(r), r.transfers, r.plan_price||r.total_price||1e9],
+    ride:  r=>[rank(r), r.ride_minutes==null?1e9:r.ride_minutes, r.plan_price||r.total_price||1e9]
   }[FILTER.sort];
   list.sort((a,b)=>{ const ka=key(a), kb=key(b);
     for(let i=0;i<ka.length;i++) if(ka[i]!==kb[i]) return ka[i]-kb[i];
     return a.id-b.id; });
-  const el=$('rlist'); if(el) el.innerHTML = list.length? list.map(routeCard).join('') : '<div class="empty">没有符合条件的路线</div>';
+  renderList(list);
 }
 
 /* ---------- 启动 ---------- */
 function boot(){
   if(!$('date').value) $('date').value = today(3);
+  updDate();
   const h = location.hash.slice(1);
   if(h){
     const p = {}; h.split('&').forEach(kv=>{ const [k,v]=kv.split('='); p[k]=decodeURIComponent(v||''); });
-    if(p.from) $('from').value=p.from;
-    if(p.to) $('to').value=p.to;
-    if(p.date) $('date').value=p.date;
+    ['from','to'].forEach(id=>{
+      if(!p[id]) return;
+      const c = classify(p[id]);
+      if(c && c.kind !== 'station') applySel(id, c.kind, c.name);
+      else { $(id).value = p[id]; SEL[id] = {kind:'station', label:p[id], stations:[p[id]]}; }
+    });
+    if(p.date){ $('date').value=p.date; updDate(); }
     if(p.types!=null) $('types').value=p.types;
     if(p.hops) $('hops').value=p.hops;
   }
+  const pf = $('ps-foot'); if(pf) pf.textContent = String(PRESALE);
   detect().then(()=>{
     const m = BUNDLE && BUNDLE.meta;
     if(location.hash.slice(1)) $('go').click();
-    else if(!LIVE && m){ RESULT=BUNDLE; render(); }
+    else if(!LIVE && m){ RESULT=BUNDLE; RESULT.meta = mkMeta(m); render(); }
   });
 }
 boot();

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>车站地图 · 12306 最便宜路线</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --ink:#111827; --sub:#6b7280; --line:#e5e7eb;
+  --green:#16a34a; --green-soft:#dcfce7; --blue:#2563eb; --amber:#d97706; --red:#dc2626;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  font-size:14px;line-height:1.6}
+a{color:var(--blue);text-decoration:none}
+header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
+  display:flex;align-items:center;gap:10px;padding:8px 16px;position:sticky;top:0;z-index:60;
+  flex-wrap:wrap}
+.logo{font-size:16px;font-weight:700;white-space:nowrap}
+.q{display:flex;gap:8px;align-items:center;position:relative}
+.q input{border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:14px;
+  font-family:inherit;width:200px;color:var(--ink);background:#fff}
+.q input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;
+  padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn:hover{border-color:var(--green);color:var(--green)}
+.btn.main{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.btn.main:hover{filter:brightness(.94);color:#fff}
+.hint{font-size:12.5px;color:var(--sub);margin-left:auto}
+
+/* 补全下拉 */
+.sug{position:absolute;top:100%;left:0;width:290px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;margin-top:4px;max-height:250px;overflow:auto;z-index:70;
+  box-shadow:0 8px 24px rgba(16,24,40,.12);display:none}
+.sug.on{display:block}
+.sug .g{font-size:11.5px;color:#9ca3af;padding:5px 12px 2px;font-weight:600}
+.sug div.i{padding:6px 12px;cursor:pointer;font-size:13.5px;display:flex;gap:8px}
+.sug div.i:hover{background:var(--bg)}
+.sug div.i span{margin-left:auto;color:#9ca3af;font-size:11.5px}
+
+#wrap{display:flex;height:calc(100vh - 56px)}
+#side{width:238px;flex:none;background:#fff;border-right:1px solid var(--line);
+  overflow:auto;padding:12px}
+#side h3{margin:2px 0 8px;font-size:13px;color:var(--sub);font-weight:600}
+.st{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;
+  cursor:pointer;font-size:13.5px}
+.st:hover{background:var(--bg)}
+.st b{width:8px;height:8px;border-radius:50%;flex:none}
+.st.g b{background:var(--green)} .st.r b{background:var(--red)}
+.st.b b{background:var(--blue)} .st.o b{background:var(--amber)}
+.st.g2 b{background:#d1d5db}
+.st.fail{opacity:.55}
+.st span{margin-left:auto;font-size:11.5px;color:#9ca3af}
+.st .rt{margin-left:6px;font-size:11px;color:var(--blue)}
+#map{flex:1;height:100%;min-width:0}
+.note{padding:8px 10px;background:var(--bg);border:1px solid var(--line);
+  border-radius:9px;font-size:12.5px;color:var(--sub);margin-bottom:10px}
+.note.err{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--sub);
+  margin:0 0 10px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+@media(max-width:720px){
+  #wrap{flex-direction:column;height:auto}
+  #side{width:auto;border-right:none;border-bottom:1px solid var(--line);max-height:36vh}
+  #map{height:64vh}
+  .hint{display:none}
+  .q input{width:150px}
+}
+</style>
+<script type="text/javascript">
+  window._TMapSecurityConfig = {
+    serviceHost: 'http://127.0.0.1:__WB_HTTP_PORT__/_TMapService/_wbt/__WB_TMAP_SECRET__',
+  };
+</script>
+<script src="https://map.qq.com/api/gljs?v=1.exp&libraries=service"></script>
+</head>
+<body>
+<header>
+  <div class="logo">🗺 车站地图</div>
+  <div class="q">
+    <input id="q" autocomplete="off" placeholder="搜车站 / 城市，如 郑州">
+    <div class="sug" id="sug"></div>
+    <button class="btn main" id="go">定位</button>
+    <button class="btn" id="fit">回到全部</button>
+  </div>
+  <div class="hint" id="hint">正在加载地图…</div>
+  <a class="btn" href="index.html">← 路线查询</a>
+</header>
+
+<div id="wrap">
+  <div id="side">
+    <div class="note" id="note">正在定位车站…</div>
+    <div class="legend">
+      <span><i style="background:#16a34a"></i>起点</span>
+      <span><i style="background:#dc2626"></i>终点</span>
+      <span><i style="background:#2563eb"></i>中转</span>
+      <span><i style="background:#d97706"></i>搜索结果</span>
+    </div>
+    <h3>本线路涉及的车站</h3>
+    <div id="list"></div>
+  </div>
+  <div id="map"></div>
+</div>
+
+<script>
+const STOPS = __STOPS__;
+const ALL   = __ALL__;
+const CITY  = __CITY__;
+const PCITY = __PCITY__;
+const PROV  = __PROV__;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+let map, mk, lb, iw, search;
+const MARKED = new Map();          // 站名 -> {lat,lng,kind,title}
+const FAILED = new Set();          // 定位失败的站名
+const CHINA = () => new TMap.LatLngBounds(
+  new TMap.LatLng(17.0, 73.0), new TMap.LatLng(54.5, 136.0));
+
+const dot = c => 'data:image/svg+xml,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
+  + '<circle cx="10" cy="10" r="7" fill="' + c + '" stroke="#fff" stroke-width="2.5"/></svg>');
+
+function boot(){
+  if(typeof TMap === 'undefined'){
+    $('hint').textContent = '地图组件未加载';
+    note('腾讯地图 SDK 没能加载。<br>本页的地图依赖预览环境的密钥代理 —— '
+       + '请通过本地服务或预览打开（直接双击本地文件打开时地图会是空的）。', true);
+    return;
+  }
+  map = new TMap.Map('map', {
+    zoom: 5, pitch: 0,
+    center: new TMap.LatLng(33.5, 106.5),
+    showControl: true,             // 缩放 / 旋转控件，方便放大看
+  });
+  try{ search = new TMap.service.Search({ pageSize: 3 }); }
+  catch(e){ note('地点检索服务初始化失败：' + esc(e.message || e), true); return; }
+
+  mk = new TMap.MultiMarker({
+    map,
+    styles: {
+      start: new TMap.MarkerStyle({width:20,height:20,src:dot('#16a34a'),anchor:{x:10,y:10}}),
+      end:   new TMap.MarkerStyle({width:20,height:20,src:dot('#dc2626'),anchor:{x:10,y:10}}),
+      via:   new TMap.MarkerStyle({width:16,height:16,src:dot('#2563eb'),anchor:{x:8,y:8}}),
+      hit:   new TMap.MarkerStyle({width:22,height:22,src:dot('#d97706'),anchor:{x:11,y:11}}),
+    },
+    geometries: [],
+  });
+  lb = new TMap.MultiLabel({
+    map,
+    styles: { t: new TMap.LabelStyle({color:'#1f2937', size:12, offset:{x:0,y:-14}}) },
+    geometries: [],
+  });
+  iw = new TMap.InfoWindow({ map, position: map.getCenter(), content:'', offset:{x:0,y:-14} });
+  mk.on('click', e=>{
+    const g = e.geometry, v = MARKED.get(g.id);
+    const pv = (PROV && PROV[g.id]) ? ' <span style="color:#9ca3af">' + esc(PROV[g.id]) + '</span>' : '';
+    iw.setPosition(g.position);
+    iw.setContent('<div style="padding:5px 10px;font-size:13px;white-space:nowrap">'
+      + '<b>' + esc(g.id) + '</b>' + pv
+      + (v && v.title && v.title !== g.id
+          ? '<div style="font-size:11.5px;color:#6b7280">' + esc(v.title) + '</div>' : '')
+      + '</div>');
+    iw.open();
+  });
+  // 缩得太小时标签会糊成一片，按需隐藏
+  map.on('zoom', ()=>{
+    const z = map.getZoom();
+    const show = z >= 6;
+    const gs = [];
+    MARKED.forEach((v,k)=>{ if(show) gs.push({id:k, styleId:'t',
+      position:new TMap.LatLng(v.lat,v.lng), content:k}); });
+    lb.setGeometries(gs);
+  });
+
+  $('go').onclick = doSearch;
+  $('q').onkeydown = e=>{ if(e.key==='Enter') doSearch(); };
+  $('fit').onclick = fitAll;
+  bindSuggest();
+
+  renderList();
+  loadAll();
+}
+
+function note(html, err){
+  const el = $('note');
+  el.innerHTML = html;
+  el.className = 'note' + (err ? ' err' : '');
+}
+
+/* ---------- 站名 -> 坐标 ---------- */
+/* 依次尝试「XX火车站」(限定火车站分类) / 「XX站」/ 原名；全部失败再整轮重试一次 */
+async function geo(name){
+  if(!name) return null;
+  const tries = [
+    [name + '火车站', 'category=火车站'],
+    [name + '站',     'category=火车站'],
+    [name + '站',     ''],
+    [name,            ''],
+  ];
+  for(let round = 0; round < 2; round++){
+    for(const [kw, filter] of tries){
+      try{
+        const p = { keyword: kw, bounds: CHINA() };
+        if(filter) p.filter = filter;
+        const r = await search.searchRectangle(p);
+        if(r && r.status === 0 && r.data && r.data.length){
+          return { poi: r.data[0], kw };
+        }
+      }catch(e){ /* 换下一种写法重试 */ }
+    }
+    if(round === 0) await new Promise(s=>setTimeout(s, 600));
+  }
+  return null;
+}
+
+/* ---------- 加载线路车站（并发，避免一个一个等） ---------- */
+async function loadAll(){
+  if(!STOPS.length){
+    note('本页没有内置线路数据。启动本地服务重新查询后，地图会标出该线路涉及的车站。');
+    return;
+  }
+  let done = 0;
+  const queue = STOPS.slice();
+  async function worker(){
+    while(queue.length){
+      const s = queue.shift();
+      const r = await geo(s.n);
+      done++;
+      if(r) MARKED.set(s.n, {lat:r.poi.location.lat, lng:r.poi.location.lng,
+                             kind:s.k, title:r.poi.title || s.n});
+      else FAILED.add(s.n);
+      $('note').textContent = '正在定位车站 ' + done + '/' + STOPS.length
+        + '（已标注 ' + MARKED.size + ' 个' + (FAILED.size ? '，失败 ' + FAILED.size : '') + '）';
+      if(done % 3 === 0 || done === STOPS.length){ draw(); renderList(); }
+    }
+  }
+  await Promise.all([worker(), worker(), worker()]);   // 3 路并发，太快会被限流
+  draw(); renderList(); fitAll();
+  note('已标注 <b>' + MARKED.size + '/' + STOPS.length + '</b> 个车站。'
+     + '滚轮或双指可缩放，点圆点看站名。'
+     + (FAILED.size ? '<br>有 ' + FAILED.size + ' 个站没能定位（灰色标注），点侧栏条目可重试。' : ''));
+}
+
+/* ---------- 搜索：支持车站与城市 ---------- */
+function resolve(kw){
+  kw = (kw || '').trim();
+  if(!kw) return [];
+  if(CITY && CITY[kw] && CITY[kw].length) return CITY[kw].slice(0, 3);
+  if(PCITY && PCITY[kw]){                       // 省份：取前 3 个城市的主站
+    const out = [];
+    for(const c of PCITY[kw].slice(0, 3))
+      for(const s of ((CITY && CITY[c]) || []).slice(0, 1))
+        if(!out.includes(s)) out.push(s);
+    return out;
+  }
+  return [kw];
+}
+async function doSearch(){
+  const kw = $('q').value.trim();
+  if(!kw) return;
+  $('sug').classList.remove('on');
+  const names = resolve(kw);
+  const isCity = names.length > 1 || names[0] !== kw;
+  note('正在查找「' + esc(kw) + '」' + (isCity ? '（' + names.join(' / ') + '）' : '') + '…');
+  const found = [];
+  for(const n of names){
+    const r = await geo(n);
+    if(r){
+      MARKED.set(n, {lat:r.poi.location.lat, lng:r.poi.location.lng, kind:'hit',
+                     title:r.poi.title || n});
+      FAILED.delete(n);
+      found.push(n);
+    }else{
+      FAILED.add(n);
+    }
+  }
+  draw(); renderList();
+  if(!found.length){
+    note('没找到「' + esc(kw) + '」，换个说法试试（如「北京西」「广州南」，或直接填城市名）。', true);
+    return;
+  }
+  if(found.length === 1){
+    const v = MARKED.get(found[0]);
+    map.setCenter(new TMap.LatLng(v.lat, v.lng));
+    map.setZoom(13);
+  }else{
+    fitTo(found);
+  }
+  note('已定位「' + esc(kw) + '」→ <b>' + esc(found.join(' / ')) + '</b>');
+}
+
+/* ---------- 补全 ---------- */
+function bindSuggest(){
+  const inp = $('q'), box = $('sug');
+  inp.addEventListener('input', ()=>{
+    const kw = inp.value.trim();
+    if(!kw){ box.classList.remove('on'); return; }
+    const cities = Object.keys(CITY || {}).filter(c=>c.indexOf(kw) >= 0).slice(0, 6);
+    const provs  = Object.keys(PCITY || {}).filter(p=>p.indexOf(kw) >= 0).slice(0, 3);
+    const stns   = (ALL || []).filter(n=>n.indexOf(kw) >= 0).slice(0, 8);
+    let h = '';
+    if(provs.length) h += '<div class="g">省份</div>'
+      + provs.map(p=>'<div class="i" data-n="'+esc(p)+'">🏞 '+esc(p)
+        + '<span>'+(PCITY[p]||[]).length+' 个城市</span></div>').join('');
+    if(cities.length) h += '<div class="g">城市</div>'
+      + cities.map(c=>'<div class="i" data-n="'+esc(c)+'">🏙 '+esc(c)
+        + '<span>'+(CITY[c]||[]).length+' 个车站</span></div>').join('');
+    if(stns.length) h += '<div class="g">车站</div>'
+      + stns.map(n=>'<div class="i" data-n="'+esc(n)+'">🚉 '+esc(n)+'</div>').join('');
+    if(!h){ box.classList.remove('on'); return; }
+    box.innerHTML = h; box.classList.add('on');
+    [...box.querySelectorAll('.i')].forEach(d=>{
+      d.onclick = ()=>{ inp.value = d.dataset.n; box.classList.remove('on'); doSearch(); };
+    });
+  });
+  inp.addEventListener('blur', ()=>setTimeout(()=>box.classList.remove('on'), 200));
+  inp.addEventListener('focus', ()=>{ if(inp.value.trim()) inp.dispatchEvent(new Event('input')); });
+}
+
+/* ---------- 绘制 ---------- */
+function draw(){
+  const gs = [];
+  MARKED.forEach((v,k)=>{
+    gs.push({id:k, styleId:v.kind, position:new TMap.LatLng(v.lat, v.lng)});
+  });
+  mk.setGeometries(gs);
+  drawLabels();
+}
+function drawLabels(){
+  const z = map ? map.getZoom() : 5;
+  const gs = [];
+  if(z >= 6){
+    MARKED.forEach((v,k)=>{
+      gs.push({id:k, styleId:'t', position:new TMap.LatLng(v.lat, v.lng), content:k});
+    });
+  }
+  lb.setGeometries(gs);
+}
+function fitTo(names){
+  let w=180, e=-180, s=90, n=-90, c=0;
+  for(const nm of names){
+    const v = MARKED.get(nm); if(!v) continue;
+    c++;
+    w=Math.min(w,v.lng); e=Math.max(e,v.lng);
+    s=Math.min(s,v.lat); n=Math.max(n,v.lat);
+  }
+  if(!c) return;
+  if(c === 1){ map.setCenter(new TMap.LatLng(s, w)); map.setZoom(13); return; }
+  map.fitBounds(new TMap.LatLngBounds(
+    new TMap.LatLng(s-0.15, w-0.15), new TMap.LatLng(n+0.15, e+0.15)),
+    {padding:{top:60,bottom:60,left:60,right:60}});
+}
+function fitAll(){
+  if(!MARKED.size) return;
+  fitTo([...MARKED.keys()]);
+}
+
+const cls = k => ({start:'g', end:'r', via:'b', hit:'o'})[k] || 'g2';
+function renderList(){
+  const order = {start:0, end:1, hit:2, via:3};
+  // 线路车站 + 搜索出来的站；没定位到的排最后并标灰
+  const arr = [...MARKED.entries()].sort((a,b)=>
+    (order[a[1].kind]??9)-(order[b[1].kind]??9));
+  const miss = [...FAILED].filter(n=>!MARKED.has(n));
+  let html = arr.length ? arr.map(([n,v])=>
+    `<div class="st ${cls(v.kind)}" data-n="${esc(n)}"><b></b>${esc(n)}
+      <span>${v.lat.toFixed(2)}, ${v.lng.toFixed(2)}</span></div>`).join('')
+    : '<div class="note">还没有车站被标注。</div>';
+  if(miss.length){
+    html += '<h3 style="margin-top:10px">未能定位（点一下重试）</h3>'
+      + miss.map(n=>`<div class="st fail g2" data-n="${esc(n)}"><b></b>${esc(n)}
+          <span class="rt">重试</span></div>`).join('');
+  }
+  $('list').innerHTML = html;
+  [...$('list').children].forEach(d=>{
+    const n = d.dataset.n; if(!n) return;
+    d.onclick = async ()=>{
+      const v = MARKED.get(n);
+      if(v){ map.setCenter(new TMap.LatLng(v.lat, v.lng)); map.setZoom(12); return; }
+      d.querySelector('.rt').textContent = '定位中…';
+      const r = await geo(n);
+      if(r){
+        MARKED.set(n, {lat:r.poi.location.lat, lng:r.poi.location.lng,
+                       kind:'hit', title:r.poi.title || n});
+        FAILED.delete(n);
+        draw(); renderList();
+        map.setCenter(new TMap.LatLng(r.poi.location.lat, r.poi.location.lng));
+        map.setZoom(12);
+      }else{
+        renderList();
+        note('「' + esc(n) + '」还是没定位到，可能站名写法特殊。', true);
+      }
+    };
+  });
+}
+
+if(document.readyState === 'complete' || document.readyState === 'interactive'){
+  setTimeout(boot, 0);
+}else{
+  window.addEventListener('DOMContentLoaded', boot);
+}
+</script>
+</body>
+</html>
