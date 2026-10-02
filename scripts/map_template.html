@@ -69,9 +69,11 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
 }
 </style>
 <script type="text/javascript">
+  // 密钥代理地址：由 render_map.py 注入。仍是占位符说明这是发布版（没有代理可用）。
   window._TMapSecurityConfig = {
-    serviceHost: 'http://127.0.0.1:__WB_HTTP_PORT__/_TMapService/_wbt/__WB_TMAP_SECRET__',
+    serviceHost: '__TMAP_HOST__',
   };
+  window.__TMAP_OK__ = !('__TMAP_HOST__'.indexOf('__WB_') >= 0);
 </script>
 <script src="https://map.qq.com/api/gljs?v=1.exp&libraries=service"></script>
 </head>
@@ -124,10 +126,22 @@ const dot = c => 'data:image/svg+xml,' + encodeURIComponent(
   + '<circle cx="10" cy="10" r="7" fill="' + c + '" stroke="#fff" stroke-width="2.5"/></svg>');
 
 function boot(){
+  // 发布到 GitHub Pages 时没有密钥代理，地点检索不可用 —— 直接说明，别让人对着白图猜
+  if(!window.__TMAP_OK__){
+    $('hint').textContent = '线上版无地图密钥';
+    note('<b>线上版本用不了地图检索。</b><br>'
+       + '车站坐标靠腾讯地图的地点检索获得，而密钥代理只能由<b>本地服务</b>提供，'
+       + '静态托管的 GitHub Pages 上没有它。<br><br>'
+       + '<b>怎么用：</b>在本项目目录双击 <b>start.bat</b> 启动本地服务，'
+       + '然后打开 <b>http://127.0.0.1:8787/map.html</b> 即可正常缩放与标注。', true);
+    (STOPS || []).forEach(s=>FAILED.add(s.n));
+    renderList();
+    return;
+  }
   if(typeof TMap === 'undefined'){
     $('hint').textContent = '地图组件未加载';
-    note('腾讯地图 SDK 没能加载。<br>本页的地图依赖预览环境的密钥代理 —— '
-       + '请通过本地服务或预览打开（直接双击本地文件打开时地图会是空的）。', true);
+    note('腾讯地图 SDK 没能加载。<br>请确认本页是通过本地服务打开的'
+       + '（http://127.0.0.1:8787/map.html），并且网络可访问 map.qq.com。', true);
     return;
   }
   map = new TMap.Map('map', {
@@ -193,7 +207,7 @@ function note(html, err){
 /* ---------- 站名 -> 坐标 ---------- */
 /* 依次尝试「XX火车站」(限定火车站分类) / 「XX站」/ 原名；全部失败再整轮重试一次 */
 async function geo(name){
-  if(!name) return null;
+  if(!name || !search) return null;
   const tries = [
     [name + '火车站', 'category=火车站'],
     [name + '站',     'category=火车站'],
@@ -370,9 +384,11 @@ function renderList(){
       <span>${v.lat.toFixed(2)}, ${v.lng.toFixed(2)}</span></div>`).join('')
     : '<div class="note">还没有车站被标注。</div>';
   if(miss.length){
-    html += '<h3 style="margin-top:10px">未能定位（点一下重试）</h3>'
-      + miss.map(n=>`<div class="st fail g2" data-n="${esc(n)}"><b></b>${esc(n)}
-          <span class="rt">重试</span></div>`).join('');
+    const can = window.__TMAP_OK__ !== false;
+    html += '<h3 style="margin-top:10px">'
+      + (can ? '未能定位（点一下重试）' : '本线路涉及的车站') + '</h3>'
+      + miss.map(n=>`<div class="st fail g2" data-n="${esc(n)}"><b></b>${esc(n)}`
+          + (can ? '<span class="rt">重试</span>' : '') + `</div>`).join('');
   }
   $('list').innerHTML = html;
   [...$('list').children].forEach(d=>{
