@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>12306 最便宜路线 · 多段换乘穷举</title>
+<style>
+:root{
+  --bg:#f5f6f8; --card:#fff; --ink:#111827; --sub:#6b7280; --line:#e5e7eb;
+  --green:#16a34a; --green-soft:#dcfce7; --green-line:#86c086;
+  --blue:#2563eb; --amber:#d97706; --red:#dc2626; --soft:#f8f9fb;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  font-size:14px;line-height:1.6}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px 60px}
+a{color:var(--blue);text-decoration:none}
+
+/* header */
+header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50}
+.hd{max-width:1000px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.logo{font-size:17px;font-weight:700;letter-spacing:-.2px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--sub);display:inline-block;margin-right:6px}
+.dot.on{background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.dot.off{background:#d1d5db}
+.status{font-size:12.5px;color:var(--sub);margin-left:auto}
+.status b{color:var(--ink);font-weight:600}
+
+/* search */
+.hero{background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:18px;margin:18px 0 14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+.field{flex:1;min-width:150px;position:relative}
+.field label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px;font-weight:600}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:10px;
+  padding:9px 12px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.swap{width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;
+  cursor:pointer;font-size:15px;color:var(--sub);flex:none;margin-bottom:1px}
+.swap:hover{border-color:var(--green);color:var(--green)}
+.btn{border:none;border-radius:10px;background:var(--green);color:#fff;font-weight:600;
+  font-size:14.5px;padding:10px 22px;cursor:pointer;font-family:inherit;height:38px}
+.btn:hover{filter:brightness(.94)}
+.btn:disabled{background:#9ca3af;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.opt{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px;
+  padding-top:12px;border-top:1px dashed var(--line);font-size:13px;color:var(--sub)}
+.opt label{display:flex;align-items:center;gap:5px;cursor:pointer}
+.opt select{border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-family:inherit;font-size:13px;background:#fff}
+.hint{font-size:12.5px;color:var(--sub);margin-top:8px}
+
+/* suggest */
+.sug{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid var(--line);
+  border-radius:10px;margin-top:4px;max-height:230px;overflow:auto;z-index:60;
+  box-shadow:0 8px 24px rgba(16,24,40,.12);display:none}
+.sug.on{display:block}
+.sug div{padding:7px 12px;cursor:pointer;font-size:13.5px;display:flex;justify-content:space-between;gap:8px}
+.sug div:hover,.sug div.sel{background:var(--soft)}
+.sug span{color:var(--sub);font-size:12px}
+
+/* progress */
+.prog{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:14px;display:none}
+.prog.on{display:block}
+.bar{height:7px;background:#eef0f3;border-radius:4px;overflow:hidden;margin:8px 0 6px}
+.bar>i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
+.bar.indet>i{width:35%!important;animation:sl 1.1s infinite}
+@keyframes sl{0%{margin-left:-35%}100%{margin-left:100%}}
+.prog .msg{font-size:13px;color:var(--sub)}
+
+/* kpi */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.kpi .k{font-size:12px;color:var(--sub)}
+.kpi .v{font-size:21px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}
+.kpi.green .v{color:var(--green)}
+.kpi .u{font-size:12px;color:var(--sub);font-weight:400}
+
+/* cards */
+.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.card h2{margin:0 0 4px;font-size:16.5px}
+.card .meta{font-size:12.5px;color:var(--sub);margin-bottom:10px}
+.best{border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+.badge{display:inline-block;background:var(--green);color:#fff;font-size:11.5px;
+  border-radius:6px;padding:2px 8px;font-weight:600;vertical-align:2px;margin-left:8px}
+.badge.gray{background:#9ca3af}
+.badge.amber{background:var(--amber)}
+.price{font-size:22px;font-weight:700;color:var(--green);font-variant-numeric:tabular-nums}
+.muted{color:var(--sub)}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.tag{border:1px solid var(--line);border-radius:20px;padding:2px 10px;font-size:12px;color:var(--sub);background:#fff}
+.tag.ok{border-color:var(--green-line);background:var(--green-soft);color:#15803d}
+.tag.no{border-color:#fecaca;background:#fee2e2;color:#b91c1c}
+.tag.amber{border-color:#fcd34d;background:#fef3c7;color:#92400e}
+
+/* table */
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th{background:var(--soft);text-align:left;padding:7px 9px;font-size:12px;color:var(--sub);
+  font-weight:600;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 9px;border-bottom:1px solid #f1f2f4}
+tr.sec td{background:#fafbfc;font-weight:600;font-size:12.5px;color:var(--sub)}
+tr.ok td{background:var(--green-soft)}
+td.n{font-variant-numeric:tabular-nums;white-space:nowrap}
+td.r{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+
+/* routes */
+.route{border:1px solid var(--line);border-radius:12px;background:#fff;margin-bottom:9px;overflow:hidden}
+.route.best{border-color:var(--green)}
+.rh{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;flex-wrap:wrap}
+.rh:hover{background:var(--soft)}
+.rk{width:22px;height:22px;border-radius:50%;background:#eef0f3;color:var(--sub);
+  font-size:11.5px;display:flex;align-items:center;justify-content:center;flex:none}
+.route.best .rk{background:var(--green);color:#fff}
+.rp{font-weight:600;flex:1;min-width:180px}
+.rp small{color:var(--sub);font-weight:400;font-size:12px;margin-left:6px}
+.rb{display:none;border-top:1px solid var(--line);padding:6px 14px 12px}
+.rb.on{display:block}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:4px 12px;
+  font-size:12.5px;cursor:pointer;color:var(--sub)}
+.chip.on{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+.filters select,.filters input{border:1px solid var(--line);border-radius:8px;padding:5px 9px;
+  font-family:inherit;font-size:12.5px;background:#fff}
+.empty{color:var(--sub);font-size:13.5px;padding:18px 0;text-align:center}
+.foot{color:var(--sub);font-size:12px;text-align:center;margin-top:22px;line-height:1.8}
+.legend{font-size:12.5px;color:var(--sub);margin-top:8px}
+.sw{display:inline-block;width:12px;height:12px;background:var(--green-soft);
+  border:1px solid var(--green-line);vertical-align:-1px;margin-right:5px}
+@media(max-width:640px){
+  .row{gap:8px}.field{min-width:120px}.kpi .v{font-size:18px}
+}
+</style>
+</head>
+<body>
+<header><div class="hd">
+  <div class="logo">🚂 12306 最便宜路线</div>
+  <div class="status" id="st"><span class="dot off" id="dot"></span><span id="stxt">检测本地服务…</span></div>
+</div></header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="row">
+      <div class="field"><label>出发</label>
+        <input id="from" autocomplete="off" placeholder="如 新乡">
+        <div class="sug" id="sug-from"></div></div>
+      <button class="swap" id="swap" title="交换起终点">⇄</button>
+      <div class="field"><label>到达</label>
+        <input id="to" autocomplete="off" placeholder="如 昆明">
+        <div class="sug" id="sug-to"></div></div>
+      <div class="field" style="max-width:150px"><label>出发日期</label>
+        <input id="date" type="date"></div>
+      <button class="btn" id="go">查询</button>
+    </div>
+    <div class="opt">
+      <label>车型
+        <select id="types">
+          <option value="ZTK">普速 Z/T/K（最便宜）</option>
+          <option value="GDC">高铁动车 G/D/C</option>
+          <option value="">不限车型</option>
+        </select>
+      </label>
+      <label>最多换乘
+        <select id="hops">
+          <option value="1">1 次</option>
+          <option value="2">2 次</option>
+          <option value="3" selected>3 次</option>
+          <option value="4">4 次（较慢）</option>
+        </select>
+      </label>
+      <span class="hint" style="margin:0" id="eta"></span>
+    </div>
+    <div class="hint" id="hint"></div>
+  </div>
+
+  <div class="prog" id="prog">
+    <div id="pmsg" class="msg">准备中…</div>
+    <div class="bar indet" id="pbar"><i></i></div>
+    <div class="msg" id="psub">穷举多段换乘需要逐段查询 12306，请稍候</div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="foot">
+    票价取该段有票席别中的最低价；12306 返回 0 元的区间已剔除。<br>
+    余票与票价实时变动，购票请以 12306 官方为准。
+  </div>
+</div>
+
+<script>
+const BUNDLE = __DATA__;
+const STATIONS = __STATIONS__;
+// 页面由本地服务托管时走同源；部署在 Pages 上时回落到 127.0.0.1:8787
+const API = (location.port === '8787') ? location.origin : "__API__";
+let LIVE = false, ES = null;
+let RESULT = null;      // {meta, direct, routes, best}
+let FILTER = {trans:'', sort:'price', feasible:false, q:''};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const money = v => v==null ? '—' : '¥' + (Math.round(v*100)/100);
+function dur(min){
+  if(min==null) return '—';
+  const h = Math.floor(min/60), m = min%60;
+  return h>0 ? (h+'小时'+(m?m+'分':'')) : (m+'分');
+}
+function today(days){
+  const d = new Date(Date.now() + days*86400000);
+  return d.toISOString().slice(0,10);
+}
+
+/* ---------- 车站补全 ---------- */
+function suggest(inp, box){
+  const kw = inp.value.trim().toLowerCase();
+  if(!kw){ box.classList.remove('on'); return; }
+  const hit = [];
+  for(const s of STATIONS){
+    if(hit.length>=12) break;
+    if(s.n.indexOf(kw)>=0 || s.i.indexOf(kw)===0 || s.p.indexOf(kw)===0) hit.push(s);
+  }
+  if(!hit.length){ box.classList.remove('on'); return; }
+  box.innerHTML = hit.map(s=>`<div data-n="${esc(s.n)}">${esc(s.n)}<span>${esc(s.p)}</span></div>`).join('');
+  box.classList.add('on');
+  [...box.children].forEach(d=>d.onclick=()=>{ inp.value=d.dataset.n; box.classList.remove('on'); });
+}
+['from','to'].forEach(id=>{
+  const inp=$(id), box=$('sug-'+id);
+  inp.addEventListener('input',()=>suggest(inp,box));
+  inp.addEventListener('blur',()=>setTimeout(()=>box.classList.remove('on'),150));
+});
+$('swap').onclick = ()=>{ const a=$('from').value; $('from').value=$('to').value; $('to').value=a; };
+
+/* ---------- 状态检测 ---------- */
+async function detect(){
+  try{
+    const r = await fetch(API+'/api/health', {cache:'no-store'});
+    LIVE = r.ok;
+  }catch(e){ LIVE = false; }
+  const dot=$('dot'), txt=$('stxt');
+  if(LIVE){ dot.className='dot on'; txt.innerHTML='<b>实时查询服务已连接</b> · 可查任意起终点'; }
+  else{ dot.className='dot off'; txt.innerHTML='<b>离线</b> · 只能看内置数据'; }
+  const m = BUNDLE && BUNDLE.meta;
+  $('hint').innerHTML = LIVE
+    ? '实时模式：逐段查询 12306 官方余票，自动穷举中转组合。'
+    : (m ? `离线模式：内置数据只有 <b>${esc(m.from)} → ${esc(m.to)}（${esc(m.date)}）</b>。想查任意线路，在本项目目录双击 <b>start.bat</b> 启动本地服务后刷新本页。`
+         : '离线模式：暂无内置数据，请启动本地服务。');
+  if(!$('from').value && m){ $('from').value=m.from; $('to').value=m.to; $('date').value=m.date; }
+  $('eta').textContent = LIVE ? '' : '';
+}
+
+/* ---------- 查询 ---------- */
+function setProg(on, msg, sub){
+  const p=$('prog'); p.classList.toggle('on',on);
+  if(msg!=null) $('pmsg').textContent=msg;
+  if(sub!=null) $('psub').textContent=sub;
+}
+$('go').onclick = ()=>{
+  const f=$('from').value.trim(), t=$('to').value.trim(), d=$('date').value;
+  if(!f||!t){ alert('请填写出发和到达'); return; }
+  if(!d){ alert('请选择日期'); return; }
+  location.hash = 'from='+encodeURIComponent(f)+'&to='+encodeURIComponent(t)+'&date='+d
+                + '&types='+$('types').value+'&hops='+$('hops').value;
+  run(f,t,d);
+};
+
+function run(f,t,d){
+  if(ES){ ES.close(); ES=null; }
+  RESULT = null; $('out').innerHTML='';
+  if(!LIVE){ offline(f,t,d); return; }
+  const types=$('types').value, hops=$('hops').value;
+  $('go').disabled=true;
+  setProg(true,'正在连接 12306…','首次查询需要几十秒到几分钟，取决于换乘次数');
+  const url = `${API}/api/query?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`
+            + `&date=${d}&types=${encodeURIComponent(types)}&hops=${hops}&top=40`;
+  const partial = [];
+  ES = new EventSource(url);
+  ES.addEventListener('progress', e=>{
+    const d = JSON.parse(e.data);
+    if(d.phase==='direct'){ setProg(true,'查询直达车次（作为价格基准）…',''); }
+    else if(d.phase==='bfs'){
+      $('pbar').classList.remove('indet');
+      const pct = Math.min(95, Math.round(d.scanned/Math.max(d.total,1)*100));
+      $('pbar').firstElementChild.style.width = pct+'%';
+      setProg(true, d.msg, '边查边出结果，下面列表会实时增加');
+    } else setProg(true, d.msg, '');
+  });
+  ES.addEventListener('direct', e=>{
+    const d = JSON.parse(e.data);
+    RESULT = {meta:{from:f,to:t,date:d.date||$('date').value}, direct:d, routes:partial, best:null};
+  });
+  ES.addEventListener('route', e=>{
+    const r = JSON.parse(e.data);
+    r.id = partial.length+1;
+    partial.push(r);
+    partial.sort((a,b)=>(a.total_price==null?1e9:a.total_price)-(b.total_price==null?1e9:b.total_price));
+    if(RESULT){ RESULT.routes = partial; RESULT.best = partial[0]; render(); }
+  });
+  ES.addEventListener('result', e=>{
+    RESULT = JSON.parse(e.data); render(); finish();
+  });
+  ES.addEventListener('error', e=>{
+    if(e.data){ try{ const d=JSON.parse(e.data); alert('查询出错：'+d.msg); }catch(_){} }
+    finish();
+  });
+  ES.addEventListener('end', ()=>{ finish(); });
+  ES.onerror = ()=>{ /* EventSource 关闭时也会触发 */ };
+}
+function finish(){
+  if(ES){ ES.close(); ES=null; }
+  $('go').disabled=false; setProg(false);
+}
+
+function offline(f,t,d){
+  const m = BUNDLE && BUNDLE.meta;
+  if(m && m.from===f && m.to===t && (m.date===d || !d)){
+    RESULT = BUNDLE; render();
+  }else{
+    $('out').innerHTML = `<div class="card"><h2>该线路没有内置数据</h2>
+      <div class="meta">离线状态下只能查看已生成的线路。</div>
+      <p style="margin:6px 0 0">内置线路：<b>${m?esc(m.from)+' → '+esc(m.to)+'（'+esc(m.date)+'）':'无'}</b></p>
+      <p style="margin:6px 0 0">要查询 <b>${esc(f)} → ${esc(t)}</b>，请在本项目目录双击 <b>start.bat</b>
+      启动本地服务，再刷新本页（页面会自动切换到实时模式）。</p></div>`;
+  }
+}
+
+/* ---------- 渲染 ---------- */
+function render(){
+  if(!RESULT) return;
+  const {meta, direct, routes} = RESULT;
+  const best = routes && routes.length ? routes[0] : null;
+  const dm = direct && direct.min_price;
+  const bp = best ? (best.plan_price || best.total_price) : null;
+  let html = '';
+
+  const kpis = [
+    ['最便宜', bp, 'green', best? (best.transfers+' 次换乘') : ''],
+    ['直达最低', dm, '', direct&&direct.trains? (direct.trains.length+' 趟直达') : ''],
+    ['最多可省', (dm!=null&&bp!=null)? (dm-bp) : null, 'green',
+      (dm!=null&&bp!=null)? ('省 '+Math.round((dm-bp)/dm*100)+'%') : ''],
+    ['可行路线', routes? routes.length : null, '', meta&&meta.total_routes? ('共 '+meta.total_routes+' 条') : '']
+  ];
+  html += '<div class="kpis">' + kpis.map(([k,v,c,u])=>
+    `<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${k==='可行路线'? (v==null?'—':v) : money(v)}</div><div class="u">${esc(u||'')}</div></div>`
+  ).join('') + '</div>';
+
+  if(best) html += bestCard(best, dm);
+  if(direct && direct.trains && direct.trains.length) html += directCard(direct, meta);
+  if(routes && routes.length) html += listCard(routes);
+
+  $('out').innerHTML = html;
+  bind();
+}
+
+function bestCard(b, dm){
+  const path = (b.path||[]).join(' → ');
+  const price = b.plan_price || b.total_price;
+  const chosen = b.chosen && b.chosen.length ? b.chosen : null;
+  let rows = '';
+  if(chosen){
+    chosen.forEach((c,i)=>{
+      rows += `<tr class="sec"><td colspan="6">第 ${i+1} 段 · ${esc(c.leg_from||'')} → ${esc(c.leg_to||'')}</td></tr>`;
+      const ok = c.available ? 'ok' : '';
+      rows += `<tr class="${ok}"><td class="n">${esc(c.code)}</td>
+        <td class="n">${esc(c.depart)} → ${esc(c.arrive)}</td>
+        <td class="n">${esc(c.duration||'')}</td><td>${esc(c.seat||'')}</td>
+        <td class="r">${money(c.price)}</td>
+        <td>${c.available?'有票':'无票'}</td></tr>`;
+      if(i<chosen.length-1){
+        const w = (chosen[i+1]._dep - c._arr);
+        rows += `<tr><td colspan="6" style="color:var(--sub);font-size:12px;padding:4px 9px">
+          换乘等待 ${dur(w)}</td></tr>`;
+      }
+    });
+  }else{
+    (b.legs||[]).forEach((l,i)=>{
+      rows += `<tr class="sec"><td colspan="6">第 ${i+1} 段 · ${esc(l.from)} → ${esc(l.to)}</td></tr>`;
+      (l.trains||[]).slice(0,4).forEach(t=>{
+        rows += `<tr class="${t.available?'ok':''}"><td class="n">${esc(t.code)}</td>
+          <td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td><td class="n">${esc(t.duration||'')}</td>
+          <td>${esc(t.seat||'')}</td><td class="r">${money(t.price)}</td>
+          <td>${t.available?'有票':'无票'}</td></tr>`;
+      });
+    });
+  }
+  const tags = [];
+  tags.push(`<span class="tag">换乘 ${b.transfers} 次</span>`);
+  if(b.plan_available) tags.push('<span class="tag ok">全程有票</span>');
+  else if(b.time_feasible) tags.push('<span class="tag amber">部分无票</span>');
+  if(b.time_feasible===false) tags.push('<span class="tag no">时间衔接不上</span>');
+  if(b.ride_minutes) tags.push(`<span class="tag">在途 ${dur(b.ride_minutes)}</span>`);
+  if(b.span_minutes) tags.push(`<span class="tag">全程 ${dur(b.span_minutes)}（含等待）</span>`);
+
+  const save = (dm!=null && price!=null) ?
+    `<div class="meta">相比直达最低价 ${money(dm)}，可省 <b style="color:var(--green)">${money(dm-price)}</b>
+      （${Math.round((dm-price)/dm*100)}%）。</div>` : '';
+  const mt = RESULT.meta || {};
+  const trunc = mt.throttled
+    ? '<div class="meta" style="color:var(--amber)">⚠ 12306 中途开始限流，搜索提前收尾，结果可能不完整，建议稍后再查一次。</div>'
+    : (mt.truncated ? '<div class="meta" style="color:var(--amber)">⚠ 探索已到时间上限，可能还有更便宜的组合未搜到。</div>' : '');
+  return `<div class="card best"><h2>🏅 ${esc(path)}<span class="badge">最便宜</span></h2>
+    <div class="meta">${esc((RESULT.meta.date)||'')} 出发 · 总价 <span class="price">${money(price)}</span></div>
+    ${save}${trunc}<div class="tags">${tags.join('')}</div>
+    <table><tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>${rows}</table>
+    ${chosen?'':'<div class="legend">未做车次衔接编排时，列出的是各段候选车次。</div>'}
+  </div>`;
+}
+
+function directCard(d, meta){
+  const rows = d.trains.map(t=>`<tr class="${t.available?'ok':''}">
+    <td class="n">${esc(t.code)}</td><td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td>
+    <td class="n">${esc(t.duration||'')}</td><td>${esc(t.seat||'')}</td>
+    <td class="r">${money(t.price)}</td><td>${t.available?'有票':'无票'}</td></tr>`).join('');
+  return `<div class="card"><h2>🚄 直达车次<span class="badge gray">价格基准</span></h2>
+    <div class="meta">${esc(meta.from)} → ${esc(meta.to)} · 最低 ${money(d.min_price)}</div>
+    <div class="legend"><span class="sw"></span>绿色 = 有票</div>
+    <table><tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>${rows}</table>
+  </div>`;
+}
+
+function listCard(routes){
+  const trans = [...new Set(routes.map(r=>r.transfers))].sort();
+  const chips = ['<div class="chip'+(FILTER.trans===''?' on':'')+'" data-t="">不限</div>']
+    .concat(trans.map(t=>`<div class="chip${FILTER.trans==String(t)?' on':''}" data-t="${t}">换乘${t}次</div>`));
+  return `<div class="card"><h2>🗺 全部 ${routes.length} 条路线</h2>
+    <div class="meta">点击任一条展开查看车次；默认按可衔接 + 总价排序</div>
+    <div class="filters">
+      ${chips.join('')}
+      <select id="f-sort">
+        <option value="price"${FILTER.sort==='price'?' selected':''}>按票价</option>
+        <option value="trans"${FILTER.sort==='trans'?' selected':''}>按换乘次数</option>
+        <option value="ride"${FILTER.sort==='ride'?' selected':''}>按在途时长</option>
+      </select>
+      <input id="f-q" placeholder="搜中转城市" value="${esc(FILTER.q)}" style="width:120px">
+      <label class="chip${FILTER.feasible?' on':''}" id="f-feas" style="cursor:pointer">只看可衔接</label>
+    </div>
+    <div id="rlist">${routes.map(routeCard).join('')}</div>
+  </div>`;
+}
+
+function routeCard(r){
+  const price = r.plan_price || r.total_price;
+  const tags = [`<span class="tag">换乘 ${r.transfers} 次</span>`];
+  if(r.plan_available) tags.push('<span class="tag ok">有票</span>');
+  else if(r.all_available) tags.push('<span class="tag amber">部分无票</span>');
+  if(r.time_feasible===false) tags.push('<span class="tag no">衔接不上</span>');
+  if(r.ride_minutes) tags.push(`<span class="tag">在途 ${dur(r.ride_minutes)}</span>`);
+  let body = '';
+  if(r.chosen && r.chosen.length){
+    body = '<table><tr><th>车次</th><th>区间</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>';
+    r.chosen.forEach(c=>{
+      body += `<tr class="${c.available?'ok':''}"><td class="n">${esc(c.code)}</td>
+        <td>${esc(c.leg_from||'')} → ${esc(c.leg_to||'')}</td>
+        <td class="n">${esc(c.depart)} → ${esc(c.arrive)}</td><td class="n">${esc(c.duration||'')}</td>
+        <td>${esc(c.seat||'')}</td><td class="r">${money(c.price)}</td>
+        <td>${c.available?'有票':'无票'}</td></tr>`;
+    });
+    body += '</table>';
+  }else{
+    (r.legs||[]).forEach((l,i)=>{
+      body += `<table><tr class="sec"><td colspan="6">第 ${i+1} 段 · ${esc(l.from)} → ${esc(l.to)}</td></tr>
+        <tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>`;
+      (l.trains||[]).slice(0,5).forEach(t=>{
+        body += `<tr class="${t.available?'ok':''}"><td class="n">${esc(t.code)}</td>
+          <td class="n">${esc(t.depart)} → ${esc(t.arrive)}</td><td class="n">${esc(t.duration||'')}</td>
+          <td>${esc(t.seat||'')}</td><td class="r">${money(t.price)}</td>
+          <td>${t.available?'有票':'无票'}</td></tr>`;
+      });
+      body += '</table>';
+    });
+  }
+  return `<div class="route${r.id===1?' best':''}" id="rt-${r.id}">
+    <div class="rh" onclick="tog(${r.id})">
+      <span class="rk">${r.id}</span>
+      <span class="rp">${esc((r.path||[]).join(' → '))}<small>${esc((r.via||[]).join('、'))}</small></span>
+      ${tags.join('')}
+      <span class="price">${money(price)}</span>
+    </div>
+    <div class="rb" id="rb-${r.id}">${body}</div>
+  </div>`;
+}
+function tog(id){ const b=$('rb-'+id); if(b) b.classList.toggle('on'); }
+
+function bind(){
+  document.querySelectorAll('.chip[data-t]').forEach(c=>{
+    c.onclick = ()=>{ FILTER.trans = c.dataset.t; applyFilter(); };
+  });
+  const s=$('f-sort'); if(s) s.onchange = ()=>{ FILTER.sort=s.value; applyFilter(); };
+  const q=$('f-q'); if(q) q.oninput = ()=>{ FILTER.q=q.value.trim(); applyFilter(); };
+  const f=$('f-feas'); if(f) f.onclick = ()=>{ FILTER.feasible=!FILTER.feasible; applyFilter(); };
+}
+function applyFilter(){
+  if(!RESULT || !RESULT.routes) return;
+  let list = RESULT.routes.slice();
+  if(FILTER.trans!=='') list = list.filter(r=>String(r.transfers)===FILTER.trans);
+  if(FILTER.feasible) list = list.filter(r=>r.time_feasible!==false);
+  if(FILTER.q) list = list.filter(r=>(r.path||[]).join('').indexOf(FILTER.q)>=0);
+  const key = {
+    price: r=>[r.plan_price==null? (r.total_price==null?1e9:r.total_price) : r.plan_price, r.transfers],
+    trans: r=>[r.transfers, r.plan_price||r.total_price||1e9],
+    ride:  r=>[r.ride_minutes==null?1e9:r.ride_minutes, r.plan_price||r.total_price||1e9]
+  }[FILTER.sort];
+  list.sort((a,b)=>{ const ka=key(a), kb=key(b);
+    for(let i=0;i<ka.length;i++) if(ka[i]!==kb[i]) return ka[i]-kb[i];
+    return a.id-b.id; });
+  const el=$('rlist'); if(el) el.innerHTML = list.length? list.map(routeCard).join('') : '<div class="empty">没有符合条件的路线</div>';
+}
+
+/* ---------- 启动 ---------- */
+function boot(){
+  if(!$('date').value) $('date').value = today(3);
+  const h = location.hash.slice(1);
+  if(h){
+    const p = {}; h.split('&').forEach(kv=>{ const [k,v]=kv.split('='); p[k]=decodeURIComponent(v||''); });
+    if(p.from) $('from').value=p.from;
+    if(p.to) $('to').value=p.to;
+    if(p.date) $('date').value=p.date;
+    if(p.types!=null) $('types').value=p.types;
+    if(p.hops) $('hops').value=p.hops;
+  }
+  detect().then(()=>{
+    const m = BUNDLE && BUNDLE.meta;
+    if(location.hash.slice(1)) $('go').click();
+    else if(!LIVE && m){ RESULT=BUNDLE; render(); }
+  });
+}
+boot();
+</script>
+</body>
+</html>
