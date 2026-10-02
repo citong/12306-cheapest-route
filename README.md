@@ -8,10 +8,15 @@
 
 ## 页面能力
 
-- 最优方案卡片：完整车次、时刻、席别、票价
-- Top 10 票价横向对比条
-- 全部可行路线列表，支持按**换乘次数 / 中转城市 / 排序方式 / 是否全程有票**筛选，点击展开看每一段的候选车次
-- 直达车次（含高铁）作为价格基准对照
+`index.html` 是**单文件静态页**：数据内嵌、零依赖、无构建，双击即可打开。
+
+五个标签页（📊 总览 / 💰 最便宜方案 / 🗺 全部路线 / 🚄 直达对比 / ℹ️ 说明）：
+
+- **总览**：省钱概览（最便宜 / 直达最低 / 可省金额与百分比）+ 最便宜的 12 条路线卡片网格，点卡片直接跳到该路线详情
+- **最便宜方案**：逐段车次、时刻、历时、席别、票价、余票
+- **全部路线**：27 条路线，可按**换乘次数 / 中转城市关键词 / 排序方式（票价·换乘·在途）/ 只看各段有票**筛选，点击展开每段候选车次
+- **直达对比**：直达高铁车次表 + 费用差额结论
+- **说明**：数据来源、票价口径、更新方式
 
 ## 它怎么工作
 
@@ -23,7 +28,9 @@
 因此采用「离线生成数据 + 静态页读取」的方式：
 
 ```
-12306 ──> 12306-mcp（本地服务）──> scripts/train_query.py ──> scripts/export_data.py ──> data.json ──> index.html
+12306 ──> 12306-mcp（本地服务）──> scripts/train_query.py
+        ──> scripts/export_data.py ──> data.json
+        ──> scripts/render_site.py ──> index.html（数据内嵌的单文件页面）
 ```
 
 ## 本地运行
@@ -63,16 +70,22 @@ python scripts/export_data.py 2026-10-05            # 指定日期
 python scripts/export_data.py --from 新乡 --to 昆明   # 自定义起终点
 ```
 
-默认查询 3 天后、新乡 → 昆明。生成 `data.json`。
+默认查询 3 天后、新乡 → 昆明。生成 `data.json` 并自动渲染 `index.html`。
+
+只改页面样式、不重新查数据时，可单独重渲染：
+
+```bash
+python scripts/render_site.py
+```
 
 ### 4. 本地预览
+
+数据已内嵌进 `index.html`，**直接双击打开即可**；也可以起服务：
 
 ```bash
 python -m http.server 8000
 # 打开 http://127.0.0.1:8000
 ```
-
-> 直接双击 `index.html` 会因为浏览器的 `file://` 跨域策略读不到 `data.json`，必须走 HTTP。
 
 ## 更新线上数据
 
@@ -82,7 +95,7 @@ python -m http.server 8000
 
 ```bash
 python scripts/export_data.py 2026-10-07
-git add data.json && git commit -m "data: 2026-10-07" && git push
+git add data.json index.html && git commit -m "data: 2026-10-07" && git push
 ```
 
 **2. 用 GitHub Actions 自动生成**
@@ -106,10 +119,11 @@ gh workflow run refresh-data.yml -f date=2026-10-07
 ## 目录结构
 
 ```
-index.html                        # 静态页面（无构建、无外部依赖）
+index.html                        # 单文件静态页面（数据内嵌、零依赖、无构建）
 data.json                         # 生成的数据
 scripts/train_query.py            # 12306 查询脚本（本仓库内置副本）
-scripts/export_data.py            # 生成 data.json
+scripts/export_data.py            # 查数据 → data.json → 调 render_site
+scripts/render_site.py            # data.json → index.html
 workflows/refresh-data.yml.example# Actions 工作流模板（需手动启用）
 ```
 

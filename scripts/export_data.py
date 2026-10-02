@@ -202,6 +202,16 @@ def main():
         },
     }
 
+    if (direct.get("trains") is None) or data["direct"]["min_price"] is None:
+        print("   提示：直达基准缺失，保留 data.json 中已有的直达数据", flush=True)
+        try:
+            with open(os.path.join(ROOT, "data.json"), encoding="utf-8") as f:
+                prev = json.load(f)
+        except Exception:
+            prev = {}
+        if prev.get("direct", {}).get("min_price") is not None:
+            data["direct"] = prev["direct"]
+
     out = os.path.join(ROOT, "data.json")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
@@ -209,6 +219,10 @@ def main():
     print(f"  路线 {len(routes)} 条；最便宜 "
           f"{best['total_price'] if best else '?'} 元；"
           f"直达最低 {data['direct']['min_price']} 元")
+
+    sys.path.insert(0, os.path.join(ROOT, "scripts"))
+    import render_site
+    render_site.main()
 
 
 if __name__ == "__main__":

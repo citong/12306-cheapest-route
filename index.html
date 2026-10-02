@@ -1,262 +1,248 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>新乡 → 昆明 · 最便宜火车路线</title>
-<meta name="description" content="基于 12306 实时余票，穷举多段换乘方案，找出新乡到昆明最便宜的火车路线。">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>12306 最便宜路线 · 新乡 → 昆明</title>
 <style>
-  :root{
-    --bg:#f5f6f8; --card:#fff; --line:#e4e7ec; --ink:#1c2024; --muted:#6b7280;
-    --red:#c0392b; --red-soft:#fdecea; --green:#0f7b3f; --green-soft:#e9f7ef;
-    --blue:#2563eb; --chip:#eef2f7; --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);
-    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
-  .wrap{max-width:980px;margin:0 auto;padding:32px 18px 64px}
-  header h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
-  .sub{color:var(--muted);font-size:14px}
-  .sub b{color:var(--ink);font-weight:600}
-
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0 8px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
-  .stat .k{font-size:12.5px;color:var(--muted);margin-bottom:6px}
-  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
-  .stat .u{font-size:13px;color:var(--muted);font-weight:400;margin-left:2px}
-  .stat.hl{background:var(--red-soft);border-color:#f3c9c4}
-  .stat.hl .v{color:var(--red)}
-  .stat.ok .v{color:var(--green)}
-
-  h2{font-size:17px;margin:34px 0 14px;padding-left:10px;border-left:4px solid var(--red)}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
-
-  .best{padding:18px 20px}
-  .best-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:16px;font-weight:600;margin-bottom:4px}
-  .chip{background:var(--chip);border-radius:8px;padding:3px 10px;font-size:14px}
-  .arrow{color:var(--muted);font-weight:400}
-  .best-meta{color:var(--muted);font-size:13.5px;margin-bottom:14px}
-  .leg{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px dashed var(--line)}
-  .leg:first-of-type{border-top:none}
-  .code{min-width:70px;text-align:center;font-weight:700;background:var(--chip);border-radius:8px;padding:8px 6px;font-size:15px}
-  .leg-r{font-weight:600}
-  .leg-t{color:var(--muted);font-size:13px}
-  .leg-p{color:var(--red);font-weight:600;font-size:13px}
-  .tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:6px;background:var(--green-soft);color:var(--green);margin-left:6px}
-  .tag.no{background:#f1f2f4;color:var(--muted)}
-
-  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 16px;margin-bottom:14px}
-  .controls label{font-size:13px;color:var(--muted);margin-right:4px}
-  select,input[type=search]{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);
-    border-radius:8px;background:#fff;color:var(--ink)}
-  .switch{display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer;user-select:none}
-  .count{margin-left:auto;font-size:13px;color:var(--muted)}
-
-  .route{padding:14px 18px;border-top:1px solid var(--line);cursor:pointer}
-  .route:hover{background:#fafbfc}
-  .route-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-  .rk{width:24px;color:var(--muted);font-size:13px}
-  .rpath{font-weight:600;flex:1;min-width:220px}
-  .rtrans{font-size:12.5px;color:var(--muted)}
-  .rprice{font-weight:700;color:var(--red);font-size:18px;min-width:80px;text-align:right}
-  .rdetail{display:none;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
-  .route.open .rdetail{display:block}
-  .mini{font-size:13px;color:var(--muted);margin-top:2px}
-
-  table{width:100%;border-collapse:collapse;font-size:14px}
-  th{background:#f0f2f5;text-align:left;padding:10px 12px;font-size:12.5px;font-weight:600}
-  td{padding:10px 12px;border-top:1px solid var(--line)}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
-
-  .bars{padding:18px 20px}
-  .bar{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px}
-  .bar .lbl{width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
-  .bar .track{flex:1;height:18px;background:#f0f2f5;border-radius:6px;overflow:hidden}
-  .bar .fill{height:100%;background:linear-gradient(90deg,#e57368,var(--red));border-radius:6px}
-  .bar .val{width:64px;text-align:right;font-weight:600;color:var(--red)}
-
-  footer{margin-top:36px;font-size:12.5px;color:var(--muted);line-height:1.8}
-  footer a{color:var(--blue)}
-  .warn{background:#fff8e6;border:1px solid #f0d9a8;border-radius:12px;padding:12px 16px;
-    font-size:13px;color:#7a5b13;margin-top:18px}
-  .empty{padding:28px;text-align:center;color:var(--muted)}
-  @media(max-width:720px){
-    .stats{grid-template-columns:repeat(2,1fr)}
-    .bar .lbl{width:110px}
-  }
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f4f5f7;margin:0;padding:20px 16px 40px;color:#1f2329}
+.wrap{max-width:980px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:#57606a;font-size:14px;margin-bottom:12px}
+.nav{position:sticky;top:0;background:#f4f5f7;padding:10px 0;z-index:10;display:flex;gap:8px;flex-wrap:wrap}
+.tab-btn{border:1px solid #d0d3d8;background:#fff;color:#1f2329;padding:7px 16px;border-radius:18px;font-size:14px;cursor:pointer;font-family:inherit}
+.tab-btn:hover{border-color:#2ea44f}
+.tab-btn.active{background:#2ea44f;border-color:#2ea44f;color:#fff;font-weight:bold}
+.card{background:#fff;border-radius:10px;padding:20px 24px;margin:14px 0;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+h2{margin:0 0 6px;font-size:19px}
+.meta{color:#57606a;font-size:13px;margin-bottom:10px}
+.stats{display:flex;gap:22px;flex-wrap:wrap;font-size:13.5px;margin-bottom:8px}
+.bar{height:8px;background:#e5e6eb;border-radius:4px;overflow:hidden;margin-bottom:14px}
+.bar>div{height:100%;background:#2ea44f}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:#eef0f3;text-align:left;padding:8px 10px;border-bottom:2px solid #d0d3d8;font-size:13px;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #eceef1}
+tr.done td{background:#c6efce}
+tr.done td.avail{color:#006100;font-weight:bold}
+tr.sec td{background:#f8f9fa;font-weight:bold;color:#57606a;border-bottom:1px solid #d0d3d8;font-size:12.5px}
+td.num{color:#8b949e;width:38px;white-space:nowrap;font-size:12.5px}
+td.dur{white-space:nowrap;width:78px;text-align:right;color:#57606a;font-variant-numeric:tabular-nums}
+td.money{white-space:nowrap;width:82px;text-align:right;font-variant-numeric:tabular-nums}
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;margin-top:6px}
+.ov-card{background:#fff;border:1px solid #e5e6eb;border-radius:10px;padding:14px 16px;cursor:pointer;transition:box-shadow .15s}
+.ov-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.12);border-color:#2ea44f}
+.ov-card.best{border-color:#2ea44f;box-shadow:0 0 0 2px rgba(46,164,79,.18)}
+.ov-head{display:flex;justify-content:space-between;font-size:15px;margin-bottom:2px;gap:8px}
+.ov-pct{color:#2ea44f;font-weight:bold;white-space:nowrap}
+.ov-meta{color:#57606a;font-size:12.5px;margin-bottom:8px}
+.ov-card .bar{margin-bottom:6px}
+.ov-stats{color:#8b949e;font-size:12.5px}
+.legend{font-size:13px;color:#57606a;margin:6px 0 4px}
+.sw{display:inline-block;width:14px;height:14px;background:#c6efce;border:1px solid #86c086;vertical-align:-2px;margin-right:5px}
+a{color:#0969da;text-decoration:none}
+.foot{color:#8b949e;font-size:12.5px;margin:22px 0 8px}
+.green{color:#2ea44f}
+.big{font-size:20px;font-weight:bold}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 4px;font-size:13.5px}
+.filters input[type=text],.filters select{border:1px solid #d0d3d8;border-radius:8px;padding:6px 10px;font-size:13.5px;font-family:inherit;background:#fff;color:#1f2329}
+.filters input[type=text]{min-width:170px}
+.filters label{color:#57606a;cursor:pointer}
+.route{border:1px solid #e5e6eb;border-radius:10px;margin-bottom:10px;overflow:hidden;background:#fff}
+.route.best{border-color:#2ea44f}
+.route-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;flex-wrap:wrap}
+.route-head:hover{background:#f8f9fa}
+.rank{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#eef0f3;color:#57606a;font-size:12px;flex:none}
+.route.best .rank{background:#2ea44f;color:#fff}
+.rpath{font-weight:bold;font-size:14.5px;flex:1;min-width:190px}
+.tag{border:1px solid #d0d3d8;border-radius:12px;padding:2px 9px;font-size:12px;color:#57606a;white-space:nowrap}
+.tag.ok{border-color:#86c086;background:#c6efce;color:#006100}
+.tag.no{border-color:#e0b4b4;background:#ffc7ce;color:#9c0006}
+.rprice{font-size:16px;font-weight:bold;color:#2ea44f;font-variant-numeric:tabular-nums;white-space:nowrap}
+.route-body{display:none;border-top:1px solid #eceef1;padding:4px 14px 12px}
+.route-body.open{display:block}
+.empty{color:#8b949e;font-size:13.5px;padding:14px 0}
+.note{font-size:13.5px;line-height:1.75;color:#1f2329}
+.note li{margin:4px 0}
+code{background:#eef0f3;border-radius:4px;padding:1px 5px;font-size:12.5px}
 </style>
 </head>
-<body>
-<div class="wrap">
-  <header>
-    <h1 id="title">最便宜火车路线</h1>
-    <div class="sub" id="subtitle">加载中…</div>
-  </header>
-
-  <div class="stats" id="stats"></div>
-
-  <div id="app" hidden>
-    <h2>最优方案</h2>
-    <div class="card best" id="best"></div>
-
-    <h2>票价对比（Top 10）</h2>
-    <div class="card bars" id="bars"></div>
-
-    <h2>全部可行路线</h2>
-    <div class="card controls">
-      <label for="fHops">最多换乘</label>
-      <select id="fHops">
-        <option value="99">不限</option><option value="1">1 次</option>
-        <option value="2">2 次</option><option value="3">3 次</option>
-      </select>
-      <label for="fVia">中转</label>
-      <input type="search" id="fVia" placeholder="城市，如 郑州" size="10">
-      <label for="fSort">排序</label>
-      <select id="fSort">
-        <option value="price">价格最低</option>
-        <option value="trans">换乘最少</option>
-        <option value="time">在途最短</option>
-      </select>
-      <label class="switch"><input type="checkbox" id="fAvail"> 只看全程有票</label>
-      <span class="count" id="count"></span>
-    </div>
-    <div class="card" id="list"></div>
-
-    <h2>直达车次（含高铁，作为价格基准）</h2>
-    <div class="card" style="overflow:hidden">
-      <table id="direct"></table>
-    </div>
-
-    <div class="warn" id="warn"></div>
-  </div>
-
-  <footer>
-    <div>数据来自 12306 实时余票接口，由 <code>12306-smart-query</code> 穷举多段换乘后生成。</div>
-    <div>票价均为该段最低价席别；<b>余票与票价实时变动，实际购票请以 12306 官方为准。</b></div>
-    <div id="gen"></div>
-  </footer>
+<body><div class="wrap">
+<h1>🚂 12306 最便宜路线 · 新乡 → 昆明</h1>
+<div class="sub">出行日期 2026-10-05 · 车型 ZTK 普速 · 最多换乘 4 次 · 更新于 2026-10-03 00:04:58</div>
+<div class="nav">
+<button class="tab-btn active" data-tab="tab-overview" onclick="showTab('tab-overview')">📊 总览</button>
+<button class="tab-btn" data-tab="tab-best" onclick="showTab('tab-best')">💰 最便宜方案</button>
+<button class="tab-btn" data-tab="tab-routes" onclick="showTab('tab-routes')">🗺 全部路线</button>
+<button class="tab-btn" data-tab="tab-direct" onclick="showTab('tab-direct')">🚄 直达对比</button>
+<button class="tab-btn" data-tab="tab-about" onclick="showTab('tab-about')">ℹ️ 说明</button>
 </div>
 
+<section class="tab-page" id="tab-overview">
+<div class="card"><h2>💰 省钱概览</h2><div class="meta">新乡 → 昆明 · 2026-10-05 · 共 27 条可行路线</div><div class="stats"><span>最便宜 <b class="green big">¥276</b></span><span>直达最低 <b>¥902</b></span><span>最多可省 <b class="green big">¥626</b>（69.4%）</span><span>换乘 <b>1 次</b></span><span>在途 <b>32小时20分</b></span></div><div class="bar"><div style="width:69.4%"></div></div><div class="legend">进度条 = 相对直达高铁的省钱幅度</div></div><div class="card"><h2>🏅 最便宜的 12 条路线</h2><div class="meta">点击卡片查看该路线每一段的候选车次</div><div class="ov-grid"><div class="ov-card best" onclick="openRoute(1)"><div class="ov-head"><b>新乡 → 郑州 → 昆明</b><span class="ov-pct">¥276</span></div><div class="ov-meta">换乘 1 次 · 中转：郑州</div><div class="bar"><div style="width:100.0%"></div></div><div class="ov-stats">在途 32小时20分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(2)"><div class="ov-head"><b>新乡 → 郑州 → 曲靖 → 昆明</b><span class="ov-pct">¥287</span></div><div class="ov-meta">换乘 2 次 · 中转：郑州、曲靖</div><div class="bar"><div style="width:96.6%"></div></div><div class="ov-stats">在途 32小时43分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(3)"><div class="ov-head"><b>新乡 → 怀化 → 昆明</b><span class="ov-pct">¥295</span></div><div class="ov-meta">换乘 1 次 · 中转：怀化</div><div class="bar"><div style="width:94.2%"></div></div><div class="ov-stats">在途 35小时28分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(4)"><div class="ov-head"><b>新乡 → 六盘水 → 昆明</b><span class="ov-pct">¥296</span></div><div class="ov-meta">换乘 1 次 · 中转：六盘水</div><div class="bar"><div style="width:93.9%"></div></div><div class="ov-stats">在途 5小时25分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(5)"><div class="ov-head"><b>新乡 → 贵阳 → 昆明</b><span class="ov-pct">¥303</span></div><div class="ov-meta">换乘 1 次 · 中转：贵阳</div><div class="bar"><div style="width:91.7%"></div></div><div class="ov-stats">在途 34小时25分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(6)"><div class="ov-head"><b>新乡 → 长沙 → 昆明</b><span class="ov-pct">¥313.5</span></div><div class="ov-meta">换乘 1 次 · 中转：长沙</div><div class="bar"><div style="width:88.5%"></div></div><div class="ov-stats">在途 31小时6分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(7)"><div class="ov-head"><b>新乡 → 成都 → 昆明</b><span class="ov-pct">¥317</span></div><div class="ov-meta">换乘 1 次 · 中转：成都</div><div class="bar"><div style="width:87.5%"></div></div><div class="ov-stats">在途 36小时52分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(8)"><div class="ov-head"><b>新乡 → 南宁 → 昆明</b><span class="ov-pct">¥329</span></div><div class="ov-meta">换乘 1 次 · 中转：南宁</div><div class="bar"><div style="width:83.8%"></div></div><div class="ov-stats">在途 37小时55分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(9)"><div class="ov-head"><b>新乡 → 桂林 → 昆明</b><span class="ov-pct">¥330</span></div><div class="ov-meta">换乘 1 次 · 中转：桂林</div><div class="bar"><div style="width:83.5%"></div></div><div class="ov-stats">在途 38小时36分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(10)"><div class="ov-head"><b>新乡 → 柳州 → 昆明</b><span class="ov-pct">¥336.5</span></div><div class="ov-meta">换乘 1 次 · 中转：柳州</div><div class="bar"><div style="width:81.5%"></div></div><div class="ov-stats">在途 38小时13分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(11)"><div class="ov-head"><b>新乡 → 贵阳 → 遵义 → 昆明</b><span class="ov-pct">¥336.5</span></div><div class="ov-meta">换乘 2 次 · 中转：贵阳、遵义</div><div class="bar"><div style="width:81.5%"></div></div><div class="ov-stats">在途 38小时39分 · 各段有票</div></div><div class="ov-card" onclick="openRoute(12)"><div class="ov-head"><b>新乡 → 郑州 → 南昌 → 昆明</b><span class="ov-pct">¥349.5</span></div><div class="ov-meta">换乘 2 次 · 中转：郑州、南昌</div><div class="bar"><div style="width:77.5%"></div></div><div class="ov-stats">在途 41小时15分 · 各段有票</div></div></div></div>
+</section>
+
+<section class="tab-page" id="tab-best" style="display:none">
+<div class="card"><h2>💰 新乡 → 郑州 → 昆明</h2><div class="meta">2026-10-05 出发 · 总价 <b class="green big">¥276</b></div><div class="meta">相比直达高铁最低价 ¥902，可省 <b class="green">¥626</b>，代价是在途 32小时20分、换乘 1 次。</div><div class="stats"><span>换乘 <b>1 次</b></span><span>在途 <b>32小时20分</b></span><span>各段均有票 <b>是</b></span></div><table><tr><th>车次</th><th>区间</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr><tr class="sec"><td colspan="7">第 1 段 · 新乡 → 郑州 &nbsp;<span style="font-weight:normal">¥12.5</span></td></tr><tr class="done"><td class="num">K4237</td><td>新乡 → 郑州</td><td>02:57 → 03:58</td><td class="dur">01:01</td><td>硬座</td><td class="money">¥12.5</td><td class="avail">有票</td></tr><tr class="sec"><td colspan="7">第 2 段 · 郑州 → 昆明 &nbsp;<span style="font-weight:normal">¥263.5</span></td></tr><tr class="done"><td class="num">Z325</td><td>郑州 → 昆明</td><td>03:30 → 10:49</td><td class="dur">31:19</td><td>无座</td><td class="money">¥263.5</td><td class="avail">有票</td></tr><tr class="done"><td class="num">Z53</td><td>郑州 → 昆明</td><td>04:42 → 10:36</td><td class="dur">29:54</td><td>无座</td><td class="money">¥263.5</td><td class="avail">有票</td></tr><tr class="done"><td class="num">Z161</td><td>郑州 → 昆明</td><td>17:44 → 22:02</td><td class="dur">28:18</td><td>无座</td><td class="money">¥263.5</td><td class="avail">有票</td></tr></table></div>
+</section>
+
+<section class="tab-page" id="tab-routes" style="display:none">
+<div class="card">
+<h2>🗺 全部 27 条可行路线</h2>
+<div class="meta">点击任一条展开，查看每一段的候选车次与余票</div>
+<div class="filters">
+<input type="text" id="f-q" placeholder="搜中转城市，如 郑州" oninput="render()">
+<select id="f-trans" onchange="render()">
+<option value="">全部换乘次数</option>
+<option value="1">换乘 1 次</option><option value="2">换乘 2 次</option>
+</select>
+<select id="f-sort" onchange="render()">
+<option value="price">按票价排序</option>
+<option value="trans">按换乘次数排序</option>
+<option value="ride">按在途时长排序</option>
+</select>
+<label><input type="checkbox" id="f-avail" onchange="render()"> 只看各段均有票</label>
+</div>
+<div id="route-list"></div>
+</div>
+</section>
+
+<section class="tab-page" id="tab-direct" style="display:none">
+<div class="card"><h2>🚄 直达车次（含高铁）</h2><div class="meta">2026-10-05 · 新乡 → 昆明 · 绿色行表示有票</div><div class="legend"><span class="sw"></span>绿色 = 有票 · 无色 = 无票</div><table><tr><th>车次</th><th>区间</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr><tr class="done"><td class="num">G1537</td><td>新乡 → 昆明</td><td>08:07 → 19:14</td><td class="dur">11:07</td><td>二等座</td><td class="money">¥902</td><td class="avail">有票</td></tr><tr><td class="num">G3473</td><td>新乡 → 昆明</td><td>10:22 → 22:04</td><td class="dur">11:42</td><td>二等座</td><td class="money">¥920</td><td class="avail">无票</td></tr></table></div><div class="card"><h2>⚖️ 对比结论</h2><table><tr><th>方案</th><th>费用</th></tr><tr class="sec"><td colspan="2">结论</td></tr><tr><td>直达高铁二等座（最低）</td><td class="money">¥902</td></tr><tr class="done"><td>普速多段换乘（最便宜）</td><td class="money">¥276</td></tr><tr><td>差额</td><td class="money">¥626</td></tr><tr><td>换乘代价</td><td class="money">换乘 1 次 · 在途 32小时20分</td></tr></table><div class="meta" style="margin-top:10px">普速方案用时间换金钱：适合预算优先、时间充裕的行程；赶时间建议直达高铁。</div></div>
+</section>
+
+<section class="tab-page" id="tab-about" style="display:none">
+
+<div class="card">
+<h2>ℹ️ 数据来源与方法</h2>
+<div class="note">
+<ul>
+<li><b>数据来源</b>：12306 官方余票接口，经本地 <code>12306-mcp</code> 服务转发查询，未使用任何第三方票代数据。</li>
+<li><b>车型范围</b>：默认只搜普速 <code>Z/T/K</code>（最便宜的主力）；直达对比表含高铁 <code>G/D/C</code>。</li>
+<li><b>穷举方式</b>：以 30+ 个枢纽城市为图节点做 BFS，最多 4 次换乘，逐段查询实时余票，
+再按「各段均有票优先 → 总价升序」排序，取第一条为最便宜方案。</li>
+<li><b>票价口径</b>：每段取「有票席别中的最低价」；若无有票席别，则取全部席别最低价并标记为无票。
+12306 对无票额区间会返回 0 元，这类票价已剔除，不参与排序。</li>
+<li><b>在途时长</b>：各段运行时间之和，<b>不含</b>换乘等待时间。</li>
+<li><b>刷新时间</b>：2026-10-03 00:04:58</li>
+</ul>
+</div>
+</div>
+<div class="card">
+<h2>🔄 如何更新数据</h2>
+<div class="note">
+<p>本页是静态页，数据在生成时内嵌，不会自动变化。重新生成：</p>
+<ul>
+<li>本地：<code>python scripts/export_data.py 2026-10-07</code>（需先启动 <code>12306-mcp</code>）</li>
+<li>线上：启用仓库里的 <code>workflows/refresh-data.yml.example</code> 为 Actions 工作流后，
+<code>gh workflow run refresh-data.yml -f date=2026-10-07</code></li>
+</ul>
+<p style="color:#57606a">余票实时变动，购票请以 12306 官方 App 为准。</p>
+</div>
+</div>
+
+</section>
+
+<div class="foot">数据由 <a href="https://github.com/citong/12306-cheapest-route">citong/12306-cheapest-route</a> 自动生成 · 余票实时变动，请以 12306 官方为准</div>
+</div>
 <script>
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const yuan = v => v == null ? '—' : '¥' + Number(v).toFixed(0);
-const dur = m => m ? Math.floor(m/60) + '小时' + (m%60) + '分' : '—';
-const tag = ok => `<span class="tag${ok?'':' no'}">${ok?'有票':'无票'}</span>`;
+const DATA = {"meta":{"from":"新乡","to":"昆明","date":"2026-10-05","train_types":"ZTK","max_hops":4,"total_routes":27,"generated_at":"2026-10-03T00:04:58+08:00"},"best":{"id":1,"path":["新乡","郑州","昆明"],"via":["郑州"],"transfers":1,"total_price":276.0,"all_available":true,"ride_minutes":1940,"legs":[{"from":"新乡","to":"郑州","type":"direct","price":12.5,"available":true,"trains":[{"code":"K4237","depart":"02:57","arrive":"03:58","duration":"01:01","price":12.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":12.5,"available":true},{"seat":"软卧","status":"无票","price":89.5,"available":false},{"seat":"硬卧","status":"无票","price":58.5,"available":false},{"seat":"无座","status":"有票","price":12.5,"available":true}]}]},{"from":"郑州","to":"昆明","type":"direct","price":263.5,"available":true,"trains":[{"code":"Z325","depart":"03:30","arrive":"10:49","duration":"31:19","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"无座","status":"剩余2张票","price":263.5,"available":true}]},{"code":"Z53","depart":"04:42","arrive":"10:36","duration":"29:54","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"无座","status":"剩余3张票","price":263.5,"available":true}]},{"code":"Z161","depart":"17:44","arrive":"22:02","duration":"28:18","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"无座","status":"有票","price":263.5,"available":true}]}]}]},"routes":[{"id":1,"path":["新乡","郑州","昆明"],"via":["郑州"],"transfers":1,"total_price":276.0,"all_available":true,"ride_minutes":1940,"legs":[{"from":"新乡","to":"郑州","type":"direct","price":12.5,"available":true,"trains":[{"code":"K4237","depart":"02:57","arrive":"03:58","duration":"01:01","price":12.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":12.5,"available":true},{"seat":"软卧","status":"无票","price":89.5,"available":false},{"seat":"硬卧","status":"无票","price":58.5,"available":false},{"seat":"无座","status":"有票","price":12.5,"available":true}]}]},{"from":"郑州","to":"昆明","type":"direct","price":263.5,"available":true,"trains":[{"code":"Z325","depart":"03:30","arrive":"10:49","duration":"31:19","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"无座","status":"剩余2张票","price":263.5,"available":true}]},{"code":"Z53","depart":"04:42","arrive":"10:36","duration":"29:54","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"无座","status":"剩余3张票","price":263.5,"available":true}]},{"code":"Z161","depart":"17:44","arrive":"22:02","duration":"28:18","price":263.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":446.5,"available":false},{"seat":"软卧","status":"无票","price":704.5,"available":false},{"seat":"硬座","status":"无票","price":263.5,"available":false},{"seat":"无座","status":"有票","price":263.5,"available":true}]}]}]},{"id":2,"path":["新乡","郑州","曲靖","昆明"],"via":["郑州","曲靖"],"transfers":2,"total_price":287.0,"all_available":true,"ride_minutes":1963,"legs":[{"from":"新乡","to":"郑州","type":"direct","price":12.5,"available":true,"trains":[{"code":"K4237","depart":"02:57","arrive":"03:58","duration":"01:01","price":12.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":12.5,"available":true},{"seat":"软卧","status":"无票","price":89.5,"available":false},{"seat":"硬卧","status":"无票","price":58.5,"available":false},{"seat":"无座","status":"有票","price":12.5,"available":true}]}]},{"from":"郑州","to":"曲靖","type":"direct","price":251.0,"available":true,"trains":[{"code":"Z325","depart":"03:30","arrive":"09:17","duration":"29:47","price":251.0,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":251.0,"available":false},{"seat":"软卧","status":"无票","price":673.0,"available":false},{"seat":"硬卧","status":"无票","price":426.0,"available":false},{"seat":"无座","status":"剩余2张票","price":251.0,"available":true}]},{"code":"Z53","depart":"04:42","arrive":"09:05","duration":"28:23","price":251.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":426.0,"available":false},{"seat":"软卧","status":"无票","price":673.0,"available":false},{"seat":"硬座","status":"无票","price":251.0,"available":false},{"seat":"无座","status":"剩余3张票","price":251.0,"available":true}]},{"code":"Z161","depart":"17:44","arrive":"20:36","duration":"26:52","price":251.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":426.0,"available":false},{"seat":"软卧","status":"无票","price":673.0,"available":false},{"seat":"硬座","status":"无票","price":251.0,"available":false},{"seat":"无座","status":"有票","price":251.0,"available":true}]}]},{"from":"曲靖","to":"昆明","type":"direct","price":23.5,"available":true,"trains":[{"code":"Z287","depart":"02:10","arrive":"04:05","duration":"01:55","price":23.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":69.5,"available":true},{"seat":"软卧","status":"有票","price":105.5,"available":true},{"seat":"硬座","status":"有票","price":23.5,"available":true},{"seat":"无座","status":"有票","price":23.5,"available":true}]}]}]},{"id":3,"path":["新乡","怀化","昆明"],"via":["怀化"],"transfers":1,"total_price":295.0,"all_available":true,"ride_minutes":2128,"legs":[{"from":"新乡","to":"怀化","type":"direct","price":156.5,"available":true,"trains":[{"code":"K267","depart":"22:02","arrive":"16:45","duration":"18:43","price":156.5,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":156.5,"available":false},{"seat":"软卧","status":"无票","price":422.5,"available":false},{"seat":"硬卧","status":"无票","price":268.5,"available":false},{"seat":"无座","status":"有票","price":156.5,"available":true}]},{"code":"K107","depart":"15:43","arrive":"12:08","duration":"20:25","price":177.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":304.5,"available":false},{"seat":"软卧","status":"无票","price":476.5,"available":false},{"seat":"硬座","status":"无票","price":177.5,"available":false},{"seat":"无座","status":"有票","price":177.5,"available":true}]}]},{"from":"怀化","to":"昆明","type":"direct","price":138.5,"available":true,"trains":[{"code":"K1235","depart":"05:37","arrive":"22:22","duration":"16:45","price":138.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"剩余16张票","price":238.5,"available":true},{"seat":"软卧","status":"剩余2张票","price":372.5,"available":true},{"seat":"硬座","status":"剩余7张票","price":138.5,"available":true},{"seat":"无座","status":"有票","price":138.5,"available":true}]}]}]},{"id":4,"path":["新乡","六盘水","昆明"],"via":["六盘水"],"transfers":1,"total_price":296.0,"all_available":true,"ride_minutes":325,"legs":[{"from":"新乡","to":"六盘水","type":"interline","price":241.5,"available":true,"trains":[{"code":"T123","depart":"16:00","arrive":"16:50","duration":"00:50","price":12.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"剩余1张票","price":12.5,"available":true},{"seat":"软卧","status":"无票","price":89.5,"available":false},{"seat":"硬卧","status":"无票","price":58.5,"available":false},{"seat":"无座","status":"无票","price":12.5,"available":false}]},{"code":"Z161","depart":"17:44","arrive":"18:11","duration":"24:27","price":229.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":389.0,"available":false},{"seat":"软卧","status":"无票","price":613.0,"available":false},{"seat":"硬座","status":"剩余1张票","price":229.0,"available":true},{"seat":"无座","status":"有票","price":229.0,"available":true}]}]},{"from":"六盘水","to":"昆明","type":"direct","price":54.5,"available":true,"trains":[{"code":"K79","depart":"00:44","arrive":"05:19","duration":"04:35","price":54.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":100.5,"available":true},{"seat":"软卧","status":"有票","price":155.5,"available":true},{"seat":"硬座","status":"有票","price":54.5,"available":true},{"seat":"无座","status":"有票","price":54.5,"available":true}]}]}]},{"id":5,"path":["新乡","贵阳","昆明"],"via":["贵阳"],"transfers":1,"total_price":303.0,"all_available":true,"ride_minutes":2065,"legs":[{"from":"新乡","to":"贵阳","type":"direct","price":217.0,"available":true,"trains":[{"code":"K107","depart":"15:43","arrive":"18:48","duration":"27:05","price":217.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":370.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"无座","status":"有票","price":217.0,"available":true}]}]},{"from":"贵阳","to":"昆明","type":"direct","price":86.0,"available":true,"trains":[{"code":"Z53","depart":"03:16","arrive":"10:36","duration":"07:20","price":86.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":152.0,"available":true},{"seat":"软卧","status":"无票","price":233.0,"available":false},{"seat":"硬座","status":"剩余5张票","price":86.0,"available":true},{"seat":"无座","status":"有票","price":86.0,"available":true}]}]}]},{"id":6,"path":["新乡","长沙","昆明"],"via":["长沙"],"transfers":1,"total_price":313.5,"all_available":true,"ride_minutes":1866,"legs":[{"from":"新乡","to":"长沙","type":"direct","price":124.0,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"21:30","duration":"11:28","price":124.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"无座","status":"无票","price":124.0,"available":false}]},{"code":"T369","depart":"10:34","arrive":"21:13","duration":"10:39","price":124.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"无座","status":"无票","price":124.0,"available":false}]},{"code":"K599","depart":"13:04","arrive":"01:38","duration":"12:34","price":124.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"无座","status":"无票","price":124.0,"available":false}]},{"code":"Z235","depart":"14:43","arrive":"00:12","duration":"09:29","price":124.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"无座","status":"无票","price":124.0,"available":false}]},{"code":"K107","depart":"15:43","arrive":"04:55","duration":"13:12","price":124.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"无座","status":"有票","price":124.0,"available":true}]}]},{"from":"长沙","to":"昆明","type":"direct","price":189.5,"available":true,"trains":[{"code":"Z161","depart":"02:24","arrive":"22:02","duration":"19:38","price":189.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":322.5,"available":false},{"seat":"软卧","status":"无票","price":504.5,"available":false},{"seat":"硬座","status":"剩余8张票","price":189.5,"available":true},{"seat":"软座","status":"剩余5张票","price":299.5,"available":true},{"seat":"无座","status":"剩余1张票","price":189.5,"available":true}]}]}]},{"id":7,"path":["新乡","成都","昆明"],"via":["成都"],"transfers":1,"total_price":317.0,"all_available":true,"ride_minutes":2212,"legs":[{"from":"新乡","to":"成都","type":"direct","price":198.0,"available":true,"trains":[{"code":"K257","depart":"03:29","arrive":"04:53","duration":"25:24","price":198.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"剩余7张票","price":337.0,"available":true},{"seat":"软卧","status":"无票","price":530.0,"available":false},{"seat":"硬座","status":"剩余7张票","price":198.0,"available":true},{"seat":"无座","status":"无票","price":198.0,"available":false}]}]},{"from":"成都","to":"昆明","type":"direct","price":119.0,"available":true,"trains":[{"code":"K4981","depart":"01:00","arrive":"12:28","duration":"11:28","price":119.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"剩余20张票","price":119.0,"available":true},{"seat":"硬卧","status":"无票","price":207.0,"available":false},{"seat":"无座","status":"无票","price":119.0,"available":false}]}]}]},{"id":8,"path":["新乡","南宁","昆明"],"via":["南宁"],"transfers":1,"total_price":329.0,"all_available":true,"ride_minutes":2275,"legs":[{"from":"新乡","to":"南宁","type":"direct","price":217.0,"available":true,"trains":[{"code":"T21","depart":"23:39","arrive":"21:49","duration":"22:10","price":217.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":370.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬座","status":"剩余2张票","price":217.0,"available":true},{"seat":"无座","status":"无票","price":217.0,"available":false}]}]},{"from":"南宁","to":"昆明","type":"direct","price":112.0,"available":true,"trains":[{"code":"K1205","depart":"05:47","arrive":"21:32","duration":"15:45","price":112.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"剩余7张票","price":112.0,"available":true},{"seat":"软卧","status":"无票","price":301.0,"available":false},{"seat":"硬卧","status":"有票","price":194.0,"available":true},{"seat":"无座","status":"剩余1张票","price":112.0,"available":true}]}]}]},{"id":9,"path":["新乡","桂林","昆明"],"via":["桂林"],"transfers":1,"total_price":330.0,"all_available":true,"ride_minutes":2316,"legs":[{"from":"新乡","to":"桂林","type":"direct","price":177.5,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"04:08","duration":"18:06","price":177.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":304.5,"available":false},{"seat":"软卧","status":"无票","price":476.5,"available":false},{"seat":"硬座","status":"无票","price":177.5,"available":false},{"seat":"无座","status":"有票","price":177.5,"available":true}]},{"code":"K157","depart":"15:50","arrive":"11:04","duration":"19:14","price":177.5,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":177.5,"available":false},{"seat":"软卧","status":"无票","price":476.5,"available":false},{"seat":"硬卧","status":"无票","price":304.5,"available":false},{"seat":"无座","status":"无票","price":177.5,"available":false}]},{"code":"T21","depart":"23:39","arrive":"15:32","duration":"15:53","price":177.5,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":304.5,"available":false},{"seat":"软卧","status":"无票","price":476.5,"available":false},{"seat":"硬座","status":"无票","price":177.5,"available":false},{"seat":"无座","status":"无票","price":177.5,"available":false}]}]},{"from":"桂林","to":"昆明","type":"direct","price":152.5,"available":true,"trains":[{"code":"T381","depart":"11:48","arrive":"08:18","duration":"20:30","price":152.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":261.5,"available":true},{"seat":"软卧","status":"无票","price":409.5,"available":false},{"seat":"硬座","status":"有票","price":152.5,"available":true},{"seat":"无座","status":"无票","price":152.5,"available":false}]}]}]},{"id":10,"path":["新乡","柳州","昆明"],"via":["柳州"],"transfers":1,"total_price":336.5,"all_available":true,"ride_minutes":2293,"legs":[{"from":"新乡","to":"柳州","type":"direct","price":198.0,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"06:02","duration":"20:00","price":198.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"软卧","status":"无票","price":530.0,"available":false},{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"无座","status":"有票","price":198.0,"available":true}]}]},{"from":"柳州","to":"昆明","type":"direct","price":138.5,"available":true,"trains":[{"code":"T381","depart":"14:05","arrive":"08:18","duration":"18:13","price":138.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":238.5,"available":true},{"seat":"软卧","status":"剩余2张票","price":372.5,"available":true},{"seat":"硬座","status":"有票","price":138.5,"available":true},{"seat":"无座","status":"无票","price":138.5,"available":false}]}]}]},{"id":11,"path":["新乡","贵阳","遵义","昆明"],"via":["贵阳","遵义"],"transfers":2,"total_price":336.5,"all_available":true,"ride_minutes":2319,"legs":[{"from":"新乡","to":"贵阳","type":"direct","price":217.0,"available":true,"trains":[{"code":"K107","depart":"15:43","arrive":"18:48","duration":"27:05","price":217.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":370.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"无座","status":"有票","price":217.0,"available":true}]}]},{"from":"贵阳","to":"遵义","type":"direct","price":21.5,"available":true,"trains":[{"code":"T3542","depart":"04:51","arrive":"06:11","duration":"01:20","price":21.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"剩余9张票","price":67.5,"available":true},{"seat":"软卧","status":"剩余16张票","price":102.5,"available":true},{"seat":"硬座","status":"无票","price":21.5,"available":false},{"seat":"高级软卧","status":"无票","price":182.5,"available":false},{"seat":"无座","status":"有票","price":21.5,"available":true}]}]},{"from":"遵义","to":"昆明","type":"direct","price":98.0,"available":true,"trains":[{"code":"K985","depart":"13:18","arrive":"23:32","duration":"10:14","price":98.0,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":98.0,"available":false},{"seat":"软卧","status":"无票","price":263.0,"available":false},{"seat":"硬卧","status":"无票","price":171.0,"available":false},{"seat":"无座","status":"有票","price":98.0,"available":true}]}]}]},{"id":12,"path":["新乡","郑州","南昌","昆明"],"via":["郑州","南昌"],"transfers":2,"total_price":349.5,"all_available":true,"ride_minutes":2475,"legs":[{"from":"新乡","to":"郑州","type":"direct","price":12.5,"available":true,"trains":[{"code":"K4237","depart":"02:57","arrive":"03:58","duration":"01:01","price":12.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":12.5,"available":true},{"seat":"软卧","status":"无票","price":89.5,"available":false},{"seat":"硬卧","status":"无票","price":58.5,"available":false},{"seat":"无座","status":"有票","price":12.5,"available":true}]}]},{"from":"郑州","to":"南昌","type":"direct","price":124.0,"available":true,"trains":[{"code":"K132","depart":"06:56","arrive":"20:05","duration":"13:09","price":124.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"无座","status":"有票","price":124.0,"available":true}]},{"code":"T145","depart":"19:30","arrive":"09:44","duration":"14:14","price":163.5,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":163.5,"available":false},{"seat":"软卧","status":"无票","price":438.5,"available":false},{"seat":"硬卧","status":"无票","price":280.5,"available":false},{"seat":"无座","status":"有票","price":163.5,"available":true}]}]},{"from":"南昌","to":"昆明","type":"direct","price":213.0,"available":true,"trains":[{"code":"K491","depart":"01:23","arrive":"04:28","duration":"27:05","price":213.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":213.0,"available":true},{"seat":"软卧","status":"无票","price":572.0,"available":false},{"seat":"硬卧","status":"剩余2张票","price":363.0,"available":true},{"seat":"无座","status":"无票","price":213.0,"available":false}]}]}]},{"id":13,"path":["新乡","广州","昆明"],"via":["广州"],"transfers":1,"total_price":390.0,"all_available":true,"ride_minutes":2800,"legs":[{"from":"新乡","to":"广州","type":"direct","price":198.0,"available":true,"trains":[{"code":"T369","depart":"10:34","arrive":"05:13","duration":"18:39","price":198.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"软卧","status":"无票","price":602.0,"available":false},{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"无座","status":"无票","price":198.0,"available":false}]},{"code":"K599","depart":"13:04","arrive":"10:30","duration":"21:26","price":198.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"软卧","status":"无票","price":602.0,"available":false},{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"无座","status":"无票","price":198.0,"available":false}]},{"code":"Z235","depart":"14:43","arrive":"08:30","duration":"17:47","price":198.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"软卧","status":"无票","price":602.0,"available":false},{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"无座","status":"无票","price":198.0,"available":false}]},{"code":"T123","depart":"16:00","arrive":"11:00","duration":"19:00","price":198.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"软卧","status":"无票","price":602.0,"available":false},{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"无座","status":"无票","price":198.0,"available":false}]},{"code":"T253","depart":"20:51","arrive":"15:31","duration":"18:40","price":198.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":337.0,"available":false},{"seat":"软卧","status":"无票","price":602.0,"available":false},{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"无座","status":"剩余1张票","price":198.0,"available":true}]}]},{"from":"广州","to":"昆明","type":"direct","price":192.0,"available":true,"trains":[{"code":"K230","depart":"05:37","arrive":"09:38","duration":"28:01","price":192.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":192.0,"available":true},{"seat":"软卧","status":"剩余1张票","price":537.0,"available":true},{"seat":"硬卧","status":"有票","price":328.0,"available":true},{"seat":"无座","status":"有票","price":192.0,"available":true}]}]}]},{"id":14,"path":["新乡","武昌","昆明"],"via":["武昌"],"transfers":1,"total_price":450.0,"all_available":true,"ride_minutes":1929,"legs":[{"from":"新乡","to":"武昌","type":"direct","price":233.0,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"17:20","duration":"07:18","price":233.0,"seat":"软卧","available":true,"seats":[{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"软卧","status":"剩余1张票","price":233.0,"available":true},{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]}]},{"from":"武昌","to":"昆明","type":"direct","price":217.0,"available":true,"trains":[{"code":"Z53","depart":"09:45","arrive":"10:36","duration":"24:51","price":217.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":370.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"无座","status":"剩余3张票","price":217.0,"available":true}]},{"code":"Z161","depart":"22:33","arrive":"22:02","duration":"23:29","price":217.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":370.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬座","status":"剩余1张票","price":217.0,"available":true},{"seat":"无座","status":"有票","price":217.0,"available":true}]},{"code":"Z325","depart":"08:45","arrive":"10:49","duration":"26:04","price":370.0,"seat":"硬卧","available":true,"seats":[{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬卧","status":"剩余9张票","price":370.0,"available":true},{"seat":"无座","status":"无票","price":217.0,"available":false}]}]}]},{"id":15,"path":["新乡","汉口","昆明"],"via":["汉口"],"transfers":1,"total_price":456.0,"all_available":true,"ride_minutes":1976,"legs":[{"from":"新乡","to":"汉口","type":"direct","price":86.0,"available":true,"trains":[{"code":"T369","depart":"10:34","arrive":"17:26","duration":"06:52","price":86.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"软卧","status":"无票","price":233.0,"available":false},{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]},{"code":"K599","depart":"13:04","arrive":"21:14","duration":"08:10","price":86.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"软卧","status":"无票","price":233.0,"available":false},{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]},{"code":"Z235","depart":"14:43","arrive":"20:46","duration":"06:03","price":86.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"软卧","status":"无票","price":233.0,"available":false},{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]},{"code":"K107","depart":"15:43","arrive":"00:17","duration":"08:34","price":86.0,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"软卧","status":"无票","price":233.0,"available":false},{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"无座","status":"有票","price":86.0,"available":true}]},{"code":"K457","depart":"10:02","arrive":"17:20","duration":"07:18","price":233.0,"seat":"软卧","available":true,"seats":[{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"软卧","status":"剩余1张票","price":233.0,"available":true},{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]}]},{"from":"汉口","to":"昆明","type":"direct","price":370.0,"available":true,"trains":[{"code":"Z325","depart":"08:45","arrive":"10:49","duration":"26:04","price":370.0,"seat":"硬卧","available":true,"seats":[{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬卧","status":"剩余8张票","price":370.0,"available":true},{"seat":"无座","status":"无票","price":217.0,"available":false}]}]}]},{"id":16,"path":["新乡","武汉","昆明"],"via":["武汉"],"transfers":1,"total_price":603.0,"all_available":true,"ride_minutes":2002,"legs":[{"from":"新乡","to":"武汉","type":"direct","price":233.0,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"17:20","duration":"07:18","price":233.0,"seat":"软卧","available":true,"seats":[{"seat":"硬卧","status":"无票","price":152.0,"available":false},{"seat":"软卧","status":"剩余1张票","price":233.0,"available":true},{"seat":"硬座","status":"无票","price":86.0,"available":false},{"seat":"无座","status":"无票","price":86.0,"available":false}]}]},{"from":"武汉","to":"昆明","type":"direct","price":370.0,"available":true,"trains":[{"code":"Z325","depart":"08:45","arrive":"10:49","duration":"26:04","price":370.0,"seat":"硬卧","available":true,"seats":[{"seat":"硬座","status":"无票","price":217.0,"available":false},{"seat":"软卧","status":"无票","price":585.0,"available":false},{"seat":"硬卧","status":"剩余9张票","price":370.0,"available":true},{"seat":"无座","status":"无票","price":217.0,"available":false}]}]}]},{"id":17,"path":["新乡","西安","昆明"],"via":["西安"],"transfers":1,"total_price":282.0,"all_available":false,"ride_minutes":1907,"legs":[{"from":"新乡","to":"西安","type":"direct","price":81.0,"available":true,"trains":[{"code":"K395","depart":"02:22","arrive":"11:22","duration":"09:00","price":81.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"软卧","status":"剩余3张票","price":222.0,"available":true},{"seat":"硬座","status":"有票","price":81.0,"available":true},{"seat":"无座","status":"有票","price":81.0,"available":true}]}]},{"from":"西安","to":"昆明","type":"direct","price":201.0,"available":false,"trains":[{"code":"K691","depart":"07:17","arrive":"06:04","duration":"22:47","price":201.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":343.0,"available":false},{"seat":"软卧","status":"无票","price":542.0,"available":false},{"seat":"硬座","status":"无票","price":201.0,"available":false},{"seat":"无座","status":"无票","price":201.0,"available":false}]}]}]},{"id":18,"path":["新乡","驻马店","昆明"],"via":["驻马店"],"transfers":1,"total_price":286.5,"all_available":false,"ride_minutes":1888,"legs":[{"from":"新乡","to":"驻马店","type":"direct","price":43.5,"available":false,"trains":[{"code":"T369","depart":"10:34","arrive":"13:47","duration":"03:13","price":43.5,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":43.5,"available":false},{"seat":"软卧","status":"无票","price":135.5,"available":false},{"seat":"硬卧","status":"无票","price":89.5,"available":false},{"seat":"无座","status":"无票","price":43.5,"available":false}]}]},{"from":"驻马店","to":"昆明","type":"direct","price":243.0,"available":true,"trains":[{"code":"Z53","depart":"06:21","arrive":"10:36","duration":"28:15","price":243.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":414.0,"available":false},{"seat":"软卧","status":"无票","price":654.0,"available":false},{"seat":"硬座","status":"有票","price":243.0,"available":true},{"seat":"无座","status":"有票","price":243.0,"available":true}]}]}]},{"id":19,"path":["新乡","衡阳","昆明"],"via":["衡阳"],"transfers":1,"total_price":338.0,"all_available":false,"ride_minutes":2297,"legs":[{"from":"新乡","to":"衡阳","type":"direct","price":148.5,"available":false,"trains":[{"code":"K457","depart":"10:02","arrive":"23:55","duration":"13:53","price":148.5,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":254.5,"available":false},{"seat":"软卧","status":"无票","price":398.5,"available":false},{"seat":"硬座","status":"无票","price":148.5,"available":false},{"seat":"无座","status":"无票","price":148.5,"available":false}]}]},{"from":"衡阳","to":"昆明","type":"direct","price":189.5,"available":true,"trains":[{"code":"T381","depart":"07:54","arrive":"08:18","duration":"24:24","price":189.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"剩余9张票","price":322.5,"available":true},{"seat":"软卧","status":"无票","price":504.5,"available":false},{"seat":"硬座","status":"有票","price":189.5,"available":true},{"seat":"无座","status":"无票","price":189.5,"available":false}]}]}]},{"id":20,"path":["新乡","石家庄","昆明"],"via":["石家庄"],"transfers":1,"total_price":344.0,"all_available":false,"ride_minutes":2241,"legs":[{"from":"新乡","to":"石家庄","type":"direct","price":50.5,"available":false,"trains":[{"code":"K590","depart":"01:01","arrive":"04:57","duration":"03:56","price":50.5,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":50.5,"available":false},{"seat":"软卧","status":"无票","price":146.5,"available":false},{"seat":"硬卧","status":"无票","price":96.5,"available":false},{"seat":"无座","status":"无票","price":50.5,"available":false}]}]},{"from":"石家庄","to":"昆明","type":"direct","price":293.5,"available":true,"trains":[{"code":"Z53","depart":"01:11","arrive":"10:36","duration":"33:25","price":293.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":497.5,"available":false},{"seat":"软卧","status":"无票","price":786.5,"available":false},{"seat":"硬座","status":"无票","price":293.5,"available":false},{"seat":"无座","status":"剩余3张票","price":293.5,"available":true}]}]}]},{"id":21,"path":["新乡","北京","昆明"],"via":["北京"],"transfers":1,"total_price":398.0,"all_available":false,"ride_minutes":2608,"legs":[{"from":"新乡","to":"北京","type":"direct","price":81.0,"available":true,"trains":[{"code":"K590","depart":"01:01","arrive":"09:46","duration":"08:45","price":81.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"剩余3张票","price":81.0,"available":true},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"无座","status":"有票","price":81.0,"available":true}]},{"code":"K268","depart":"03:58","arrive":"12:20","duration":"08:22","price":81.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":81.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"无座","status":"无票","price":81.0,"available":false}]},{"code":"Z336","depart":"05:05","arrive":"10:36","duration":"05:31","price":81.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":81.0,"available":false},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"无座","status":"无票","price":81.0,"available":false}]},{"code":"K474","depart":"06:18","arrive":"15:06","duration":"08:48","price":81.0,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":81.0,"available":false},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"无座","status":"无票","price":81.0,"available":false}]},{"code":"T50","depart":"07:28","arrive":"13:59","duration":"06:31","price":81.0,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":81.0,"available":false},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"无座","status":"剩余2张票","price":81.0,"available":true}]}]},{"from":"北京","to":"昆明","type":"direct","price":317.0,"available":false,"trains":[{"code":"Z161","depart":"11:19","arrive":"22:02","duration":"34:43","price":317.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":536.0,"available":false},{"seat":"软卧","status":"无票","price":849.0,"available":false},{"seat":"硬座","status":"无票","price":317.0,"available":false},{"seat":"无座","status":"无票","price":317.0,"available":false}]}]}]},{"id":22,"path":["新乡","北京西","昆明"],"via":["北京西"],"transfers":1,"total_price":398.0,"all_available":false,"ride_minutes":2608,"legs":[{"from":"新乡","to":"北京西","type":"direct","price":81.0,"available":true,"trains":[{"code":"K590","depart":"01:01","arrive":"09:46","duration":"08:45","price":81.0,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"剩余3张票","price":81.0,"available":true},{"seat":"软卧","status":"无票","price":222.0,"available":false},{"seat":"硬卧","status":"无票","price":144.0,"available":false},{"seat":"无座","status":"有票","price":81.0,"available":true}]}]},{"from":"北京西","to":"昆明","type":"direct","price":317.0,"available":false,"trains":[{"code":"Z161","depart":"11:19","arrive":"22:02","duration":"34:43","price":317.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":536.0,"available":false},{"seat":"软卧","status":"无票","price":849.0,"available":false},{"seat":"硬座","status":"无票","price":317.0,"available":false},{"seat":"无座","status":"无票","price":317.0,"available":false}]}]}]},{"id":23,"path":["新乡","重庆","昆明"],"via":["重庆"],"transfers":1,"total_price":404.5,"all_available":false,"ride_minutes":2019,"legs":[{"from":"新乡","to":"重庆","type":"direct","price":280.5,"available":false,"trains":[{"code":"K4185","depart":"14:46","arrive":"11:24","duration":"20:38","price":280.5,"seat":"硬卧","available":false,"seats":[{"seat":"硬卧","status":"无票","price":280.5,"available":false},{"seat":"软卧","status":"无票","price":438.5,"available":false}]}]},{"from":"重庆","to":"昆明","type":"direct","price":124.0,"available":true,"trains":[{"code":"K985","depart":"10:31","arrive":"23:32","duration":"13:01","price":124.0,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":124.0,"available":false},{"seat":"软卧","status":"无票","price":336.0,"available":false},{"seat":"硬卧","status":"无票","price":215.0,"available":false},{"seat":"无座","status":"有票","price":124.0,"available":true}]}]}]},{"id":24,"path":["新乡","岳阳","昆明"],"via":["岳阳"],"transfers":1,"total_price":449.0,"all_available":false,"ride_minutes":2031,"legs":[{"from":"新乡","to":"岳阳","type":"direct","price":112.0,"available":false,"trains":[{"code":"K457","depart":"10:02","arrive":"19:57","duration":"09:55","price":112.0,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":194.0,"available":false},{"seat":"软卧","status":"无票","price":301.0,"available":false},{"seat":"硬座","status":"无票","price":112.0,"available":false},{"seat":"无座","status":"无票","price":112.0,"available":false}]}]},{"from":"岳阳","to":"昆明","type":"direct","price":337.0,"available":true,"trains":[{"code":"Z325","depart":"10:53","arrive":"10:49","duration":"23:56","price":337.0,"seat":"硬卧","available":true,"seats":[{"seat":"硬座","status":"无票","price":198.0,"available":false},{"seat":"软卧","status":"无票","price":530.0,"available":false},{"seat":"硬卧","status":"剩余8张票","price":337.0,"available":true},{"seat":"无座","status":"无票","price":198.0,"available":false}]}]}]},{"id":25,"path":["新乡","株洲","昆明"],"via":["株洲"],"transfers":1,"total_price":null,"all_available":false,"ride_minutes":2222,"legs":[{"from":"新乡","to":"株洲","type":"direct","price":null,"available":null,"trains":[{"code":"K457","depart":"10:02","arrive":"22:24","duration":"12:22","price":null,"seat":null,"available":null,"seats":[]},{"code":"T369","depart":"10:34","arrive":"21:53","duration":"11:19","price":null,"seat":null,"available":null,"seats":[]},{"code":"T253","depart":"20:51","arrive":"08:16","duration":"11:25","price":null,"seat":null,"available":null,"seats":[]},{"code":"T21","depart":"23:39","arrive":"10:37","duration":"10:58","price":null,"seat":null,"available":null,"seats":[]}]},{"from":"株洲","to":"昆明","type":"direct","price":180.5,"available":true,"trains":[{"code":"K79","depart":"04:39","arrive":"05:19","duration":"24:40","price":180.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":310.5,"available":true},{"seat":"软卧","status":"剩余2张票","price":488.5,"available":true},{"seat":"硬座","status":"有票","price":180.5,"available":true},{"seat":"无座","status":"无票","price":180.5,"available":false}]}]}]},{"id":26,"path":["新乡","信阳","昆明"],"via":["信阳"],"transfers":1,"total_price":null,"all_available":false,"ride_minutes":1984,"legs":[{"from":"新乡","to":"信阳","type":"direct","price":54.5,"available":true,"trains":[{"code":"K457","depart":"10:02","arrive":"14:35","duration":"04:33","price":54.5,"seat":"硬座","available":false,"seats":[{"seat":"硬卧","status":"无票","price":100.5,"available":false},{"seat":"软卧","status":"无票","price":155.5,"available":false},{"seat":"硬座","status":"无票","price":54.5,"available":false},{"seat":"无座","status":"无票","price":54.5,"available":false}]},{"code":"K599","depart":"13:04","arrive":"18:14","duration":"05:10","price":54.5,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":54.5,"available":false},{"seat":"软卧","status":"无票","price":155.5,"available":false},{"seat":"硬卧","status":"无票","price":100.5,"available":false},{"seat":"无座","status":"无票","price":54.5,"available":false}]},{"code":"K1969","depart":"14:05","arrive":"20:20","duration":"06:15","price":54.5,"seat":"无座","available":true,"seats":[{"seat":"硬座","status":"无票","price":54.5,"available":false},{"seat":"硬卧","status":"无票","price":100.5,"available":false},{"seat":"无座","status":"有票","price":54.5,"available":true}]},{"code":"K107","depart":"15:43","arrive":"20:58","duration":"05:15","price":54.5,"seat":"无座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":100.5,"available":false},{"seat":"软卧","status":"无票","price":155.5,"available":false},{"seat":"硬座","status":"无票","price":54.5,"available":false},{"seat":"无座","status":"有票","price":54.5,"available":true}]},{"code":"K157","depart":"15:50","arrive":"21:04","duration":"05:14","price":54.5,"seat":"硬座","available":false,"seats":[{"seat":"硬座","status":"无票","price":54.5,"available":false},{"seat":"软卧","status":"无票","price":155.5,"available":false},{"seat":"硬卧","status":"无票","price":100.5,"available":false},{"seat":"无座","status":"无票","price":54.5,"available":false}]}]},{"from":"信阳","to":"昆明","type":"direct","price":null,"available":null,"trains":[{"code":"Z325","depart":"06:18","arrive":"10:49","duration":"28:31","price":null,"seat":null,"available":null,"seats":[]},{"code":"Z53","depart":"07:17","arrive":"10:36","duration":"27:19","price":null,"seat":null,"available":null,"seats":[]}]}]},{"id":27,"path":["新乡","株洲","安顺","昆明"],"via":["株洲","安顺"],"transfers":2,"total_price":null,"all_available":false,"ride_minutes":2320,"legs":[{"from":"新乡","to":"株洲","type":"direct","price":null,"available":null,"trains":[{"code":"K457","depart":"10:02","arrive":"22:24","duration":"12:22","price":null,"seat":null,"available":null,"seats":[]},{"code":"T369","depart":"10:34","arrive":"21:53","duration":"11:19","price":null,"seat":null,"available":null,"seats":[]},{"code":"T253","depart":"20:51","arrive":"08:16","duration":"11:25","price":null,"seat":null,"available":null,"seats":[]},{"code":"T21","depart":"23:39","arrive":"10:37","duration":"10:58","price":null,"seat":null,"available":null,"seats":[]}]},{"from":"株洲","to":"安顺","type":"direct","price":128.5,"available":true,"trains":[{"code":"K79","depart":"04:39","arrive":"22:28","duration":"17:49","price":128.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"有票","price":222.5,"available":true},{"seat":"软卧","status":"剩余2张票","price":348.5,"available":true},{"seat":"硬座","status":"有票","price":128.5,"available":true},{"seat":"无座","status":"无票","price":128.5,"available":false}]},{"code":"K739","depart":"05:20","arrive":"22:42","duration":"17:22","price":128.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":128.5,"available":true},{"seat":"软卧","status":"剩余1张票","price":348.5,"available":true},{"seat":"硬卧","status":"有票","price":222.5,"available":true},{"seat":"无座","status":"无票","price":128.5,"available":false}]},{"code":"K491","depart":"05:26","arrive":"20:58","duration":"15:32","price":128.5,"seat":"硬座","available":true,"seats":[{"seat":"硬座","status":"有票","price":128.5,"available":true},{"seat":"软卧","status":"剩余4张票","price":348.5,"available":true},{"seat":"硬卧","status":"有票","price":222.5,"available":true},{"seat":"无座","status":"无票","price":128.5,"available":false}]},{"code":"K1235","depart":"23:18","arrive":"13:49","duration":"14:31","price":128.5,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"无票","price":222.5,"available":false},{"seat":"软卧","status":"剩余3张票","price":348.5,"available":true},{"seat":"硬座","status":"有票","price":128.5,"available":true},{"seat":"无座","status":"有票","price":128.5,"available":true}]}]},{"from":"安顺","to":"昆明","type":"direct","price":75.0,"available":true,"trains":[{"code":"K1235","depart":"13:53","arrive":"22:22","duration":"08:29","price":75.0,"seat":"硬座","available":true,"seats":[{"seat":"硬卧","status":"剩余16张票","price":133.0,"available":true},{"seat":"软卧","status":"剩余1张票","price":205.0,"available":true},{"seat":"硬座","status":"有票","price":75.0,"available":true},{"seat":"无座","status":"有票","price":75.0,"available":true}]}]}]}],"direct":{"trains":[{"code":"G1537","depart":"08:07","arrive":"19:14","duration":"11:07","price":902.0,"seat":"二等座","available":true,"seats":[{"seat":"商务座","status":"剩余2张票","price":2899.0,"available":true},{"seat":"一等座","status":"剩余10张票","price":1429.0,"available":true},{"seat":"二等座","status":"剩余19张票","price":902.0,"available":true},{"seat":"无座","status":"有票","price":902.0,"available":true}]},{"code":"G3473","depart":"10:22","arrive":"22:04","duration":"11:42","price":920.0,"seat":"二等座","available":false,"seats":[{"seat":"商务座","status":"无票","price":2915.0,"available":false},{"seat":"一等座","status":"无票","price":1490.0,"available":false},{"seat":"二等座","status":"无票","price":920.0,"available":false},{"seat":"无座","status":"无票","price":920.0,"available":false}]}],"min_price":902.0,"note":"直达车次于 2026-10-02 23:33 采集；12306 随后对该区间限流，重取为空，故沿用本次结果。"}};
+const BEST = DATA.best;
+const ROUTES = DATA.routes || [];
 
-let DATA = null, state = {hops:99, via:'', sort:'price', avail:false};
+function money(v){ return v==null ? '—' : '¥' + (Math.round(v*100)/100); }
+function dur(min){
+  if(min==null) return '—';
+  const h = Math.floor(min/60), m = min%60;
+  return h>0 ? (h + '小时' + (m? m+'分':'')) : (m + '分');
+}
+function showTab(id){
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.toggle('active',b.dataset.tab===id);});
+  document.querySelectorAll('.tab-page').forEach(function(p){p.style.display=p.id===id?'':'none';});
+  window.scrollTo(0,0);
+}
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-function pathHTML(p){
-  return p.map((s,i)=>`<span class="chip">${esc(s)}</span>${i<p.length-1?'<span class="arrow">→</span>':''}`).join('');
+function seatRows(t){
+  if(!t.seats || !t.seats.length) return '';
+  return t.seats.map(function(s){
+    return '<tr><td></td><td></td><td>' + esc(s.seat) + '</td><td>' + esc(s.status) +
+           '</td><td class="money">' + money(s.price) + '</td></tr>';
+  }).join('');
 }
 
-function legHTML(l){
-  const ts = (l.trains||[]).slice(0,3).map(t=>`
-    <div class="leg">
-      <div class="code">${esc(t.code)}</div>
-      <div>
-        <div class="leg-r">${esc(l.from)} <span class="arrow">→</span> ${esc(l.to)}</div>
-        <div class="leg-t">${esc(t.depart)} 发车 · ${esc(t.arrive)} 到达 · 历时 ${esc(t.duration)}</div>
-        <div class="leg-p">${esc(t.seat||'')} ${yuan(t.price)} ${t.available?tag(true):tag(false)}</div>
-      </div>
-    </div>`).join('');
-  return ts || `<div class="mini">${esc(l.from)} → ${esc(l.to)}（无具体车次）</div>`;
+function legTable(leg, idx){
+  const rows = (leg.trains||[]).map(function(t){
+    const cls = t.available ? ' class="done"' : '';
+    return '<tr' + cls + '><td class="num">' + esc(t.code) + '</td><td>' + esc(t.depart) + ' → ' + esc(t.arrive) +
+      '</td><td class="dur">' + esc(t.duration) + '</td><td>' + esc(t.seat||'—') +
+      '</td><td class="dur">' + money(t.price) + '</td><td class="avail">' +
+      (t.available ? '有票' : (t.available===false ? '无票' : '—')) + '</td></tr>';
+  }).join('');
+  return '<tr class="sec"><td colspan="6">第 ' + idx + ' 段 · ' + esc(leg.from) + ' → ' + esc(leg.to) +
+    ' &nbsp;<span style="font-weight:normal">' + (leg.price!=null? money(leg.price) : '票价未知') + '</span></td></tr>' + rows;
+}
+
+function routeCard(r){
+  const tags = [];
+  tags.push('<span class="tag">换乘 ' + r.transfers + ' 次</span>');
+  tags.push(r.all_available ? '<span class="tag ok">各段有票</span>' : '<span class="tag no">部分无票</span>');
+  tags.push('<span class="tag">在途 ' + dur(r.ride_minutes) + '</span>');
+  const body = (r.legs||[]).map(function(l,i){ return legTable(l, i+1); }).join('');
+  return '<div class="route' + (r.id===BEST.id?' best':'') + '" id="rt-' + r.id + '">' +
+    '<div class="route-head" onclick="toggle(' + r.id + ')">' +
+      '<span class="rank">' + r.id + '</span>' +
+      '<span class="rpath">' + esc(r.path.join(' → ')) + '</span>' +
+      tags.join('') +
+      '<span class="rprice">' + money(r.total_price) + '</span>' +
+    '</div>' +
+    '<div class="route-body" id="rb-' + r.id + '"><table>' +
+      '<tr><th>车次</th><th>时刻</th><th>历时</th><th>席别</th><th>票价</th><th>余票</th></tr>' +
+      body + '</table></div>' +
+  '</div>';
+}
+
+function toggle(id){
+  const b = document.getElementById('rb-' + id);
+  if(b) b.classList.toggle('open');
+}
+function openRoute(id){
+  showTab('tab-routes');
+  const b = document.getElementById('rb-' + id);
+  if(b) b.classList.add('open');
+  const el = document.getElementById('rt-' + id);
+  if(el) setTimeout(function(){ el.scrollIntoView({block:'center'}); }, 30);
 }
 
 function render(){
-  const {from,to,date,total_routes,generated_at,max_hops,train_types} = DATA.meta;
-  $('#title').textContent = `${from} → ${to} · 最便宜火车路线`;
-  $('#subtitle').innerHTML = `出发日期 <b>${esc(date)}</b> · 车型 <b>${esc(train_types||'普速')}</b> · 最多换乘 <b>${esc(max_hops)}</b> 次 · 搜出 <b>${esc(total_routes)}</b> 条可行路线`;
-
-  const best = DATA.best, dmin = DATA.direct.min_price;
-  const save = (best && best.total_price != null && dmin != null) ? dmin - best.total_price : null;
-  $('#stats').innerHTML = `
-    <div class="stat hl"><div class="k">最便宜方案</div><div class="v">${yuan(best&&best.total_price)}</div></div>
-    <div class="stat"><div class="k">直达最低价</div><div class="v">${yuan(dmin)}</div></div>
-    <div class="stat ok"><div class="k">最多可省</div><div class="v">${save==null?'—':'¥'+save.toFixed(0)}</div></div>
-    <div class="stat"><div class="k">换乘次数</div><div class="v">${best?best.transfers:'—'}<span class="u">次</span></div></div>`;
-  $('#app').hidden = false;
-
-  if(best){
-    $('#best').innerHTML = `
-      <div class="best-path">${pathHTML(best.path)}</div>
-      <div class="best-meta">换乘 ${best.transfers} 次 · 在途约 ${dur(best.ride_minutes)} · 合计 ${yuan(best.total_price)}</div>
-      ${best.legs.map(legHTML).join('')}`;
-  }
-
-  const top = [...DATA.routes].filter(r=>r.total_price!=null).slice(0,10);
-  const max = Math.max(...top.map(r=>r.total_price));
-  $('#bars').innerHTML = top.map(r=>`
-    <div class="bar">
-      <div class="lbl">${esc(r.path.join(' → '))}</div>
-      <div class="track"><div class="fill" style="width:${(r.total_price/max*100).toFixed(1)}%"></div></div>
-      <div class="val">${yuan(r.total_price)}</div>
-    </div>`).join('');
-
-  renderList();
-
-  const d = DATA.direct.trains||[];
-  $('#direct').innerHTML = d.length ? `
-    <thead><tr><th>车次</th><th>区间</th><th>时刻</th><th>历时</th><th class="num">最低价</th><th>席别</th></tr></thead>
-    <tbody>${d.map(t=>`<tr>
-      <td><b>${esc(t.code)}</b></td>
-      <td>${esc(DATA.meta.from)} → ${esc(DATA.meta.to)}</td>
-      <td>${esc(t.depart)} → ${esc(t.arrive)}</td>
-      <td>${esc(t.duration)}</td>
-      <td class="num">${yuan(t.price)}</td>
-      <td>${esc(t.seat||'')} ${t.available?tag(true):tag(false)}</td></tr>`).join('')}</tbody>` : '';
-
-  $('#warn').textContent = '提示：换乘方案由程序自动拼接，请自行确认换乘站的换乘时间是否充裕（建议预留 1 小时以上）。';
-  $('#gen').textContent = '数据生成时间：' + (generated_at||'—');
-}
-
-function renderList(){
-  let rs = DATA.routes.filter(r=>{
-    if(r.transfers > state.hops) return false;
-    if(state.avail && !r.all_available) return false;
-    if(state.via && !(r.via||[]).some(v=>v.includes(state.via))) return false;
+  const q = (document.getElementById('f-q').value||'').trim();
+  const trans = document.getElementById('f-trans').value;
+  const sort = document.getElementById('f-sort').value;
+  const availOnly = document.getElementById('f-avail').checked;
+  let list = ROUTES.filter(function(r){
+    if(availOnly && !r.all_available) return false;
+    if(trans !== ''){
+      const t = r.transfers;
+      if(trans === '0' && t !== 0) return false;
+      if(trans === '1' && t !== 1) return false;
+      if(trans === '2' && t !== 2) return false;
+      if(trans === '3' && t < 3) return false;
+    }
+    if(q && !(r.via||[]).some(function(c){ return c.indexOf(q) >= 0; }) && r.path.join('').indexOf(q) < 0) return false;
     return true;
   });
-  const cmp = {
-    price:(a,b)=>(a.total_price??1e9)-(b.total_price??1e9),
-    trans:(a,b)=>a.transfers-b.transfers || (a.total_price??1e9)-(b.total_price??1e9),
-    time:(a,b)=>(a.ride_minutes||1e9)-(b.ride_minutes||1e9),
-  }[state.sort];
-  rs.sort(cmp);
-  $('#count').textContent = `共 ${rs.length} 条`;
-  $('#list').innerHTML = rs.length ? rs.map(r=>`
-    <div class="route" data-id="${r.id}">
-      <div class="route-top">
-        <span class="rk">${r.id}</span>
-        <span class="rpath">${pathHTML(r.path)}</span>
-        <span class="rtrans">换乘 ${r.transfers} 次 · 在途 ${dur(r.ride_minutes)}</span>
-        <span class="rprice">${yuan(r.total_price)}</span>
-      </div>
-      <div class="rdetail">${r.legs.map(legHTML).join('')}</div>
-    </div>`).join('') : '<div class="empty">没有符合条件的路线</div>';
-  document.querySelectorAll('.route').forEach(el=>{
-    el.onclick = ()=>el.classList.toggle('open');
+  const key = {
+    price: function(r){ return [r.total_price==null?1e9:r.total_price, r.transfers, r.ride_minutes]; },
+    trans: function(r){ return [r.transfers, r.total_price==null?1e9:r.total_price]; },
+    ride:  function(r){ return [r.ride_minutes==null?1e9:r.ride_minutes, r.total_price==null?1e9:r.total_price]; }
+  }[sort];
+  list = list.slice().sort(function(a,b){
+    const ka = key(a), kb = key(b);
+    for(let i=0;i<ka.length;i++){ if(ka[i]!==kb[i]) return ka[i]-kb[i]; }
+    return a.id-b.id;
   });
+  const el = document.getElementById('route-list');
+  el.innerHTML = list.length ? list.map(routeCard).join('') : '<div class="empty">没有符合条件的路线</div>';
 }
-
-['fHops','fVia','fSort','fAvail'].forEach(id=>{
-  const el = $('#'+id);
-  el.addEventListener('input', ()=>{
-    state.hops = +$('#fHops').value;
-    state.via = $('#fVia').value.trim();
-    state.sort = $('#fSort').value;
-    state.avail = $('#fAvail').checked;
-    renderList();
-  });
-});
-
-fetch('data.json?t=' + Date.now())
-  .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-  .then(d=>{ DATA = d; render(); })
-  .catch(e=>{
-    $('#subtitle').innerHTML = '数据加载失败：' + esc(e.message) +
-      '<br>请通过 HTTP 访问本页面（GitHub Pages），直接双击打开本地文件会被浏览器的跨域策略拦截。';
-  });
+render();
 </script>
-</body>
-</html>
+</body></html>
