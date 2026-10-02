@@ -76,12 +76,32 @@ python -m http.server 8000
 
 ## 更新线上数据
 
-仓库里配了 GitHub Actions：进 Actions → **Refresh 12306 data** → Run workflow，
-可填查询日期。跑完会自动提交新的 `data.json`，Pages 稍后自动生效。
+数据需要定期重新生成。两种方式：
+
+**1. 本地生成后提交**
+
+```bash
+python scripts/export_data.py 2026-10-07
+git add data.json && git commit -m "data: 2026-10-07" && git push
+```
+
+**2. 用 GitHub Actions 自动生成**
+
+本仓库附带了工作流模板 `workflows/refresh-data.yml.example`
+（未直接放在 `.github/workflows/`，因为当前 GitHub token 没有 `workflow` scope，无法推送该目录）。
+启用方法（任选其一）：
+
+- GitHub 网页端：Actions → New workflow → set up a workflow yourself → 粘贴该文件内容，命名为 `refresh-data.yml`；
+- 或本地：`cp workflows/refresh-data.yml.example .github/workflows/refresh-data.yml`，
+  然后 `gh auth refresh -s workflow` 授权后再推送。
+
+启用后即可手动触发：
 
 ```bash
 gh workflow run refresh-data.yml -f date=2026-10-07
 ```
+
+它会安装 `12306-mcp`、启动本地服务、跑 `export_data.py`，并自动提交新的 `data.json`。
 
 ## 目录结构
 
@@ -90,7 +110,7 @@ index.html                        # 静态页面（无构建、无外部依赖�
 data.json                         # 生成的数据
 scripts/train_query.py            # 12306 查询脚本（本仓库内置副本）
 scripts/export_data.py            # 生成 data.json
-.github/workflows/refresh-data.yml
+workflows/refresh-data.yml.example# Actions 工作流模板（需手动启用）
 ```
 
 ## 说明
