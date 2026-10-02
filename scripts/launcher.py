@@ -55,6 +55,11 @@ def first_existing(cands):
 
 
 def main():
+    # 双击 bat 运行时 stdout 是管道，不设行缓冲就看不到任何进度输出
+    try:
+        sys.stdout.reconfigure(line_buffering=True)
+    except Exception:
+        pass
     py = first_existing(PY_CANDIDATES)
     node = first_existing(NODE_CANDIDATES)
     if not py:
