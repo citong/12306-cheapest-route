@@ -1,0 +1,4456 @@
+{
+  "meta": {
+    "from": "新乡",
+    "to": "昆明",
+    "date": "2026-10-05",
+    "train_types": "ZTK",
+    "max_hops": 4,
+    "total_routes": 27,
+    "generated_at": "2026-10-03T00:04:58+08:00"
+  },
+  "best": {
+    "id": 1,
+    "path": [
+      "新乡",
+      "郑州",
+      "昆明"
+    ],
+    "via": [
+      "郑州"
+    ],
+    "transfers": 1,
+    "total_price": 276.0,
+    "all_available": true,
+    "ride_minutes": 1940,
+    "legs": [
+      {
+        "from": "新乡",
+        "to": "郑州",
+        "type": "direct",
+        "price": 12.5,
+        "available": true,
+        "trains": [
+          {
+            "code": "K4237",
+            "depart": "02:57",
+            "arrive": "03:58",
+            "duration": "01:01",
+            "price": 12.5,
+            "seat": "硬座",
+            "available": true,
+            "seats": [
+              {
+                "seat": "硬座",
+                "status": "有票",
+                "price": 12.5,
+                "available": true
+              },
+              {
+                "seat": "软卧",
+                "status": "无票",
+                "price": 89.5,
+                "available": false
+              },
+              {
+                "seat": "硬卧",
+                "status": "无票",
+                "price": 58.5,
+                "available": false
+              },
+              {
+                "seat": "无座",
+                "status": "有票",
+                "price": 12.5,
+                "available": true
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "from": "郑州",
+        "to": "昆明",
+        "type": "direct",
+        "price": 263.5,
+        "available": true,
+        "trains": [
+          {
+            "code": "Z325",
+            "depart": "03:30",
+            "arrive": "10:49",
+            "duration": "31:19",
+            "price": 263.5,
+            "seat": "无座",
+            "available": true,
+            "seats": [
+              {
+                "seat": "硬座",
+                "status": "无票",
+                "price": 263.5,
+                "available": false
+              },
+              {
+                "seat": "软卧",
+                "status": "无票",
+                "price": 704.5,
+                "available": false
+              },
+              {
+                "seat": "硬卧",
+                "status": "无票",
+                "price": 446.5,
+                "available": false
+              },
+              {
+                "seat": "无座",
+                "status": "剩余2张票",
+                "price": 263.5,
+                "available": true
+              }
+            ]
+          },
+          {
+            "code": "Z53",
+            "depart": "04:42",
+            "arrive": "10:36",
+            "duration": "29:54",
+            "price": 263.5,
+            "seat": "无座",
+            "available": true,
+            "seats": [
+              {
+                "seat": "硬卧",
+                "status": "无票",
+                "price": 446.5,
+                "available": false
+              },
+              {
+                "seat": "软卧",
+                "status": "无票",
+                "price": 704.5,
+                "available": false
+              },
+              {
+                "seat": "硬座",
+                "status": "无票",
+                "price": 263.5,
+                "available": false
+              },
+              {
+                "seat": "无座",
+                "status": "剩余3张票",
+                "price": 263.5,
+                "available": true
+              }
+            ]
+          },
+          {
+            "code": "Z161",
+            "depart": "17:44",
+            "arrive": "22:02",
+            "duration": "28:18",
+            "price": 263.5,
+            "seat": "无座",
+            "available": true,
+            "seats": [
+              {
+                "seat": "硬卧",
+                "status": "无票",
+                "price": 446.5,
+                "available": false
+              },
+              {
+                "seat": "软卧",
+                "status": "无票",
+                "price": 704.5,
+                "available": false
+              },
+              {
+                "seat": "硬座",
+                "status": "无票",
+                "price": 263.5,
+                "available": false
+              },
+              {
+                "seat": "无座",
+                "status": "有票",
+                "price": 263.5,
+                "available": true
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "routes": [
+    {
+      "id": 1,
+      "path": [
+        "新乡",
+        "郑州",
+        "昆明"
+      ],
+      "via": [
+        "郑州"
+      ],
+      "transfers": 1,
+      "total_price": 276.0,
+      "all_available": true,
+      "ride_minutes": 1940,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "郑州",
+          "type": "direct",
+          "price": 12.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K4237",
+              "depart": "02:57",
+              "arrive": "03:58",
+              "duration": "01:01",
+              "price": 12.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 89.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 58.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "郑州",
+          "to": "昆明",
+          "type": "direct",
+          "price": 263.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "03:30",
+              "arrive": "10:49",
+              "duration": "31:19",
+              "price": 263.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 263.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 704.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 446.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余2张票",
+                  "price": 263.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z53",
+              "depart": "04:42",
+              "arrive": "10:36",
+              "duration": "29:54",
+              "price": 263.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 446.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 704.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 263.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余3张票",
+                  "price": 263.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z161",
+              "depart": "17:44",
+              "arrive": "22:02",
+              "duration": "28:18",
+              "price": 263.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 446.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 704.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 263.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 263.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "path": [
+        "新乡",
+        "郑州",
+        "曲靖",
+        "昆明"
+      ],
+      "via": [
+        "郑州",
+        "曲靖"
+      ],
+      "transfers": 2,
+      "total_price": 287.0,
+      "all_available": true,
+      "ride_minutes": 1963,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "郑州",
+          "type": "direct",
+          "price": 12.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K4237",
+              "depart": "02:57",
+              "arrive": "03:58",
+              "duration": "01:01",
+              "price": 12.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 89.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 58.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "郑州",
+          "to": "曲靖",
+          "type": "direct",
+          "price": 251.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "03:30",
+              "arrive": "09:17",
+              "duration": "29:47",
+              "price": 251.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 251.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 673.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 426.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余2张票",
+                  "price": 251.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z53",
+              "depart": "04:42",
+              "arrive": "09:05",
+              "duration": "28:23",
+              "price": 251.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 426.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 673.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 251.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余3张票",
+                  "price": 251.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z161",
+              "depart": "17:44",
+              "arrive": "20:36",
+              "duration": "26:52",
+              "price": 251.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 426.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 673.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 251.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 251.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "曲靖",
+          "to": "昆明",
+          "type": "direct",
+          "price": 23.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z287",
+              "depart": "02:10",
+              "arrive": "04:05",
+              "duration": "01:55",
+              "price": 23.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 69.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "有票",
+                  "price": 105.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 23.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 23.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "path": [
+        "新乡",
+        "怀化",
+        "昆明"
+      ],
+      "via": [
+        "怀化"
+      ],
+      "transfers": 1,
+      "total_price": 295.0,
+      "all_available": true,
+      "ride_minutes": 2128,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "怀化",
+          "type": "direct",
+          "price": 156.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K267",
+              "depart": "22:02",
+              "arrive": "16:45",
+              "duration": "18:43",
+              "price": 156.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 156.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 422.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 268.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 156.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "12:08",
+              "duration": "20:25",
+              "price": 177.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 304.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 476.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 177.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "怀化",
+          "to": "昆明",
+          "type": "direct",
+          "price": 138.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K1235",
+              "depart": "05:37",
+              "arrive": "22:22",
+              "duration": "16:45",
+              "price": 138.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "剩余16张票",
+                  "price": 238.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余2张票",
+                  "price": 372.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余7张票",
+                  "price": 138.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 138.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "path": [
+        "新乡",
+        "六盘水",
+        "昆明"
+      ],
+      "via": [
+        "六盘水"
+      ],
+      "transfers": 1,
+      "total_price": 296.0,
+      "all_available": true,
+      "ride_minutes": 325,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "六盘水",
+          "type": "interline",
+          "price": 241.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "T123",
+              "depart": "16:00",
+              "arrive": "16:50",
+              "duration": "00:50",
+              "price": 12.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "剩余1张票",
+                  "price": 12.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 89.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 58.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 12.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "Z161",
+              "depart": "17:44",
+              "arrive": "18:11",
+              "duration": "24:27",
+              "price": 229.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 389.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 613.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余1张票",
+                  "price": 229.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 229.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "六盘水",
+          "to": "昆明",
+          "type": "direct",
+          "price": 54.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K79",
+              "depart": "00:44",
+              "arrive": "05:19",
+              "duration": "04:35",
+              "price": 54.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 100.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "有票",
+                  "price": 155.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 54.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 54.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "path": [
+        "新乡",
+        "贵阳",
+        "昆明"
+      ],
+      "via": [
+        "贵阳"
+      ],
+      "transfers": 1,
+      "total_price": 303.0,
+      "all_available": true,
+      "ride_minutes": 2065,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "贵阳",
+          "type": "direct",
+          "price": 217.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "18:48",
+              "duration": "27:05",
+              "price": 217.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 370.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 217.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "贵阳",
+          "to": "昆明",
+          "type": "direct",
+          "price": 86.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z53",
+              "depart": "03:16",
+              "arrive": "10:36",
+              "duration": "07:20",
+              "price": 86.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 152.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 233.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余5张票",
+                  "price": 86.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 86.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "path": [
+        "新乡",
+        "长沙",
+        "昆明"
+      ],
+      "via": [
+        "长沙"
+      ],
+      "transfers": 1,
+      "total_price": 313.5,
+      "all_available": true,
+      "ride_minutes": 1866,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "长沙",
+          "type": "direct",
+          "price": 124.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "21:30",
+              "duration": "11:28",
+              "price": 124.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "21:13",
+              "duration": "10:39",
+              "price": 124.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K599",
+              "depart": "13:04",
+              "arrive": "01:38",
+              "duration": "12:34",
+              "price": 124.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "Z235",
+              "depart": "14:43",
+              "arrive": "00:12",
+              "duration": "09:29",
+              "price": 124.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "04:55",
+              "duration": "13:12",
+              "price": 124.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 124.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "长沙",
+          "to": "昆明",
+          "type": "direct",
+          "price": 189.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z161",
+              "depart": "02:24",
+              "arrive": "22:02",
+              "duration": "19:38",
+              "price": 189.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 322.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 504.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余8张票",
+                  "price": 189.5,
+                  "available": true
+                },
+                {
+                  "seat": "软座",
+                  "status": "剩余5张票",
+                  "price": 299.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余1张票",
+                  "price": 189.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "path": [
+        "新乡",
+        "成都",
+        "昆明"
+      ],
+      "via": [
+        "成都"
+      ],
+      "transfers": 1,
+      "total_price": 317.0,
+      "all_available": true,
+      "ride_minutes": 2212,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "成都",
+          "type": "direct",
+          "price": 198.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K257",
+              "depart": "03:29",
+              "arrive": "04:53",
+              "duration": "25:24",
+              "price": 198.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "剩余7张票",
+                  "price": 337.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 530.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余7张票",
+                  "price": 198.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "成都",
+          "to": "昆明",
+          "type": "direct",
+          "price": 119.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K4981",
+              "depart": "01:00",
+              "arrive": "12:28",
+              "duration": "11:28",
+              "price": 119.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "剩余20张票",
+                  "price": 119.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 207.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 119.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "path": [
+        "新乡",
+        "南宁",
+        "昆明"
+      ],
+      "via": [
+        "南宁"
+      ],
+      "transfers": 1,
+      "total_price": 329.0,
+      "all_available": true,
+      "ride_minutes": 2275,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "南宁",
+          "type": "direct",
+          "price": 217.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "T21",
+              "depart": "23:39",
+              "arrive": "21:49",
+              "duration": "22:10",
+              "price": 217.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 370.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余2张票",
+                  "price": 217.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "南宁",
+          "to": "昆明",
+          "type": "direct",
+          "price": 112.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K1205",
+              "depart": "05:47",
+              "arrive": "21:32",
+              "duration": "15:45",
+              "price": 112.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "剩余7张票",
+                  "price": 112.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 301.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 194.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余1张票",
+                  "price": 112.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "path": [
+        "新乡",
+        "桂林",
+        "昆明"
+      ],
+      "via": [
+        "桂林"
+      ],
+      "transfers": 1,
+      "total_price": 330.0,
+      "all_available": true,
+      "ride_minutes": 2316,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "桂林",
+          "type": "direct",
+          "price": 177.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "04:08",
+              "duration": "18:06",
+              "price": 177.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 304.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 476.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 177.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K157",
+              "depart": "15:50",
+              "arrive": "11:04",
+              "duration": "19:14",
+              "price": 177.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 476.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 304.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "T21",
+              "depart": "23:39",
+              "arrive": "15:32",
+              "duration": "15:53",
+              "price": 177.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 304.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 476.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 177.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "桂林",
+          "to": "昆明",
+          "type": "direct",
+          "price": 152.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "T381",
+              "depart": "11:48",
+              "arrive": "08:18",
+              "duration": "20:30",
+              "price": 152.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 261.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 409.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 152.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 152.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "path": [
+        "新乡",
+        "柳州",
+        "昆明"
+      ],
+      "via": [
+        "柳州"
+      ],
+      "transfers": 1,
+      "total_price": 336.5,
+      "all_available": true,
+      "ride_minutes": 2293,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "柳州",
+          "type": "direct",
+          "price": 198.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "06:02",
+              "duration": "20:00",
+              "price": 198.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 530.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 198.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "柳州",
+          "to": "昆明",
+          "type": "direct",
+          "price": 138.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "T381",
+              "depart": "14:05",
+              "arrive": "08:18",
+              "duration": "18:13",
+              "price": 138.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 238.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余2张票",
+                  "price": 372.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 138.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 138.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "path": [
+        "新乡",
+        "贵阳",
+        "遵义",
+        "昆明"
+      ],
+      "via": [
+        "贵阳",
+        "遵义"
+      ],
+      "transfers": 2,
+      "total_price": 336.5,
+      "all_available": true,
+      "ride_minutes": 2319,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "贵阳",
+          "type": "direct",
+          "price": 217.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "18:48",
+              "duration": "27:05",
+              "price": 217.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 370.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 217.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "贵阳",
+          "to": "遵义",
+          "type": "direct",
+          "price": 21.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "T3542",
+              "depart": "04:51",
+              "arrive": "06:11",
+              "duration": "01:20",
+              "price": 21.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "剩余9张票",
+                  "price": 67.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余16张票",
+                  "price": 102.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 21.5,
+                  "available": false
+                },
+                {
+                  "seat": "高级软卧",
+                  "status": "无票",
+                  "price": 182.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 21.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "遵义",
+          "to": "昆明",
+          "type": "direct",
+          "price": 98.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K985",
+              "depart": "13:18",
+              "arrive": "23:32",
+              "duration": "10:14",
+              "price": 98.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 98.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 263.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 171.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 98.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "path": [
+        "新乡",
+        "郑州",
+        "南昌",
+        "昆明"
+      ],
+      "via": [
+        "郑州",
+        "南昌"
+      ],
+      "transfers": 2,
+      "total_price": 349.5,
+      "all_available": true,
+      "ride_minutes": 2475,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "郑州",
+          "type": "direct",
+          "price": 12.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K4237",
+              "depart": "02:57",
+              "arrive": "03:58",
+              "duration": "01:01",
+              "price": 12.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 89.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 58.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 12.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "郑州",
+          "to": "南昌",
+          "type": "direct",
+          "price": 124.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K132",
+              "depart": "06:56",
+              "arrive": "20:05",
+              "duration": "13:09",
+              "price": 124.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 124.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "T145",
+              "depart": "19:30",
+              "arrive": "09:44",
+              "duration": "14:14",
+              "price": 163.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 163.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 438.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 280.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 163.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "南昌",
+          "to": "昆明",
+          "type": "direct",
+          "price": 213.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K491",
+              "depart": "01:23",
+              "arrive": "04:28",
+              "duration": "27:05",
+              "price": 213.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 213.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 572.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "剩余2张票",
+                  "price": 363.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 213.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "path": [
+        "新乡",
+        "广州",
+        "昆明"
+      ],
+      "via": [
+        "广州"
+      ],
+      "transfers": 1,
+      "total_price": 390.0,
+      "all_available": true,
+      "ride_minutes": 2800,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "广州",
+          "type": "direct",
+          "price": 198.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "05:13",
+              "duration": "18:39",
+              "price": 198.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 602.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K599",
+              "depart": "13:04",
+              "arrive": "10:30",
+              "duration": "21:26",
+              "price": 198.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 602.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "Z235",
+              "depart": "14:43",
+              "arrive": "08:30",
+              "duration": "17:47",
+              "price": 198.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 602.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "T123",
+              "depart": "16:00",
+              "arrive": "11:00",
+              "duration": "19:00",
+              "price": 198.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 602.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "T253",
+              "depart": "20:51",
+              "arrive": "15:31",
+              "duration": "18:40",
+              "price": 198.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 337.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 602.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余1张票",
+                  "price": 198.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "广州",
+          "to": "昆明",
+          "type": "direct",
+          "price": 192.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K230",
+              "depart": "05:37",
+              "arrive": "09:38",
+              "duration": "28:01",
+              "price": 192.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 192.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 537.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 328.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 192.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "path": [
+        "新乡",
+        "武昌",
+        "昆明"
+      ],
+      "via": [
+        "武昌"
+      ],
+      "transfers": 1,
+      "total_price": 450.0,
+      "all_available": true,
+      "ride_minutes": 1929,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "武昌",
+          "type": "direct",
+          "price": 233.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "17:20",
+              "duration": "07:18",
+              "price": 233.0,
+              "seat": "软卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 233.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "武昌",
+          "to": "昆明",
+          "type": "direct",
+          "price": 217.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z53",
+              "depart": "09:45",
+              "arrive": "10:36",
+              "duration": "24:51",
+              "price": 217.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 370.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余3张票",
+                  "price": 217.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z161",
+              "depart": "22:33",
+              "arrive": "22:02",
+              "duration": "23:29",
+              "price": 217.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 370.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "剩余1张票",
+                  "price": 217.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 217.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "Z325",
+              "depart": "08:45",
+              "arrive": "10:49",
+              "duration": "26:04",
+              "price": 370.0,
+              "seat": "硬卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "剩余9张票",
+                  "price": 370.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "path": [
+        "新乡",
+        "汉口",
+        "昆明"
+      ],
+      "via": [
+        "汉口"
+      ],
+      "transfers": 1,
+      "total_price": 456.0,
+      "all_available": true,
+      "ride_minutes": 1976,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "汉口",
+          "type": "direct",
+          "price": 86.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "17:26",
+              "duration": "06:52",
+              "price": 86.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 233.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K599",
+              "depart": "13:04",
+              "arrive": "21:14",
+              "duration": "08:10",
+              "price": 86.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 233.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "Z235",
+              "depart": "14:43",
+              "arrive": "20:46",
+              "duration": "06:03",
+              "price": 86.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 233.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "00:17",
+              "duration": "08:34",
+              "price": 86.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 233.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 86.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "17:20",
+              "duration": "07:18",
+              "price": 233.0,
+              "seat": "软卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 233.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "汉口",
+          "to": "昆明",
+          "type": "direct",
+          "price": 370.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "08:45",
+              "arrive": "10:49",
+              "duration": "26:04",
+              "price": 370.0,
+              "seat": "硬卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "剩余8张票",
+                  "price": 370.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "path": [
+        "新乡",
+        "武汉",
+        "昆明"
+      ],
+      "via": [
+        "武汉"
+      ],
+      "transfers": 1,
+      "total_price": 603.0,
+      "all_available": true,
+      "ride_minutes": 2002,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "武汉",
+          "type": "direct",
+          "price": 233.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "17:20",
+              "duration": "07:18",
+              "price": 233.0,
+              "seat": "软卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 152.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 233.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 86.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "武汉",
+          "to": "昆明",
+          "type": "direct",
+          "price": 370.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "08:45",
+              "arrive": "10:49",
+              "duration": "26:04",
+              "price": 370.0,
+              "seat": "硬卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 585.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "剩余9张票",
+                  "price": 370.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 217.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "path": [
+        "新乡",
+        "西安",
+        "昆明"
+      ],
+      "via": [
+        "西安"
+      ],
+      "transfers": 1,
+      "total_price": 282.0,
+      "all_available": false,
+      "ride_minutes": 1907,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "西安",
+          "type": "direct",
+          "price": 81.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K395",
+              "depart": "02:22",
+              "arrive": "11:22",
+              "duration": "09:00",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余3张票",
+                  "price": 222.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 81.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 81.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "西安",
+          "to": "昆明",
+          "type": "direct",
+          "price": 201.0,
+          "available": false,
+          "trains": [
+            {
+              "code": "K691",
+              "depart": "07:17",
+              "arrive": "06:04",
+              "duration": "22:47",
+              "price": 201.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 343.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 542.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 201.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 201.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "path": [
+        "新乡",
+        "驻马店",
+        "昆明"
+      ],
+      "via": [
+        "驻马店"
+      ],
+      "transfers": 1,
+      "total_price": 286.5,
+      "all_available": false,
+      "ride_minutes": 1888,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "驻马店",
+          "type": "direct",
+          "price": 43.5,
+          "available": false,
+          "trains": [
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "13:47",
+              "duration": "03:13",
+              "price": 43.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 43.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 135.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 89.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 43.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "驻马店",
+          "to": "昆明",
+          "type": "direct",
+          "price": 243.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z53",
+              "depart": "06:21",
+              "arrive": "10:36",
+              "duration": "28:15",
+              "price": 243.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 414.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 654.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 243.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 243.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "path": [
+        "新乡",
+        "衡阳",
+        "昆明"
+      ],
+      "via": [
+        "衡阳"
+      ],
+      "transfers": 1,
+      "total_price": 338.0,
+      "all_available": false,
+      "ride_minutes": 2297,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "衡阳",
+          "type": "direct",
+          "price": 148.5,
+          "available": false,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "23:55",
+              "duration": "13:53",
+              "price": 148.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 254.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 398.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 148.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 148.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "衡阳",
+          "to": "昆明",
+          "type": "direct",
+          "price": 189.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "T381",
+              "depart": "07:54",
+              "arrive": "08:18",
+              "duration": "24:24",
+              "price": 189.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "剩余9张票",
+                  "price": 322.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 504.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 189.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 189.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "path": [
+        "新乡",
+        "石家庄",
+        "昆明"
+      ],
+      "via": [
+        "石家庄"
+      ],
+      "transfers": 1,
+      "total_price": 344.0,
+      "all_available": false,
+      "ride_minutes": 2241,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "石家庄",
+          "type": "direct",
+          "price": 50.5,
+          "available": false,
+          "trains": [
+            {
+              "code": "K590",
+              "depart": "01:01",
+              "arrive": "04:57",
+              "duration": "03:56",
+              "price": 50.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 50.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 146.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 96.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 50.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "石家庄",
+          "to": "昆明",
+          "type": "direct",
+          "price": 293.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z53",
+              "depart": "01:11",
+              "arrive": "10:36",
+              "duration": "33:25",
+              "price": 293.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 497.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 786.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 293.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余3张票",
+                  "price": 293.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "path": [
+        "新乡",
+        "北京",
+        "昆明"
+      ],
+      "via": [
+        "北京"
+      ],
+      "transfers": 1,
+      "total_price": 398.0,
+      "all_available": false,
+      "ride_minutes": 2608,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "北京",
+          "type": "direct",
+          "price": 81.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K590",
+              "depart": "01:01",
+              "arrive": "09:46",
+              "duration": "08:45",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "剩余3张票",
+                  "price": 81.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 81.0,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K268",
+              "depart": "03:58",
+              "arrive": "12:20",
+              "duration": "08:22",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "Z336",
+              "depart": "05:05",
+              "arrive": "10:36",
+              "duration": "05:31",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K474",
+              "depart": "06:18",
+              "arrive": "15:06",
+              "duration": "08:48",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "T50",
+              "depart": "07:28",
+              "arrive": "13:59",
+              "duration": "06:31",
+              "price": 81.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 81.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "剩余2张票",
+                  "price": 81.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "北京",
+          "to": "昆明",
+          "type": "direct",
+          "price": 317.0,
+          "available": false,
+          "trains": [
+            {
+              "code": "Z161",
+              "depart": "11:19",
+              "arrive": "22:02",
+              "duration": "34:43",
+              "price": 317.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 536.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 849.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 317.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 317.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "path": [
+        "新乡",
+        "北京西",
+        "昆明"
+      ],
+      "via": [
+        "北京西"
+      ],
+      "transfers": 1,
+      "total_price": 398.0,
+      "all_available": false,
+      "ride_minutes": 2608,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "北京西",
+          "type": "direct",
+          "price": 81.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K590",
+              "depart": "01:01",
+              "arrive": "09:46",
+              "duration": "08:45",
+              "price": 81.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "剩余3张票",
+                  "price": 81.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 222.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 144.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 81.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "北京西",
+          "to": "昆明",
+          "type": "direct",
+          "price": 317.0,
+          "available": false,
+          "trains": [
+            {
+              "code": "Z161",
+              "depart": "11:19",
+              "arrive": "22:02",
+              "duration": "34:43",
+              "price": 317.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 536.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 849.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 317.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 317.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "path": [
+        "新乡",
+        "重庆",
+        "昆明"
+      ],
+      "via": [
+        "重庆"
+      ],
+      "transfers": 1,
+      "total_price": 404.5,
+      "all_available": false,
+      "ride_minutes": 2019,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "重庆",
+          "type": "direct",
+          "price": 280.5,
+          "available": false,
+          "trains": [
+            {
+              "code": "K4185",
+              "depart": "14:46",
+              "arrive": "11:24",
+              "duration": "20:38",
+              "price": 280.5,
+              "seat": "硬卧",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 280.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 438.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "重庆",
+          "to": "昆明",
+          "type": "direct",
+          "price": 124.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K985",
+              "depart": "10:31",
+              "arrive": "23:32",
+              "duration": "13:01",
+              "price": 124.0,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 124.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 336.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 215.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 124.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "path": [
+        "新乡",
+        "岳阳",
+        "昆明"
+      ],
+      "via": [
+        "岳阳"
+      ],
+      "transfers": 1,
+      "total_price": 449.0,
+      "all_available": false,
+      "ride_minutes": 2031,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "岳阳",
+          "type": "direct",
+          "price": 112.0,
+          "available": false,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "19:57",
+              "duration": "09:55",
+              "price": 112.0,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 194.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 301.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 112.0,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 112.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "岳阳",
+          "to": "昆明",
+          "type": "direct",
+          "price": 337.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "10:53",
+              "arrive": "10:49",
+              "duration": "23:56",
+              "price": 337.0,
+              "seat": "硬卧",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 530.0,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "剩余8张票",
+                  "price": 337.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 198.0,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "path": [
+        "新乡",
+        "株洲",
+        "昆明"
+      ],
+      "via": [
+        "株洲"
+      ],
+      "transfers": 1,
+      "total_price": null,
+      "all_available": false,
+      "ride_minutes": 2222,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "株洲",
+          "type": "direct",
+          "price": null,
+          "available": null,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "22:24",
+              "duration": "12:22",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "21:53",
+              "duration": "11:19",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T253",
+              "depart": "20:51",
+              "arrive": "08:16",
+              "duration": "11:25",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T21",
+              "depart": "23:39",
+              "arrive": "10:37",
+              "duration": "10:58",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            }
+          ]
+        },
+        {
+          "from": "株洲",
+          "to": "昆明",
+          "type": "direct",
+          "price": 180.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K79",
+              "depart": "04:39",
+              "arrive": "05:19",
+              "duration": "24:40",
+              "price": 180.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 310.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余2张票",
+                  "price": 488.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 180.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 180.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "path": [
+        "新乡",
+        "信阳",
+        "昆明"
+      ],
+      "via": [
+        "信阳"
+      ],
+      "transfers": 1,
+      "total_price": null,
+      "all_available": false,
+      "ride_minutes": 1984,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "信阳",
+          "type": "direct",
+          "price": 54.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "14:35",
+              "duration": "04:33",
+              "price": 54.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 100.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 155.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K599",
+              "depart": "13:04",
+              "arrive": "18:14",
+              "duration": "05:10",
+              "price": 54.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 155.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 100.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K1969",
+              "depart": "14:05",
+              "arrive": "20:20",
+              "duration": "06:15",
+              "price": 54.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 100.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 54.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K107",
+              "depart": "15:43",
+              "arrive": "20:58",
+              "duration": "05:15",
+              "price": 54.5,
+              "seat": "无座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 100.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 155.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 54.5,
+                  "available": true
+                }
+              ]
+            },
+            {
+              "code": "K157",
+              "depart": "15:50",
+              "arrive": "21:04",
+              "duration": "05:14",
+              "price": 54.5,
+              "seat": "硬座",
+              "available": false,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "无票",
+                  "price": 155.5,
+                  "available": false
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 100.5,
+                  "available": false
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 54.5,
+                  "available": false
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "信阳",
+          "to": "昆明",
+          "type": "direct",
+          "price": null,
+          "available": null,
+          "trains": [
+            {
+              "code": "Z325",
+              "depart": "06:18",
+              "arrive": "10:49",
+              "duration": "28:31",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "Z53",
+              "depart": "07:17",
+              "arrive": "10:36",
+              "duration": "27:19",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "path": [
+        "新乡",
+        "株洲",
+        "安顺",
+        "昆明"
+      ],
+      "via": [
+        "株洲",
+        "安顺"
+      ],
+      "transfers": 2,
+      "total_price": null,
+      "all_available": false,
+      "ride_minutes": 2320,
+      "legs": [
+        {
+          "from": "新乡",
+          "to": "株洲",
+          "type": "direct",
+          "price": null,
+          "available": null,
+          "trains": [
+            {
+              "code": "K457",
+              "depart": "10:02",
+              "arrive": "22:24",
+              "duration": "12:22",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T369",
+              "depart": "10:34",
+              "arrive": "21:53",
+              "duration": "11:19",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T253",
+              "depart": "20:51",
+              "arrive": "08:16",
+              "duration": "11:25",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            },
+            {
+              "code": "T21",
+              "depart": "23:39",
+              "arrive": "10:37",
+              "duration": "10:58",
+              "price": null,
+              "seat": null,
+              "available": null,
+              "seats": []
+            }
+          ]
+        },
+        {
+          "from": "株洲",
+          "to": "安顺",
+          "type": "direct",
+          "price": 128.5,
+          "available": true,
+          "trains": [
+            {
+              "code": "K79",
+              "depart": "04:39",
+              "arrive": "22:28",
+              "duration": "17:49",
+              "price": 128.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 222.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余2张票",
+                  "price": 348.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 128.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 128.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K739",
+              "depart": "05:20",
+              "arrive": "22:42",
+              "duration": "17:22",
+              "price": 128.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 128.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 348.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 222.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 128.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K491",
+              "depart": "05:26",
+              "arrive": "20:58",
+              "duration": "15:32",
+              "price": 128.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 128.5,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余4张票",
+                  "price": 348.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬卧",
+                  "status": "有票",
+                  "price": 222.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "无票",
+                  "price": 128.5,
+                  "available": false
+                }
+              ]
+            },
+            {
+              "code": "K1235",
+              "depart": "23:18",
+              "arrive": "13:49",
+              "duration": "14:31",
+              "price": 128.5,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "无票",
+                  "price": 222.5,
+                  "available": false
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余3张票",
+                  "price": 348.5,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 128.5,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 128.5,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "from": "安顺",
+          "to": "昆明",
+          "type": "direct",
+          "price": 75.0,
+          "available": true,
+          "trains": [
+            {
+              "code": "K1235",
+              "depart": "13:53",
+              "arrive": "22:22",
+              "duration": "08:29",
+              "price": 75.0,
+              "seat": "硬座",
+              "available": true,
+              "seats": [
+                {
+                  "seat": "硬卧",
+                  "status": "剩余16张票",
+                  "price": 133.0,
+                  "available": true
+                },
+                {
+                  "seat": "软卧",
+                  "status": "剩余1张票",
+                  "price": 205.0,
+                  "available": true
+                },
+                {
+                  "seat": "硬座",
+                  "status": "有票",
+                  "price": 75.0,
+                  "available": true
+                },
+                {
+                  "seat": "无座",
+                  "status": "有票",
+                  "price": 75.0,
+                  "available": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "direct": {
+    "trains": [
+      {
+        "code": "G1537",
+        "depart": "08:07",
+        "arrive": "19:14",
+        "duration": "11:07",
+        "price": 902.0,
+        "seat": "二等座",
+        "available": true,
+        "seats": [
+          {
+            "seat": "商务座",
+            "status": "剩余2张票",
+            "price": 2899.0,
+            "available": true
+          },
+          {
+            "seat": "一等座",
+            "status": "剩余10张票",
+            "price": 1429.0,
+            "available": true
+          },
+          {
+            "seat": "二等座",
+            "status": "剩余19张票",
+            "price": 902.0,
+            "available": true
+          },
+          {
+            "seat": "无座",
+            "status": "有票",
+            "price": 902.0,
+            "available": true
+          }
+        ]
+      },
+      {
+        "code": "G3473",
+        "depart": "10:22",
+        "arrive": "22:04",
+        "duration": "11:42",
+        "price": 920.0,
+        "seat": "二等座",
+        "available": false,
+        "seats": [
+          {
+            "seat": "商务座",
+            "status": "无票",
+            "price": 2915.0,
+            "available": false
+          },
+          {
+            "seat": "一等座",
+            "status": "无票",
+            "price": 1490.0,
+            "available": false
+          },
+          {
+            "seat": "二等座",
+            "status": "无票",
+            "price": 920.0,
+            "available": false
+          },
+          {
+            "seat": "无座",
+            "status": "无票",
+            "price": 920.0,
+            "available": false
+          }
+        ]
+      }
+    ],
+    "min_price": 902.0,
+    "note": "直达车次于 2026-10-02 23:33 采集；12306 随后对该区间限流，重取为空，故沿用本次结果。"
+  }
+}

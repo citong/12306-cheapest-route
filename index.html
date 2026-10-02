@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新乡 → 昆明 · 最便宜火车路线</title>
+<meta name="description" content="基于 12306 实时余票，穷举多段换乘方案，找出新乡到昆明最便宜的火车路线。">
+<style>
+  :root{
+    --bg:#f5f6f8; --card:#fff; --line:#e4e7ec; --ink:#1c2024; --muted:#6b7280;
+    --red:#c0392b; --red-soft:#fdecea; --green:#0f7b3f; --green-soft:#e9f7ef;
+    --blue:#2563eb; --chip:#eef2f7; --shadow:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  .wrap{max-width:980px;margin:0 auto;padding:32px 18px 64px}
+  header h1{font-size:26px;margin:0 0 6px;letter-spacing:-.3px}
+  .sub{color:var(--muted);font-size:14px}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0 8px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+  .stat .k{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+  .stat .v{font-size:28px;font-weight:700;letter-spacing:-.5px;line-height:1.2}
+  .stat .u{font-size:13px;color:var(--muted);font-weight:400;margin-left:2px}
+  .stat.hl{background:var(--red-soft);border-color:#f3c9c4}
+  .stat.hl .v{color:var(--red)}
+  .stat.ok .v{color:var(--green)}
+
+  h2{font-size:17px;margin:34px 0 14px;padding-left:10px;border-left:4px solid var(--red)}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+
+  .best{padding:18px 20px}
+  .best-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:16px;font-weight:600;margin-bottom:4px}
+  .chip{background:var(--chip);border-radius:8px;padding:3px 10px;font-size:14px}
+  .arrow{color:var(--muted);font-weight:400}
+  .best-meta{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+  .leg{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px dashed var(--line)}
+  .leg:first-of-type{border-top:none}
+  .code{min-width:70px;text-align:center;font-weight:700;background:var(--chip);border-radius:8px;padding:8px 6px;font-size:15px}
+  .leg-r{font-weight:600}
+  .leg-t{color:var(--muted);font-size:13px}
+  .leg-p{color:var(--red);font-weight:600;font-size:13px}
+  .tag{display:inline-block;font-size:11.5px;padding:1px 7px;border-radius:6px;background:var(--green-soft);color:var(--green);margin-left:6px}
+  .tag.no{background:#f1f2f4;color:var(--muted)}
+
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:14px 16px;margin-bottom:14px}
+  .controls label{font-size:13px;color:var(--muted);margin-right:4px}
+  select,input[type=search]{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);
+    border-radius:8px;background:#fff;color:var(--ink)}
+  .switch{display:flex;align-items:center;gap:6px;font-size:13.5px;cursor:pointer;user-select:none}
+  .count{margin-left:auto;font-size:13px;color:var(--muted)}
+
+  .route{padding:14px 18px;border-top:1px solid var(--line);cursor:pointer}
+  .route:hover{background:#fafbfc}
+  .route-top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .rk{width:24px;color:var(--muted);font-size:13px}
+  .rpath{font-weight:600;flex:1;min-width:220px}
+  .rtrans{font-size:12.5px;color:var(--muted)}
+  .rprice{font-weight:700;color:var(--red);font-size:18px;min-width:80px;text-align:right}
+  .rdetail{display:none;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+  .route.open .rdetail{display:block}
+  .mini{font-size:13px;color:var(--muted);margin-top:2px}
+
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th{background:#f0f2f5;text-align:left;padding:10px 12px;font-size:12.5px;font-weight:600}
+  td{padding:10px 12px;border-top:1px solid var(--line)}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+
+  .bars{padding:18px 20px}
+  .bar{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px}
+  .bar .lbl{width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--muted)}
+  .bar .track{flex:1;height:18px;background:#f0f2f5;border-radius:6px;overflow:hidden}
+  .bar .fill{height:100%;background:linear-gradient(90deg,#e57368,var(--red));border-radius:6px}
+  .bar .val{width:64px;text-align:right;font-weight:600;color:var(--red)}
+
+  footer{margin-top:36px;font-size:12.5px;color:var(--muted);line-height:1.8}
+  footer a{color:var(--blue)}
+  .warn{background:#fff8e6;border:1px solid #f0d9a8;border-radius:12px;padding:12px 16px;
+    font-size:13px;color:#7a5b13;margin-top:18px}
+  .empty{padding:28px;text-align:center;color:var(--muted)}
+  @media(max-width:720px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .bar .lbl{width:110px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="title">最便宜火车路线</h1>
+    <div class="sub" id="subtitle">加载中…</div>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <div id="app" hidden>
+    <h2>最优方案</h2>
+    <div class="card best" id="best"></div>
+
+    <h2>票价对比（Top 10）</h2>
+    <div class="card bars" id="bars"></div>
+
+    <h2>全部可行路线</h2>
+    <div class="card controls">
+      <label for="fHops">最多换乘</label>
+      <select id="fHops">
+        <option value="99">不限</option><option value="1">1 次</option>
+        <option value="2">2 次</option><option value="3">3 次</option>
+      </select>
+      <label for="fVia">中转</label>
+      <input type="search" id="fVia" placeholder="城市，如 郑州" size="10">
+      <label for="fSort">排序</label>
+      <select id="fSort">
+        <option value="price">价格最低</option>
+        <option value="trans">换乘最少</option>
+        <option value="time">在途最短</option>
+      </select>
+      <label class="switch"><input type="checkbox" id="fAvail"> 只看全程有票</label>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="card" id="list"></div>
+
+    <h2>直达车次（含高铁，作为价格基准）</h2>
+    <div class="card" style="overflow:hidden">
+      <table id="direct"></table>
+    </div>
+
+    <div class="warn" id="warn"></div>
+  </div>
+
+  <footer>
+    <div>数据来自 12306 实时余票接口，由 <code>12306-smart-query</code> 穷举多段换乘后生成。</div>
+    <div>票价均为该段最低价席别；<b>余票与票价实时变动，实际购票请以 12306 官方为准。</b></div>
+    <div id="gen"></div>
+  </footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const yuan = v => v == null ? '—' : '¥' + Number(v).toFixed(0);
+const dur = m => m ? Math.floor(m/60) + '小时' + (m%60) + '分' : '—';
+const tag = ok => `<span class="tag${ok?'':' no'}">${ok?'有票':'无票'}</span>`;
+
+let DATA = null, state = {hops:99, via:'', sort:'price', avail:false};
+
+function pathHTML(p){
+  return p.map((s,i)=>`<span class="chip">${esc(s)}</span>${i<p.length-1?'<span class="arrow">→</span>':''}`).join('');
+}
+
+function legHTML(l){
+  const ts = (l.trains||[]).slice(0,3).map(t=>`
+    <div class="leg">
+      <div class="code">${esc(t.code)}</div>
+      <div>
+        <div class="leg-r">${esc(l.from)} <span class="arrow">→</span> ${esc(l.to)}</div>
+        <div class="leg-t">${esc(t.depart)} 发车 · ${esc(t.arrive)} 到达 · 历时 ${esc(t.duration)}</div>
+        <div class="leg-p">${esc(t.seat||'')} ${yuan(t.price)} ${t.available?tag(true):tag(false)}</div>
+      </div>
+    </div>`).join('');
+  return ts || `<div class="mini">${esc(l.from)} → ${esc(l.to)}（无具体车次）</div>`;
+}
+
+function render(){
+  const {from,to,date,total_routes,generated_at,max_hops,train_types} = DATA.meta;
+  $('#title').textContent = `${from} → ${to} · 最便宜火车路线`;
+  $('#subtitle').innerHTML = `出发日期 <b>${esc(date)}</b> · 车型 <b>${esc(train_types||'普速')}</b> · 最多换乘 <b>${esc(max_hops)}</b> 次 · 搜出 <b>${esc(total_routes)}</b> 条可行路线`;
+
+  const best = DATA.best, dmin = DATA.direct.min_price;
+  const save = (best && best.total_price != null && dmin != null) ? dmin - best.total_price : null;
+  $('#stats').innerHTML = `
+    <div class="stat hl"><div class="k">最便宜方案</div><div class="v">${yuan(best&&best.total_price)}</div></div>
+    <div class="stat"><div class="k">直达最低价</div><div class="v">${yuan(dmin)}</div></div>
+    <div class="stat ok"><div class="k">最多可省</div><div class="v">${save==null?'—':'¥'+save.toFixed(0)}</div></div>
+    <div class="stat"><div class="k">换乘次数</div><div class="v">${best?best.transfers:'—'}<span class="u">次</span></div></div>`;
+  $('#app').hidden = false;
+
+  if(best){
+    $('#best').innerHTML = `
+      <div class="best-path">${pathHTML(best.path)}</div>
+      <div class="best-meta">换乘 ${best.transfers} 次 · 在途约 ${dur(best.ride_minutes)} · 合计 ${yuan(best.total_price)}</div>
+      ${best.legs.map(legHTML).join('')}`;
+  }
+
+  const top = [...DATA.routes].filter(r=>r.total_price!=null).slice(0,10);
+  const max = Math.max(...top.map(r=>r.total_price));
+  $('#bars').innerHTML = top.map(r=>`
+    <div class="bar">
+      <div class="lbl">${esc(r.path.join(' → '))}</div>
+      <div class="track"><div class="fill" style="width:${(r.total_price/max*100).toFixed(1)}%"></div></div>
+      <div class="val">${yuan(r.total_price)}</div>
+    </div>`).join('');
+
+  renderList();
+
+  const d = DATA.direct.trains||[];
+  $('#direct').innerHTML = d.length ? `
+    <thead><tr><th>车次</th><th>区间</th><th>时刻</th><th>历时</th><th class="num">最低价</th><th>席别</th></tr></thead>
+    <tbody>${d.map(t=>`<tr>
+      <td><b>${esc(t.code)}</b></td>
+      <td>${esc(DATA.meta.from)} → ${esc(DATA.meta.to)}</td>
+      <td>${esc(t.depart)} → ${esc(t.arrive)}</td>
+      <td>${esc(t.duration)}</td>
+      <td class="num">${yuan(t.price)}</td>
+      <td>${esc(t.seat||'')} ${t.available?tag(true):tag(false)}</td></tr>`).join('')}</tbody>` : '';
+
+  $('#warn').textContent = '提示：换乘方案由程序自动拼接，请自行确认换乘站的换乘时间是否充裕（建议预留 1 小时以上）。';
+  $('#gen').textContent = '数据生成时间：' + (generated_at||'—');
+}
+
+function renderList(){
+  let rs = DATA.routes.filter(r=>{
+    if(r.transfers > state.hops) return false;
+    if(state.avail && !r.all_available) return false;
+    if(state.via && !(r.via||[]).some(v=>v.includes(state.via))) return false;
+    return true;
+  });
+  const cmp = {
+    price:(a,b)=>(a.total_price??1e9)-(b.total_price??1e9),
+    trans:(a,b)=>a.transfers-b.transfers || (a.total_price??1e9)-(b.total_price??1e9),
+    time:(a,b)=>(a.ride_minutes||1e9)-(b.ride_minutes||1e9),
+  }[state.sort];
+  rs.sort(cmp);
+  $('#count').textContent = `共 ${rs.length} 条`;
+  $('#list').innerHTML = rs.length ? rs.map(r=>`
+    <div class="route" data-id="${r.id}">
+      <div class="route-top">
+        <span class="rk">${r.id}</span>
+        <span class="rpath">${pathHTML(r.path)}</span>
+        <span class="rtrans">换乘 ${r.transfers} 次 · 在途 ${dur(r.ride_minutes)}</span>
+        <span class="rprice">${yuan(r.total_price)}</span>
+      </div>
+      <div class="rdetail">${r.legs.map(legHTML).join('')}</div>
+    </div>`).join('') : '<div class="empty">没有符合条件的路线</div>';
+  document.querySelectorAll('.route').forEach(el=>{
+    el.onclick = ()=>el.classList.toggle('open');
+  });
+}
+
+['fHops','fVia','fSort','fAvail'].forEach(id=>{
+  const el = $('#'+id);
+  el.addEventListener('input', ()=>{
+    state.hops = +$('#fHops').value;
+    state.via = $('#fVia').value.trim();
+    state.sort = $('#fSort').value;
+    state.avail = $('#fAvail').checked;
+    renderList();
+  });
+});
+
+fetch('data.json?t=' + Date.now())
+  .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+  .then(d=>{ DATA = d; render(); })
+  .catch(e=>{
+    $('#subtitle').innerHTML = '数据加载失败：' + esc(e.message) +
+      '<br>请通过 HTTP 访问本页面（GitHub Pages），直接双击打开本地文件会被浏览器的跨域策略拦截。';
+  });
+</script>
+</body>
+</html>
