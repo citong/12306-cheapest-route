@@ -192,40 +192,16 @@ REAL_TIPS = {
 }
 TIPS.update(REAL_TIPS)
 
-# 三种取景：主体居中 / 偏左 / 偏右。
-# 城市横幅多为竖构图、地平线偏下，垂直方向统一取"略偏下"的 16:9 窗口，
-# 否则很容易只裁到天空。水平方向再做三种偏移，让三张图不至于雷同。
-CROPS = [(0.0, 0.44), (0.24, 0.44), (0.52, 0.44)]
-
-
-def derive_spot_img(src_path, dst_path, idx, total, force=False):
-    """从城市横幅裁出第 idx 张景点配图（16:9）。force=True 时覆盖已有文件。"""
-    if os.path.exists(dst_path) and not force:
-        return False
-    if not os.path.exists(src_path):
-        return False
-    im = Image.open(src_path).convert("RGB")
-    w, h = im.size
-    target = 16 / 9
-    nh = min(h, int(w / target))          # 先由宽度定高
-    if nh >= h:                            # 图太窄，则由高度定宽
-        nh = h
-    nw = int(nh * target)
-    if nw > w:
-        nw, nh = w, int(w / target)
-    fx, fy = CROPS[idx % len(CROPS)]
-    x0 = int(max(0, min(w - nw, w * fx)))
-    y0 = int(max(0, min(h - nh, h * fy)))
-    im2 = im.crop((x0, y0, x0 + nw, y0 + nh))
-    if im2.width > 520:
-        im2 = im2.resize((520, max(1, round(520 / target))), Image.LANCZOS)
-    # 轻微差异化调色，让三张图不显得完全雷同
-    if idx % 3 == 1:
-        im2 = ImageEnhance.Color(im2).enhance(1.12)
-    elif idx % 3 == 2:
-        im2 = ImageEnhance.Brightness(im2).enhance(1.05)
-    im2.save(dst_path, "JPEG", quality=74, optimize=True, progressive=True)
-    return True
+# ---------------------------------------------------------------- 派生配图
+# 配图的真实生成逻辑已迁移到 scripts/diversify_images.py。
+#
+#为什么迁移：旧实现在这里从横幅裁 3 张 16:9，但横幅多为 480x441（约 1.09:1），
+# 裁 16:9 时横向余量为 0（nw == w），三个 fx 偏移全被 clamp 成同一窗口，
+# 结果三张图只差一点点调色 —— 肉眼看就是同一张图重复三遍。
+# 新实现改用「变焦倍数 + 画幅比例 + 取景中心 + 镜像 + 调色」五种维度做差异化，
+# 并带两两像素差自检（见 diversify_images.MIN_DIFF）。
+#
+# 本脚本只保留字段补齐与配图引用自检，不再自己裁图，避免两处逻辑打架。
 
 
 def main():
@@ -243,10 +219,9 @@ def main():
         if city in TIPS:
             v["tip"] = TIPS[city]
 
-        # --- 2) 景点字段 + 配图 ---
+        # --- 2) 景点字段 + 配图引用 ---
         rows = SPOT.get(city)
         sl = slug.get(city)
-        src = os.path.join(IMG, "pop-%s.jpg" % sl) if sl else None
         for i, sp in enumerate(v.get("spots") or []):
             if rows and i < len(rows):
                 t, p, b = rows[i]
@@ -256,16 +231,12 @@ def main():
             # 12 城的实景点图受保护，任何情况下都不覆盖
             if city in REAL_CITIES and sp.get("img"):
                 continue
-            if sp.get("img") and sl and os.path.exists(os.path.join(ROOT, sp["img"])):
-                # 已有图（非受保护城市）也只在 force 时重生成
-                if not force:
-                    continue
-            if sl:
+            # 非受保护城市：只补引用，实际裁图交给 diversify_images.py
+            if sl and not sp.get("img"):
                 dst = "images/spot-%s-%d.jpg" % (sl, i + 1)
-                if derive_spot_img(src, os.path.join(ROOT, dst), i,
-                                   len(v["spots"]), force=force):
+                if os.path.exists(os.path.join(ROOT, dst)):
+                    sp["img"] = dst
                     n_img += 1
-                sp["img"] = dst
 
         # --- 3) 配图自检：任何景点都必须有图 ---
         for sp in (v.get("spots") or []):
