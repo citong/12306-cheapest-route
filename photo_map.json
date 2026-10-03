@@ -1,0 +1,336 @@
+{
+ "烟台": {
+  "蓬莱阁": "images/ph-yantai-1.jpg",
+  "长岛": "images/ph-yantai-2.jpg",
+  "张裕酒文化博物馆": "images/ph-yantai-3.jpg"
+ },
+ "张家界": {
+  "武陵源": "images/ph-zhangjiajie-1.jpg",
+  "天门山": "images/ph-zhangjiajie-2.jpg",
+  "大峡谷玻璃桥": "images/ph-zhangjiajie-3.jpg"
+ },
+ "黄山": {
+  "黄山风景区": "images/ph-huangshan-1.jpg",
+  "宏村": "images/ph-huangshan-2.jpg",
+  "西递": "images/ph-huangshan-3.jpg"
+ },
+ "北京": {
+  "故宫博物院": "images/ph-beijing-1.jpg",
+  "八达岭长城": "images/ph-beijing-2.jpg",
+  "颐和园": "images/ph-beijing-3.jpg",
+  "天安门广场": "images/ph-beijing-4.jpg",
+  "天坛": "images/ph-beijing-5.jpg",
+  "南锣鼓巷": "images/ph-beijing-6.jpg",
+  "圆明园": "images/ph-beijing-7.jpg",
+  "雍和宫": "images/ph-beijing-8.jpg"
+ },
+ "天津": {
+  "五大道": "images/ph-tianjin-1.jpg",
+  "古文化街": "images/ph-tianjin-2.jpg",
+  "意大利风情区": "images/ph-tianjin-3.jpg",
+  "天津之眼摩天轮": "images/ph-tianjin-4.jpg"
+ },
+ "上海": {
+  "外滩": "images/ph-shanghai-1.jpg",
+  "豫园": "images/ph-shanghai-2.jpg",
+  "南京路步行街": "images/ph-shanghai-3.jpg",
+  "东方明珠": "images/ph-shanghai-4.jpg",
+  "上海博物馆": "images/ph-shanghai-5.jpg",
+  "田子坊": "images/ph-shanghai-6.jpg",
+  "陆家嘴环路": "images/ph-shanghai-7.jpg",
+  "朱家角古镇": "images/ph-shanghai-8.jpg"
+ },
+ "重庆": {
+  "洪崖洞": "images/ph-chongqing-1.jpg",
+  "磁器口古镇": "images/ph-chongqing-2.jpg",
+  "长江索道": "images/ph-chongqing-3.jpg",
+  "解放碑": "images/ph-chongqing-4.jpg",
+  "李子坝轻轨站": "images/ph-chongqing-5.jpg",
+  "鹅岭二厂": "images/ph-chongqing-6.jpg",
+  "南山一棵树": "images/ph-chongqing-7.jpg",
+  "武隆天生三桥": "images/ph-chongqing-8.jpg"
+ },
+ "沈阳": {
+  "沈阳故宫": "images/ph-shenyang-1.jpg",
+  "九一八历史博物馆": "images/ph-shenyang-2.jpg",
+  "张氏帅府": "images/ph-shenyang-3.jpg"
+ },
+ "大连": {
+  "星海广场": "images/ph-dalian-1.jpg",
+  "老虎滩海洋公园": "images/ph-dalian-2.jpg",
+  "金石滩": "images/ph-dalian-3.jpg"
+ },
+ "长春": {
+  "伪满皇宫博物院": "images/ph-changchun-1.jpg",
+  "净月潭": "images/ph-changchun-2.jpg",
+  "长影旧址博物馆": "images/ph-changchun-3.jpg"
+ },
+ "哈尔滨": {
+  "冰雪大世界": "images/ph-haerbin-1.jpg",
+  "中央大街": "images/ph-haerbin-2.jpg",
+  "圣索菲亚大教堂": "images/ph-haerbin-3.jpg"
+ },
+ "南京": {
+  "中山陵": "images/ph-nanjing-1.jpg",
+  "夫子庙秦淮河": "images/ph-nanjing-2.jpg",
+  "明孝陵": "images/ph-nanjing-3.jpg",
+  "夫子庙-秦淮风光带": "images/ph-nanjing-4.jpg"
+ },
+ "苏州": {
+  "拙政园": "images/ph-suzhou-1.jpg",
+  "平江路": "images/ph-suzhou-2.jpg",
+  "虎丘": "images/ph-suzhou-3.jpg"
+ },
+ "无锡": {
+  "鼋头渚": "images/ph-wuxi-1.jpg",
+  "灵山胜境": "images/ph-wuxi-2.jpg",
+  "惠山古镇": "images/ph-wuxi-3.jpg"
+ },
+ "杭州": {
+  "西湖": "images/ph-hangzhou-1.jpg",
+  "灵隐寺": "images/ph-hangzhou-2.jpg",
+  "西溪湿地": "images/ph-hangzhou-3.jpg",
+  "雷峰塔": "images/ph-hangzhou-4.jpg",
+  "河坊街": "images/ph-hangzhou-5.jpg",
+  "宋城": "images/ph-hangzhou-6.jpg",
+  "太子湾公园": "images/ph-hangzhou-7.jpg",
+  "京杭大运河·桥西历史街区": "images/ph-hangzhou-8.jpg",
+  "浙江省博物馆(孤山)": "images/ph-hangzhou-9.jpg",
+  "清河坊·南宋御街": "images/ph-hangzhou-10.jpg"
+ },
+ "宁波": {
+  "天一阁": "images/ph-ningbo-1.jpg",
+  "老外滩": "images/ph-ningbo-2.jpg",
+  "东钱湖": "images/ph-ningbo-3.jpg"
+ },
+ "福州": {
+  "三坊七巷": "images/ph-fuzhou-1.jpg",
+  "鼓山": "images/ph-fuzhou-2.jpg",
+  "平潭": "images/ph-fuzhou-3.jpg"
+ },
+ "厦门": {
+  "鼓浪屿": "images/ph-xiamen-1.jpg",
+  "厦门大学": "images/ph-xiamen-2.jpg",
+  "环岛路": "images/ph-xiamen-3.jpg",
+  "曾厝垵": "images/ph-xiamen-4.jpg",
+  "南普陀寺": "images/ph-xiamen-5.jpg",
+  "沙坡尾": "images/ph-xiamen-6.jpg",
+  "胡里山炮台": "images/ph-xiamen-7.jpg",
+  "集美学村": "images/ph-xiamen-8.jpg"
+ },
+ "济南": {
+  "趵突泉": "images/ph-jinan-1.jpg",
+  "大明湖": "images/ph-jinan-2.jpg",
+  "千佛山": "images/ph-jinan-3.jpg"
+ },
+ "青岛": {
+  "栈桥": "images/ph-qingdao-1.jpg",
+  "八大关": "images/ph-qingdao-2.jpg",
+  "崂山": "images/ph-qingdao-3.jpg",
+  "崂山风景区": "images/ph-qingdao-4.jpg"
+ },
+ "威海": {
+  "刘公岛": "images/ph-weihai-1.jpg",
+  "成山头": "images/ph-weihai-2.jpg",
+  "国际海水浴场": "images/ph-weihai-3.jpg"
+ },
+ "郑州": {
+  "少林寺": "images/ph-zhengzhou-1.jpg",
+  "河南博物院": "images/ph-zhengzhou-2.jpg",
+  "黄河风景名胜区": "images/ph-zhengzhou-3.jpg"
+ },
+ "洛阳": {
+  "龙门石窟": "images/ph-luoyang-1.jpg",
+  "白马寺": "images/ph-luoyang-2.jpg",
+  "老君山": "images/ph-luoyang-3.jpg"
+ },
+ "开封": {
+  "清明上河园": "images/ph-kaifeng-1.jpg",
+  "包公祠": "images/ph-kaifeng-2.jpg",
+  "大相国寺": "images/ph-kaifeng-3.jpg"
+ },
+ "武汉": {
+  "黄鹤楼": "images/ph-wuhan-1.jpg",
+  "东湖": "images/ph-wuhan-2.jpg",
+  "武汉大学": "images/ph-wuhan-3.jpg",
+  "东湖生态旅游风景区": "images/ph-wuhan-4.jpg",
+  "湖北省博物馆": "images/ph-wuhan-5.jpg"
+ },
+ "长沙": {
+  "岳麓书院": "images/ph-changsha-1.jpg",
+  "橘子洲": "images/ph-changsha-2.jpg",
+  "湖南省博物馆": "images/ph-changsha-3.jpg",
+  "岳麓山·岳麓书院": "images/ph-changsha-4.jpg"
+ },
+ "广州": {
+  "广州塔": "images/ph-guangzhou-1.jpg",
+  "陈家祠": "images/ph-guangzhou-2.jpg",
+  "沙面岛": "images/ph-guangzhou-3.jpg",
+  "北京路步行街": "images/ph-guangzhou-4.jpg",
+  "越秀公园": "images/ph-guangzhou-5.jpg",
+  "上下九步行街": "images/ph-guangzhou-6.jpg",
+  "珠江夜游": "images/ph-guangzhou-7.jpg",
+  "圣心大教堂": "images/ph-guangzhou-8.jpg"
+ },
+ "深圳": {
+  "世界之窗": "images/ph-shenzhen-1.jpg",
+  "大梅沙海滨": "images/ph-shenzhen-2.jpg",
+  "莲花山公园": "images/ph-shenzhen-3.jpg",
+  "欢乐谷": "images/ph-shenzhen-4.jpg"
+ },
+ "珠海": {
+  "长隆海洋王国": "images/ph-zhuhai-1.jpg",
+  "情侣路": "images/ph-zhuhai-2.jpg",
+  "外伶仃岛": "images/ph-zhuhai-3.jpg"
+ },
+ "桂林": {
+  "漓江": "images/ph-guilin-1.jpg",
+  "阳朔西街": "images/ph-guilin-2.jpg",
+  "象鼻山": "images/ph-guilin-3.jpg",
+  "漓江竹筏(杨堤-兴坪)": "images/ph-guilin-4.jpg",
+  "遇龙河漂流": "images/ph-guilin-5.jpg",
+  "两江四湖": "images/ph-guilin-6.jpg",
+  "龙脊梯田": "images/ph-guilin-7.jpg",
+  "银子岩": "images/ph-guilin-8.jpg",
+  "东西巷": "images/ph-guilin-9.jpg"
+ },
+ "海口": {
+  "骑楼老街": "images/ph-haikou-1.jpg",
+  "火山口地质公园": "images/ph-haikou-2.jpg",
+  "假日海滩": "images/ph-haikou-3.jpg"
+ },
+ "三亚": {
+  "亚龙湾": "images/ph-sanya-1.jpg",
+  "天涯海角": "images/ph-sanya-2.jpg",
+  "南山文化旅游区": "images/ph-sanya-3.jpg",
+  "蜈支洲岛": "images/ph-sanya-4.jpg",
+  "大东海": "images/ph-sanya-5.jpg",
+  "椰梦长廊": "images/ph-sanya-6.jpg",
+  "鹿回头": "images/ph-sanya-7.jpg",
+  "第一市场": "images/ph-sanya-8.jpg"
+ },
+ "成都": {
+  "大熊猫繁育研究基地": "images/ph-chengdu-1.jpg",
+  "宽窄巷子": "images/ph-chengdu-2.jpg",
+  "都江堰": "images/ph-chengdu-3.jpg",
+  "锦里": "images/ph-chengdu-4.jpg",
+  "武侯祠": "images/ph-chengdu-5.jpg",
+  "杜甫草堂": "images/ph-chengdu-6.jpg",
+  "春熙路·IFS": "images/ph-chengdu-7.jpg",
+  "金沙遗址博物馆": "images/ph-chengdu-8.jpg",
+  "太古里": "images/ph-chengdu-9.jpg"
+ },
+ "乐山": {
+  "乐山大佛": "images/ph-leshan-1.jpg",
+  "峨眉山": "images/ph-leshan-2.jpg",
+  "嘉阳小火车": "images/ph-leshan-3.jpg"
+ },
+ "昆明": {
+  "石林": "images/ph-kunming-1.jpg",
+  "滇池": "images/ph-kunming-2.jpg",
+  "大观楼": "images/ph-kunming-3.jpg",
+  "滇池海埂大坝": "images/ph-kunming-4.jpg",
+  "云南民族村": "images/ph-kunming-5.jpg",
+  "翠湖公园": "images/ph-kunming-6.jpg",
+  "西山龙门": "images/ph-kunming-7.jpg",
+  "金马碧鸡坊": "images/ph-kunming-8.jpg",
+  "官渡古镇": "images/ph-kunming-9.jpg"
+ },
+ "大理": {
+  "洱海": "images/ph-dali-1.jpg",
+  "大理古城": "images/ph-dali-2.jpg",
+  "崇圣寺三塔": "images/ph-dali-3.jpg"
+ },
+ "丽江": {
+  "丽江古城": "images/ph-lijiang-1.jpg",
+  "玉龙雪山": "images/ph-lijiang-2.jpg",
+  "束河古镇": "images/ph-lijiang-3.jpg",
+  "丽江古城(大研)": "images/ph-lijiang-4.jpg",
+  "黑龙潭公园": "images/ph-lijiang-5.jpg",
+  "木府": "images/ph-lijiang-6.jpg",
+  "白沙古镇": "images/ph-lijiang-7.jpg",
+  "拉市海": "images/ph-lijiang-8.jpg",
+  "狮子山万古楼": "images/ph-lijiang-9.jpg"
+ },
+ "西双版纳": {
+  "中科院植物园": "images/ph-xishuangbanna-1.jpg",
+  "曼听公园": "images/ph-xishuangbanna-2.jpg",
+  "告庄西双景": "images/ph-xishuangbanna-3.jpg"
+ },
+ "拉萨": {
+  "布达拉宫": "images/ph-lasa-1.jpg",
+  "大昭寺": "images/ph-lasa-2.jpg",
+  "八廓街": "images/ph-lasa-3.jpg"
+ },
+ "西安": {
+  "秦始皇兵马俑": "images/ph-xian-1.jpg",
+  "西安城墙": "images/ph-xian-2.jpg",
+  "大雁塔": "images/ph-xian-3.jpg",
+  "兵马俑": "images/ph-xian-4.jpg",
+  "回民街": "images/ph-xian-5.jpg",
+  "钟鼓楼": "images/ph-xian-6.jpg",
+  "陕西历史博物馆": "images/ph-xian-7.jpg",
+  "华清宫": "images/ph-xian-8.jpg",
+  "大唐芙蓉园": "images/ph-xian-9.jpg"
+ },
+ "延安": {
+  "宝塔山": "images/ph-yanan-1.jpg",
+  "枣园革命旧址": "images/ph-yanan-2.jpg",
+  "壶口瀑布": "images/ph-yanan-3.jpg"
+ },
+ "兰州": {
+  "中山桥": "images/ph-lanzhou-1.jpg",
+  "白塔山": "images/ph-lanzhou-2.jpg",
+  "甘肃省博物馆": "images/ph-lanzhou-3.jpg"
+ },
+ "西宁": {
+  "塔尔寺": "images/ph-xining-1.jpg",
+  "青海湖": "images/ph-xining-2.jpg",
+  "东关清真大寺": "images/ph-xining-3.jpg"
+ },
+ "乌鲁木齐": {
+  "天山天池": "images/ph-wulumuqi-1.jpg",
+  "国际大巴扎": "images/ph-wulumuqi-2.jpg",
+  "红山公园": "images/ph-wulumuqi-3.jpg"
+ },
+ "承德": {
+  "避暑山庄": "images/ph-chengde-1.jpg",
+  "普陀宗乘之庙": "images/ph-chengde-2.jpg",
+  "棒槌山": "images/ph-chengde-3.jpg"
+ },
+ "秦皇岛": {
+  "山海关": "images/ph-qinhuangdao-1.jpg",
+  "北戴河": "images/ph-qinhuangdao-2.jpg",
+  "鸽子窝公园": "images/ph-qinhuangdao-3.jpg"
+ },
+ "泰安": {
+  "泰山": "images/ph-taian-1.jpg",
+  "岱庙": "images/ph-taian-2.jpg",
+  "桃花峪": "images/ph-taian-3.jpg"
+ },
+ "扬州": {
+  "瘦西湖": "images/ph-yangzhou-1.jpg",
+  "个园": "images/ph-yangzhou-2.jpg",
+  "东关街": "images/ph-yangzhou-3.jpg"
+ },
+ "泉州": {
+  "开元寺": "images/ph-quanzhou-1.jpg",
+  "西街": "images/ph-quanzhou-2.jpg",
+  "清源山": "images/ph-quanzhou-3.jpg"
+ },
+ "温州": {
+  "雁荡山": "images/ph-wenzhou-1.jpg",
+  "江心屿": "images/ph-wenzhou-2.jpg",
+  "楠溪江": "images/ph-wenzhou-3.jpg"
+ },
+ "景德镇": {
+  "古窑民俗博览区": "images/ph-jingdezhen-1.jpg",
+  "御窑厂遗址": "images/ph-jingdezhen-2.jpg",
+  "陶溪川": "images/ph-jingdezhen-3.jpg"
+ },
+ "福州·平潭": {
+  "龙王头海滩": "images/ph-pingtan-1.jpg",
+  "北港村": "images/ph-pingtan-2.jpg",
+  "仙人井": "images/ph-pingtan-3.jpg"
+ }
+}

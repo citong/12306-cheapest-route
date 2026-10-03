@@ -5,3 +5,6 @@ __pycache__/
 venv/
 .DS_Store
 train_cache_graph.json
+.cache/
+fetch_log.txt
+scripts/fetch_log.txt

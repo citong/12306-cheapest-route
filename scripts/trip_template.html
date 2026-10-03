@@ -104,6 +104,15 @@ h1{font-size:22px;margin:6px 0 2px}
 .tcard-s{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .tcard-link{color:var(--blue);text-decoration:none;font-weight:600}
 .btn.sm{display:inline-block;padding:5px 12px;font-size:13px;margin:0}
+
+/* ---- 偏好命中条 ---- */
+.prefbar{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:12px 0 2px;padding:10px 12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:12.5px;color:#334155}
+.prefbar b{font-size:13px}
+.ptag{display:inline-block;padding:2px 9px;border-radius:20px;background:#e0edff;color:#1d4ed8;border:1px solid #bfdbfe;font-size:12px;line-height:1.5}
+.ptag.pt-mut{background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0}
+.pmeta{margin-left:auto;color:#64748b}
+.pmeta b{color:#1d4ed8}
+.badge.b-hit{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
 </style>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <script src="vendor/leaflet/leaflet.js"></script>
@@ -282,10 +291,22 @@ function buildDay(group, idx, ctx){
 }
 
 function plan(data, days, prefs){
-  let spots=data.spots.map(s=>({...s}));
-  spots.forEach(s=>{ const hit=(s.tags||[]).filter(t=>prefs.has(t)).length; s._score=1+hit*2+((s.tags||[]).includes('必去')?1:0); });
-  spots.sort((a,b)=>b._score-a._score);
-  const sel=spots.slice(0, Math.min(days*3, spots.length));
+  const all=data.spots.map(s=>({...s}));
+  all.forEach(s=>{
+    const tags=s.tags||[];
+    s._hit=tags.filter(t=>prefs.has(t)).length;      // 命中几个偏好
+    s._star=s._hit>0;
+    s._score=s._hit*3+((tags.includes('必去'))?2:0)+1;
+  });
+  all.sort((a,b)=>b._score-a._score);
+  const cap=Math.min(days*3, all.length);                 // 上限：每天最多 3 个
+  const floor=Math.min(all.length, Math.max(days, 3));    // 下限：每天至少 1 个，别把行程抽空
+  // 偏好真正参与筛选：选了偏好就只看命中项，不够再用高分项补齐
+  let sel = prefs.size ? all.filter(s=>s._hit>0) : all.slice();
+  if(sel.length<floor){
+    sel=sel.concat(all.filter(s=>s._hit===0).slice(0, floor-sel.length));
+  }
+  sel=sel.slice(0, Math.max(floor, Math.min(cap, sel.length)));
   const K=Math.min(days, sel.length);
   // 先按地理最近邻串成一条顺路的线，再均匀切成 K 段连续线路：
   // 每天景点数尽量均衡（±1），且同一天内景点地理相邻、不绕路。
@@ -315,8 +336,10 @@ function checklist(prefs, city, days, dateStr){
   return li;
 }
 
+let ACTIVE_PREFS=new Set();
 function render(data, days, dateStr, budget){
   const prefs=new Set([...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t));
+  ACTIVE_PREFS=prefs;
   const planOut=plan(data, days, prefs);
   const hotelPy=data.py||'';
   const ci=dateStr||'';
@@ -349,6 +372,18 @@ function render(data, days, dateStr, budget){
     +'<div class="kpi"><b>¥'+(MEAL_PER_DAY*days)+'</b><span>餐饮估算</span></div>'
     +'<div class="kpi"><b>'+totalWalk.toFixed(1)+'km</b><span>市内总里程</span></div>'
     +'</div>';
+
+  // ---------- 偏好命中条 ----------
+  const activePrefs=[...prefs];
+  const matched=planOut.reduce((n,d)=>n+d.items.filter(i=>i.spot&&i.spot._star).length,0);
+  const totalSpots=(data.spots||[]).length;
+  h+='<div class="prefbar">'
+    +'<b>🎯 偏好</b> '
+    +(activePrefs.length
+        ? activePrefs.map(t=>'<span class="ptag">'+esc(t)+'</span>').join('')
+        : '<span class="ptag pt-mut">未选（显示全部景点）</span>')
+    +'<span class="pmeta">已按偏好优先保留：命中 <b>'+matched+'</b> / 本城 '+totalSpots+' 个景点'
+    +(activePrefs.length?'，取消偏好可看全部':'，勾选偏好可筛选')+'</span></div>';
 
   // ---------- 去程卡片（P3） ----------
   const fromCity=(document.getElementById('from').value||'济南').trim();
@@ -394,11 +429,12 @@ function render(data, days, dateStr, budget){
       if(it.meal){ p+='<div class="meal">'+esc(it.text)+'</div>'; return; }
       const s=it.spot;
       const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+esc(t)+'</span>').join('');
+      const star=(s._star && ACTIVE_PREFS.size)?'<span class="badge b-hit">★ 偏好</span>':'';
       const tr=lastTransit? '<span class="badge b-tr">↔ '+lastTransit.transit+'min</span>':'';
       const img = s.img? '<img class="sph" src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy" onerror="this.style.display=\'none\'">':'';
       let p2='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
         +'<div class="body"><div class="nm">'+img+esc(s.n)+'</div>'
-        +'<div class="meta">'+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
+        +'<div class="meta">'+star+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
         +(s.note?'<div class="note">💡 '+esc(s.note)+'</div>':'')+'</div></div>';
       if(lastTransit){
         p+='<div class="transit">🚶 从「'+esc(lastTransit.from)+'」到「'+esc(lastTransit.to)+'」约 '
@@ -457,18 +493,26 @@ const citySel=document.getElementById('city');
 Object.keys(CITIES).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=CITIES[c].city; citySel.appendChild(o); });
 citySel.value=Object.keys(CITIES)[0];
 const prefsBox=document.getElementById('prefs');
+// 立即按当前表单重新规划（偏好标签一点即生效，不用再点「生成行程」）
+function refresh(){
+  const c=CITIES[citySel.value];
+  let days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
+  document.getElementById('days').value=days;
+  render(c, days, document.getElementById('date').value, +document.getElementById('budget').value);
+}
 ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; e.dataset.t=t; e.textContent=t;
-  e.onclick=()=>e.classList.toggle('on'); prefsBox.appendChild(e); });
+  e.onclick=()=>{ e.classList.toggle('on'); refresh(); }; prefsBox.appendChild(e); });
 // 默认勾选几个常见偏好
 ['必去','美食','自然'].forEach(t=>{ const e=prefsBox.querySelector('[data-t="'+t+'"]'); if(e) e.classList.add('on'); });
 // default date = today+14
 const def=new Date(); def.setDate(def.getDate()+14);
 document.getElementById('date').value=def.toISOString().slice(0,10);
-document.getElementById('go').onclick=()=>{
-  const c=CITIES[citySel.value]; const days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
-  document.getElementById('days').value=days;
-  render(c, days, document.getElementById('date').value, +document.getElementById('budget').value);
-};
+// 城市 / 天数 / 日期 / 预算 / 出发地 变化即重算
+['city','days','date','budget','from'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('change', refresh);
+});
+document.getElementById('go').onclick=refresh;
 // first render
 render(CITIES[citySel.value], 3, document.getElementById('date').value, 300);
 </script>
