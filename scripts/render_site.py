@@ -80,6 +80,7 @@ def main(no_data=False):
 
     city = load("city_stations.json")
     pcity = load("province_cities.json")
+    attr = load("attractions.json")
 
     data = enrich(data)
 
@@ -91,6 +92,7 @@ def main(no_data=False):
             .replace("__PROV__", js(prov))
             .replace("__CITY__", js(city))
             .replace("__PCITY__", js(pcity))
+            .replace("__ATTR__", js(attr))
             .replace('"__API__"', '"%s"' % os.environ.get("SITE_API", DEFAULT_API)))
 
     out = os.path.join(ROOT, "index.html")

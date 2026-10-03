@@ -258,6 +258,35 @@ tr.seatrow td{background:#fafbfc;padding:6px 9px 10px;border-bottom:1px solid va
 .sp.no{border-color:var(--line);background:#f3f4f6;color:#9ca3af}
 td .na{color:var(--red);font-weight:600}
 
+/* 景点介绍右侧抽屉（随机目的地时弹出） */
+#attr{position:fixed;top:0;right:0;height:100vh;width:370px;max-width:90vw;
+  background:rgba(255,255,255,.97);backdrop-filter:blur(12px);
+  box-shadow:-14px 0 44px rgba(16,24,40,.18);transform:translateX(102%);
+  transition:transform .3s cubic-bezier(.22,.61,.36,1);z-index:1200;
+  overflow:auto;padding:22px 24px 30px}
+#attr.on{transform:none}
+.attr-x{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;
+  border-radius:50%;background:#f1f2f4;color:#6b7280;font-size:15px;cursor:pointer;
+  line-height:32px;text-align:center;transition:background .15s,color .15s}
+.attr-x:hover{background:#e5e7eb;color:#111827}
+.attr-city{font-size:23px;font-weight:800;letter-spacing:-.3px;margin:6px 36px 2px 0}
+.attr-city small{font-size:12px;color:#9ca3af;font-weight:500;margin-left:7px;letter-spacing:0}
+.attr-intro{font-size:13px;color:#6b7280;line-height:1.75;margin:10px 0 18px}
+.attr-h{font-size:11.5px;color:#9ca3af;font-weight:700;letter-spacing:.08em;
+  margin:16px 0 6px;text-transform:uppercase}
+.attr-spot{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #f1f2f4}
+.attr-spot:last-child{border-bottom:none}
+.attr-spot .dotn{flex:none;width:27px;height:27px;border-radius:50%;
+  background:var(--green-soft);color:#10b981;font-weight:700;font-size:12.5px;
+  display:flex;align-items:center;justify-content:center}
+.attr-spot .sn{font-weight:600;font-size:14.5px;color:#111827}
+.attr-spot .sd{font-size:12.5px;color:#6b7280;line-height:1.65;margin-top:3px}
+.attr-tip{font-size:11.5px;color:#9ca3af;margin-top:18px;line-height:1.7;
+  border-top:1px dashed #e5e7eb;padding-top:12px}
+@media(max-width:640px){
+  #attr{width:100%;max-width:100vw}
+}
+
 /* 无票方案折叠 */
 .grp{margin-top:14px;border:1px dashed #d1d5db;border-radius:12px;background:#fafbfc;overflow:hidden}
 .gh{display:flex;align-items:center;gap:8px;padding:11px 14px;cursor:pointer;
@@ -350,12 +379,18 @@ td .na{color:var(--red);font-weight:600}
   </div>
 </div>
 
+<aside id="attr" aria-hidden="true">
+  <button class="attr-x" id="attr-x" type="button" title="关闭">✕</button>
+  <div id="attr-body"></div>
+</aside>
+
 <script>
 const BUNDLE = __DATA__;
 const STATIONS = __STATIONS__;
 const PROV = __PROV__;
 const CITY = __CITY__;        // 城市 -> 该市车站（已按重要度排序）
 const PCITY = __PCITY__;      // 省份 -> 该省城市
+const ATTR = __ATTR__;        // 城市 -> 景点介绍（随机目的地时右侧弹出）
 // 12306 预售期（天，含当日）。超过这个范围的日期尚未开售，只能给预估。
 const PRESALE = 15;
 // 城市级搜索默认勾选的车站数：多了会把 12306 打限流，少了会漏掉最优方案
@@ -474,6 +509,37 @@ function applySel(id, kind, name){
   $('sug-'+id).classList.remove('on');
   renderPick(id);
   updProv();
+  if(id === 'to') syncAttr(kind, name);
+}
+
+/* 随机目的地 / 城市级目的地 -> 右侧景点卡片 */
+function syncAttr(kind, name){
+  if(kind === 'city' && ATTR){
+    const k = Object.keys(ATTR).find(x => (ATTR[x].city || x) === name);
+    if(k){ showAttr(k); return; }
+  }
+  hideAttr();
+}
+function showAttr(k){
+  const e = ATTR[k]; if(!e) return;
+  let h = '<div class="attr-city">'+esc(k)
+        + (e.city && e.city !== k ? ' <small>'+esc(e.city)+'</small>' : '')
+        + '</div>'
+        + '<div class="attr-intro">'+esc(e.intro||'')+'</div>'
+        + '<div class="attr-h">推荐打卡</div>';
+  (e.spots||[]).forEach((s,i)=>{
+    h += '<div class="attr-spot"><div class="dotn">'+String(i+1)+'</div>'
+       + '<div><div class="sn">'+esc(s.n)+'</div>'
+       + '<div class="sd">'+esc(s.d||'')+'</div></div></div>';
+  });
+  h += '<div class="attr-tip">目的地卡片为内置旅行信息，仅供参考；开放时间、门票以景区官方为准。</div>';
+  $('attr-body').innerHTML = h;
+  $('attr').classList.add('on');
+  $('attr').setAttribute('aria-hidden','false');
+}
+function hideAttr(){
+  const a = $('attr'); if(!a) return;
+  a.classList.remove('on'); a.setAttribute('aria-hidden','true');
 }
 
 /* 车站勾选区 */
@@ -705,15 +771,16 @@ function updProv(){
 }
 $('to').addEventListener('input', updProv);
 $('rnd').onclick = ()=>{
-  // 随机换一个「城市」当目的地：城市比单个小站更实用，也顺便演示城市级搜索
-  const cities = Object.keys(CITY || {}).filter(c=>(CITY[c]||[]).length >= 2);
-  const src = cities.length ? cities : (STATIONS || []).map(s=>s.n);
-  if(!src.length) return;
-  let n = src[Math.floor(Math.random()*src.length)];
+  // 从内置景点城市里随机挑一个当目的地：每次都能在右侧弹出景点卡片
+  const ks = Object.keys(ATTR || {});
+  if(!ks.length) return;
   const cur = SEL.from.label || $('from').value.trim();
-  for(let i=0; i<30 && n === cur; i++) n = src[Math.floor(Math.random()*src.length)];
-  applySel('to', cities.length ? 'city' : 'station', n);
+  let k = ks[Math.floor(Math.random()*ks.length)], e = ATTR[k];
+  for(let i=0; i<40 && (e.city||k) === cur; i++){ k = ks[Math.floor(Math.random()*ks.length)]; e = ATTR[k]; }
+  applySel('to', 'city', e.city || k);
+  $('to').value = k;   // 用友好显示名（如「大理」而非「大理白族」）
 };
+$('attr-x').onclick = hideAttr;
 
 /* ---------- 预售期：未开售的日期用「同星期几的可售日期」预估 ---------- */
 function pad(n){ return String(n).padStart(2,'0'); }
