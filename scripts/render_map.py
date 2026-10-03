@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 """
-生成车站地图页 map.html（单文件，内嵌车站名，坐标由腾讯地图实时检索）。
+生成车站地图页 map.html（单文件，内嵌车站名 + 内置坐标，使用 Leaflet + 国内可达底图）。
 
-地图的地点检索需要密钥代理，只有本地服务能代理，静态托管的 GitHub Pages 上没有。
-因此：
-  - 有代理时（本地/预览环境）正常生成地图页；
-  - 没有代理时（发布版）占位符保留，页面会明确提示「线上版用不了，请用本地服务打开」，
-    而不是给一个白屏让人猜。
+坐标来源：
+  - 内置 stations_geo.json（站名 -> 城市级坐标，覆盖约 85% 车站，离线即可用）；
+  - 其余冷门城市在用户浏览器端用 Photon 地理编码补全（带 localStorage 缓存）。
 
-若自己有腾讯地图密钥，可用环境变量注入，让发布版也能用：
-  WB_HTTP_PORT=8787 WB_TMAP_SECRET=xxx python scripts/render_map.py
+底图用 Geoq（智图，国内确定可达）/ OpenStreetMap，Leaflet 库由用户浏览器从 CDN 加载
+（多源兜底），因此线上 GitHub Pages 直接可用，不再依赖本地密钥代理。
 
 用法：
   python scripts/render_map.py
@@ -66,15 +64,10 @@ def main():
     pcity = load("province_cities.json")
     prov = load("stations_prov.json")
 
+    geo = load("stations_geo.json")
+
     with open(TPL, encoding="utf-8") as f:
         html = f.read()
-    # 密钥代理：有环境变量就注入真实地址，否则保留占位符（页面会提示线上版不可用）
-    port = os.environ.get("WB_HTTP_PORT", "").strip()
-    secret = os.environ.get("WB_TMAP_SECRET", "").strip()
-    host = ("http://127.0.0.1:%s/_TMapService/_wbt/%s" % (port, secret)
-            if port and secret else "__TMAP_PLACEHOLDER__")
-    if host == "__TMAP_PLACEHOLDER__":
-        host = "http://127.0.0.1:__WB_HTTP_PORT__/_TMapService/_wbt/__WB_TMAP_SECRET__"
 
     html = (html
             .replace("__STOPS__", js(stops))
@@ -82,8 +75,7 @@ def main():
             .replace("__CITY__", js(city))
             .replace("__PCITY__", js(pcity))
             .replace("__PROV__", js(prov))
-            .replace("'__TMAP_HOST__'", "'%s'" % host)
-            .replace("'__TMAP_HOST__'.indexOf", "'%s'.indexOf" % host))
+            .replace("__GEO__", js(geo)))
 
     out = os.path.join(ROOT, "map.html")
     with open(out, "w", encoding="utf-8") as f:

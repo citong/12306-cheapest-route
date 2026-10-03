@@ -15,7 +15,7 @@ body{margin:0;background:var(--bg);color:var(--ink);
   font-size:14px;line-height:1.6}
 a{color:var(--blue);text-decoration:none}
 header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
-  display:flex;align-items:center;gap:10px;padding:8px 16px;position:sticky;top:0;z-index:60;
+  display:flex;align-items:center;gap:10px;padding:8px 16px;position:sticky;top:0;z-index:1060;
   flex-wrap:wrap}
 .logo{font-size:16px;font-weight:700;white-space:nowrap}
 .q{display:flex;gap:8px;align-items:center;position:relative}
@@ -29,9 +29,8 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
 .btn.main:hover{filter:brightness(.94);color:#fff}
 .hint{font-size:12.5px;color:var(--sub);margin-left:auto}
 
-/* 补全下拉 */
 .sug{position:absolute;top:100%;left:0;width:290px;background:#fff;border:1px solid var(--line);
-  border-radius:10px;margin-top:4px;max-height:250px;overflow:auto;z-index:70;
+  border-radius:10px;margin-top:4px;max-height:250px;overflow:auto;z-index:1070;
   box-shadow:0 8px 24px rgba(16,24,40,.12);display:none}
 .sug.on{display:block}
 .sug .g{font-size:11.5px;color:#9ca3af;padding:5px 12px 2px;font-weight:600}
@@ -53,7 +52,7 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
 .st.fail{opacity:.55}
 .st span{margin-left:auto;font-size:11.5px;color:#9ca3af}
 .st .rt{margin-left:6px;font-size:11px;color:var(--blue)}
-#map{flex:1;height:100%;min-width:0}
+#map{flex:1;height:100%;min-width:0;background:#eaf0f5}
 .note{padding:8px 10px;background:var(--bg);border:1px solid var(--line);
   border-radius:9px;font-size:12.5px;color:var(--sub);margin-bottom:10px}
 .note.err{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
@@ -68,14 +67,6 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
   .q input{width:150px}
 }
 </style>
-<script type="text/javascript">
-  // 密钥代理地址：由 render_map.py 注入。仍是占位符说明这是发布版（没有代理可用）。
-  window._TMapSecurityConfig = {
-    serviceHost: '__TMAP_HOST__',
-  };
-  window.__TMAP_OK__ = !('__TMAP_HOST__'.indexOf('__WB_') >= 0);
-</script>
-<script src="https://map.qq.com/api/gljs?v=1.exp&libraries=service"></script>
 </head>
 <body>
 <header>
@@ -85,6 +76,7 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
     <div class="sug" id="sug"></div>
     <button class="btn main" id="go">定位</button>
     <button class="btn" id="fit">回到全部</button>
+    <button class="btn" id="base">切换底图</button>
   </div>
   <div class="hint" id="hint">正在加载地图…</div>
   <a class="btn" href="index.html">← 路线查询</a>
@@ -92,7 +84,7 @@ header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
 
 <div id="wrap">
   <div id="side">
-    <div class="note" id="note">正在定位车站…</div>
+    <div class="note" id="note">正在加载地图组件…</div>
     <div class="legend">
       <span><i style="background:#16a34a"></i>起点</span>
       <span><i style="background:#dc2626"></i>终点</span>
@@ -111,126 +103,102 @@ const ALL   = __ALL__;
 const CITY  = __CITY__;
 const PCITY = __PCITY__;
 const PROV  = __PROV__;
+const GEO   = __GEO__;   // 站名 -> [lng,lat]（城市级，已内置约 85% 车站）
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
-let map, mk, lb, iw, search;
+// 站名 -> 归属城市（由 CITY 反查，用于运行时地理编码兜底）
+const CITYREV = {};
+for(const [city, arr] of Object.entries(CITY || {}))
+  for(const s of (arr||[])) CITYREV[s] = city;
+
+let map, baseGeoq, baseOsm, baseLayer = 'geoq';
 const MARKED = new Map();          // 站名 -> {lat,lng,kind,title}
 const FAILED = new Set();          // 定位失败的站名
-const CHINA = () => new TMap.LatLngBounds(
-  new TMap.LatLng(17.0, 73.0), new TMap.LatLng(54.5, 136.0));
+const LS = id => { try{ return localStorage.getItem(id); }catch(e){ return null; } };
+const LSset = (id,v) => { try{ localStorage.setItem(id,v); }catch(e){} };
 
-const dot = c => 'data:image/svg+xml,' + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20">'
-  + '<circle cx="10" cy="10" r="7" fill="' + c + '" stroke="#fff" stroke-width="2.5"/></svg>');
+/* ---------- 动态加载 Leaflet（多 CDN 兜底） ---------- */
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');
+  s.src=src; s.onload=res; s.onerror=()=>rej(new Error('load '+src)); document.head.appendChild(s);});}
+function loadCSS(href){return new Promise((res)=>{const l=document.createElement('link');
+  l.rel='stylesheet'; l.href=href; l.onload=res; l.onerror=res; document.head.appendChild(l);});}
+const LEAFLET_CDNS=[
+  'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4',
+  'https://unpkg.com/leaflet@1.9.4/dist',
+  'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist'
+];
+async function ensureLeaflet(){
+  if(window.L) return true;
+  for(const base of LEAFLET_CDNS){
+    try{
+      await loadCSS(base + '/leaflet.css');
+      await loadScript(base + '/leaflet.js');
+      if(window.L) return true;
+    }catch(e){ /* 试下一个 CDN */ }
+  }
+  return false;
+}
 
+/* ---------- 坐标获取：内置 GEO 优先，缺失的城市运行时 Photon 补全 ---------- */
+async function getCoord(name){
+  if(GEO && GEO[name]) return GEO[name];
+  const city = CITYREV[name] || name;
+  const key = 'tcr.geo.' + city;
+  const cached = LS(key);
+  if(cached) { try{ return JSON.parse(cached); }catch(e){} }
+  // 浏览器端调用 Photon（免密钥，中文友好）；失败则该站标不出
+  try{
+    const u = 'https://photon.komoot.de/api/?q=' + encodeURIComponent(city) + '&limit=1';
+    const r = await fetch(u, {signal: AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined});
+    const d = await r.json();
+    if(d && d.features && d.features.length){
+      const c = d.features[0].geometry.coordinates;   // [lng,lat]
+      const coord = [c[0], c[1]];
+      LSset(key, JSON.stringify(coord));
+      return coord;
+    }
+  }catch(e){ /* 网络不通等 */ }
+  return null;
+}
+
+/* ---------- 初始化 ---------- */
 function boot(){
-  // 发布到 GitHub Pages 时没有密钥代理，地点检索不可用 —— 直接说明，别让人对着白图猜
-  if(!window.__TMAP_OK__){
-    $('hint').textContent = '线上版无地图密钥';
-    note('<b>线上版本用不了地图检索。</b><br>'
-       + '车站坐标靠腾讯地图的地点检索获得，而密钥代理只能由<b>本地服务</b>提供，'
-       + '静态托管的 GitHub Pages 上没有它。<br><br>'
-       + '<b>怎么用：</b>在本项目目录双击 <b>start.bat</b> 启动本地服务，'
-       + '然后打开 <b>http://127.0.0.1:8787/map.html</b> 即可正常缩放与标注。', true);
-    (STOPS || []).forEach(s=>FAILED.add(s.n));
-    renderList();
-    return;
-  }
-  if(typeof TMap === 'undefined'){
+  if(typeof L === 'undefined'){
     $('hint').textContent = '地图组件未加载';
-    note('腾讯地图 SDK 没能加载。<br>请确认本页是通过本地服务打开的'
-       + '（http://127.0.0.1:8787/map.html），并且网络可访问 map.qq.com。', true);
+    note('地图组件加载失败：无法连接地图库 CDN。请检查网络后刷新页面。', true);
     return;
   }
-  map = new TMap.Map('map', {
-    zoom: 5, pitch: 0,
-    center: new TMap.LatLng(33.5, 106.5),
-    showControl: true,             // 缩放 / 旋转控件，方便放大看
-  });
-  try{ search = new TMap.service.Search({ pageSize: 3 }); }
-  catch(e){ note('地点检索服务初始化失败：' + esc(e.message || e), true); return; }
+  map = L.map('map', {zoomControl:true, attributionControl:true}).setView([35.5, 105], 5);
 
-  mk = new TMap.MultiMarker({
-    map,
-    styles: {
-      start: new TMap.MarkerStyle({width:20,height:20,src:dot('#16a34a'),anchor:{x:10,y:10}}),
-      end:   new TMap.MarkerStyle({width:20,height:20,src:dot('#dc2626'),anchor:{x:10,y:10}}),
-      via:   new TMap.MarkerStyle({width:16,height:16,src:dot('#2563eb'),anchor:{x:8,y:8}}),
-      hit:   new TMap.MarkerStyle({width:22,height:22,src:dot('#d97706'),anchor:{x:11,y:11}}),
-    },
-    geometries: [],
-  });
-  lb = new TMap.MultiLabel({
-    map,
-    styles: { t: new TMap.LabelStyle({color:'#1f2937', size:12, offset:{x:0,y:-14}}) },
-    geometries: [],
-  });
-  iw = new TMap.InfoWindow({ map, position: map.getCenter(), content:'', offset:{x:0,y:-14} });
-  mk.on('click', e=>{
-    const g = e.geometry, v = MARKED.get(g.id);
-    const pv = (PROV && PROV[g.id]) ? ' <span style="color:#9ca3af">' + esc(PROV[g.id]) + '</span>' : '';
-    iw.setPosition(g.position);
-    iw.setContent('<div style="padding:5px 10px;font-size:13px;white-space:nowrap">'
-      + '<b>' + esc(g.id) + '</b>' + pv
-      + (v && v.title && v.title !== g.id
-          ? '<div style="font-size:11.5px;color:#6b7280">' + esc(v.title) + '</div>' : '')
-      + '</div>');
-    iw.open();
-  });
-  // 缩得太小时标签会糊成一片，按需隐藏
-  map.on('zoom', ()=>{
-    const z = map.getZoom();
-    const show = z >= 6;
-    const gs = [];
-    MARKED.forEach((v,k)=>{ if(show) gs.push({id:k, styleId:'t',
-      position:new TMap.LatLng(v.lat,v.lng), content:k}); });
-    lb.setGeometries(gs);
-  });
+  baseGeoq = L.tileLayer(
+    'https://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineCommunity/MapServer/tile/{z}/{y}/{x}',
+    {maxZoom:18, subdomains:'', attribution:'Geoq © Esri'});
+  baseOsm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19, subdomains:'abc', attribution:'© OpenStreetMap'});
+  baseGeoq.addTo(map);
+  // Geoq 不可达时自动切 OSM
+  let geoqErr = 0;
+  baseGeoq.on('tileerror', ()=>{ if(++geoqErr >= 3 && baseLayer==='geoq'){ switchBase(); } });
 
   $('go').onclick = doSearch;
   $('q').onkeydown = e=>{ if(e.key==='Enter') doSearch(); };
   $('fit').onclick = fitAll;
+  $('base').onclick = switchBase;
   bindSuggest();
 
   renderList();
   loadAll();
 }
 
-function note(html, err){
-  const el = $('note');
-  el.innerHTML = html;
-  el.className = 'note' + (err ? ' err' : '');
+function switchBase(){
+  if(baseLayer === 'geoq'){ map.removeLayer(baseGeoq); baseOsm.addTo(map); baseLayer='osm'; }
+  else { map.removeLayer(baseOsm); baseGeoq.addTo(map); baseLayer='geoq'; }
+  $('hint').textContent = '底图：' + (baseLayer==='geoq' ? '智图 Geoq' : 'OpenStreetMap');
 }
 
-/* ---------- 站名 -> 坐标 ---------- */
-/* 依次尝试「XX火车站」(限定火车站分类) / 「XX站」/ 原名；全部失败再整轮重试一次 */
-async function geo(name){
-  if(!name || !search) return null;
-  const tries = [
-    [name + '火车站', 'category=火车站'],
-    [name + '站',     'category=火车站'],
-    [name + '站',     ''],
-    [name,            ''],
-  ];
-  for(let round = 0; round < 2; round++){
-    for(const [kw, filter] of tries){
-      try{
-        const p = { keyword: kw, bounds: CHINA() };
-        if(filter) p.filter = filter;
-        const r = await search.searchRectangle(p);
-        if(r && r.status === 0 && r.data && r.data.length){
-          return { poi: r.data[0], kw };
-        }
-      }catch(e){ /* 换下一种写法重试 */ }
-    }
-    if(round === 0) await new Promise(s=>setTimeout(s, 600));
-  }
-  return null;
-}
-
-/* ---------- 加载线路车站（并发，避免一个一个等） ---------- */
+/* ---------- 加载线路车站（并发 + 进度） ---------- */
 async function loadAll(){
   if(!STOPS.length){
     note('本页没有内置线路数据。启动本地服务重新查询后，地图会标出该线路涉及的车站。');
@@ -241,32 +209,33 @@ async function loadAll(){
   async function worker(){
     while(queue.length){
       const s = queue.shift();
-      const r = await geo(s.n);
+      const c = await getCoord(s.n);
       done++;
-      if(r) MARKED.set(s.n, {lat:r.poi.location.lat, lng:r.poi.location.lng,
-                             kind:s.k, title:r.poi.title || s.n});
+      if(c) MARKED.set(s.n, {lat:c[1], lng:c[0], kind:s.k, title:s.n});
       else FAILED.add(s.n);
       $('note').textContent = '正在定位车站 ' + done + '/' + STOPS.length
         + '（已标注 ' + MARKED.size + ' 个' + (FAILED.size ? '，失败 ' + FAILED.size : '') + '）';
       if(done % 3 === 0 || done === STOPS.length){ draw(); renderList(); }
     }
   }
-  await Promise.all([worker(), worker(), worker()]);   // 3 路并发，太快会被限流
+  await Promise.all([worker(), worker(), worker()]);
   draw(); renderList(); fitAll();
-  note('已标注 <b>' + MARKED.size + '/' + STOPS.length + '</b> 个车站。'
-     + '滚轮或双指可缩放，点圆点看站名。'
-     + (FAILED.size ? '<br>有 ' + FAILED.size + ' 个站没能定位（灰色标注），点侧栏条目可重试。' : ''));
+  let msg = '已标注 <b>' + MARKED.size + '/' + STOPS.length + '</b> 个车站。'
+    + '滚轮或双指可缩放，点圆点看站名。'
+    + (FAILED.size ? '<br>有 ' + FAILED.size + ' 个站没能定位（侧栏灰色，点一下可重试）。' : '');
+  note(msg);
+  $('hint').textContent = '底图：智图 Geoq（可切换）';
 }
 
 /* ---------- 搜索：支持车站与城市 ---------- */
 function resolve(kw){
-  kw = (kw || '').trim();
+  kw = (kw||'').trim();
   if(!kw) return [];
-  if(CITY && CITY[kw] && CITY[kw].length) return CITY[kw].slice(0, 3);
-  if(PCITY && PCITY[kw]){                       // 省份：取前 3 个城市的主站
+  if(CITY && CITY[kw] && CITY[kw].length) return CITY[kw].slice(0,3);
+  if(PCITY && PCITY[kw]){
     const out = [];
-    for(const c of PCITY[kw].slice(0, 3))
-      for(const s of ((CITY && CITY[c]) || []).slice(0, 1))
+    for(const c of (PCITY[kw]||[]).slice(0,3))
+      for(const s of ((CITY && CITY[c])||[]).slice(0,1))
         if(!out.includes(s)) out.push(s);
     return out;
   }
@@ -277,147 +246,138 @@ async function doSearch(){
   if(!kw) return;
   $('sug').classList.remove('on');
   const names = resolve(kw);
-  const isCity = names.length > 1 || names[0] !== kw;
-  note('正在查找「' + esc(kw) + '」' + (isCity ? '（' + names.join(' / ') + '）' : '') + '…');
+  const isCity = names.length>1 || names[0]!==kw;
+  note('正在查找「'+esc(kw)+'」'+(isCity?'（'+names.join(' / ')+'）':'')+'…');
   const found = [];
   for(const n of names){
-    const r = await geo(n);
-    if(r){
-      MARKED.set(n, {lat:r.poi.location.lat, lng:r.poi.location.lng, kind:'hit',
-                     title:r.poi.title || n});
-      FAILED.delete(n);
-      found.push(n);
-    }else{
-      FAILED.add(n);
-    }
+    const c = await getCoord(n);
+    if(c){ MARKED.set(n,{lat:c[1],lng:c[0],kind:'hit',title:n}); FAILED.delete(n); found.push(n); }
+    else FAILED.add(n);
   }
   draw(); renderList();
   if(!found.length){
-    note('没找到「' + esc(kw) + '」，换个说法试试（如「北京西」「广州南」，或直接填城市名）。', true);
+    note('没找到「'+esc(kw)+'」的位置，换个说法试试（如「北京西」「广州南」，或直接填城市名）。', true);
     return;
   }
-  if(found.length === 1){
+  if(found.length===1){
     const v = MARKED.get(found[0]);
-    map.setCenter(new TMap.LatLng(v.lat, v.lng));
-    map.setZoom(13);
-  }else{
+    map.setView([v.lat, v.lng], 13);
+  } else {
     fitTo(found);
   }
-  note('已定位「' + esc(kw) + '」→ <b>' + esc(found.join(' / ')) + '</b>');
+  note('已定位「'+esc(kw)+'」→ <b>'+esc(found.join(' / '))+'</b>');
 }
 
 /* ---------- 补全 ---------- */
 function bindSuggest(){
-  const inp = $('q'), box = $('sug');
+  const inp=$('q'), box=$('sug');
   inp.addEventListener('input', ()=>{
-    const kw = inp.value.trim();
+    const kw=inp.value.trim();
     if(!kw){ box.classList.remove('on'); return; }
-    const cities = Object.keys(CITY || {}).filter(c=>c.indexOf(kw) >= 0).slice(0, 6);
-    const provs  = Object.keys(PCITY || {}).filter(p=>p.indexOf(kw) >= 0).slice(0, 3);
-    const stns   = (ALL || []).filter(n=>n.indexOf(kw) >= 0).slice(0, 8);
-    let h = '';
-    if(provs.length) h += '<div class="g">省份</div>'
-      + provs.map(p=>'<div class="i" data-n="'+esc(p)+'">🏞 '+esc(p)
-        + '<span>'+(PCITY[p]||[]).length+' 个城市</span></div>').join('');
-    if(cities.length) h += '<div class="g">城市</div>'
-      + cities.map(c=>'<div class="i" data-n="'+esc(c)+'">🏙 '+esc(c)
-        + '<span>'+(CITY[c]||[]).length+' 个车站</span></div>').join('');
-    if(stns.length) h += '<div class="g">车站</div>'
-      + stns.map(n=>'<div class="i" data-n="'+esc(n)+'">🚉 '+esc(n)+'</div>').join('');
+    const cities=Object.keys(CITY||{}).filter(c=>c.indexOf(kw)>=0).slice(0,6);
+    const provs =Object.keys(PCITY||{}).filter(p=>p.indexOf(kw)>=0).slice(0,3);
+    const stns  =(ALL||[]).filter(n=>n.indexOf(kw)>=0).slice(0,8);
+    let h='';
+    if(provs.length) h+='<div class="g">省份</div>'
+      +provs.map(p=>'<div class="i" data-n="'+esc(p)+'">🏞 '+esc(p)
+        +'<span>'+(PCITY[p]||[]).length+' 个城市</span></div>').join('');
+    if(cities.length) h+='<div class="g">城市</div>'
+      +cities.map(c=>'<div class="i" data-n="'+esc(c)+'">🏙 '+esc(c)
+        +'<span>'+(CITY[c]||[]).length+' 个车站</span></div>').join('');
+    if(stns.length) h+='<div class="g">车站</div>'
+      +stns.map(n=>'<div class="i" data-n="'+esc(n)+'">🚉 '+esc(n)+'</div>').join('');
     if(!h){ box.classList.remove('on'); return; }
-    box.innerHTML = h; box.classList.add('on');
+    box.innerHTML=h; box.classList.add('on');
     [...box.querySelectorAll('.i')].forEach(d=>{
-      d.onclick = ()=>{ inp.value = d.dataset.n; box.classList.remove('on'); doSearch(); };
+      d.onmousedown=()=>{ inp.value=d.dataset.n; box.classList.remove('on'); doSearch(); };
     });
   });
-  inp.addEventListener('blur', ()=>setTimeout(()=>box.classList.remove('on'), 200));
+  inp.addEventListener('blur', ()=>setTimeout(()=>box.classList.remove('on'),200));
   inp.addEventListener('focus', ()=>{ if(inp.value.trim()) inp.dispatchEvent(new Event('input')); });
 }
 
 /* ---------- 绘制 ---------- */
+const COLORS = {start:'#16a34a', end:'#dc2626', via:'#2563eb', hit:'#d97706'};
+const RADII  = {start:7, end:7, via:5, hit:8};
 function draw(){
-  const gs = [];
+  // 清旧
+  if(window.__layer) __layer.remove();
+  const fg = [];
   MARKED.forEach((v,k)=>{
-    gs.push({id:k, styleId:v.kind, position:new TMap.LatLng(v.lat, v.lng)});
-  });
-  mk.setGeometries(gs);
-  drawLabels();
-}
-function drawLabels(){
-  const z = map ? map.getZoom() : 5;
-  const gs = [];
-  if(z >= 6){
-    MARKED.forEach((v,k)=>{
-      gs.push({id:k, styleId:'t', position:new TMap.LatLng(v.lat, v.lng), content:k});
+    const color = COLORS[v.kind] || '#9ca3af';
+    const m = L.circleMarker([v.lat, v.lng], {
+      radius: RADII[v.kind] || 5, color:'#fff', weight:2, fillColor:color, fillOpacity:1
     });
-  }
-  lb.setGeometries(gs);
+    const pv = (PROV && PROV[k]) ? ' <span style="color:#9ca3af">'+esc(PROV[k])+'</span>' : '';
+    m.bindPopup('<div style="font-size:13px;white-space:nowrap"><b>'+esc(k)+'</b>'+pv+'</div>');
+    if(map.getZoom() >= 6)
+      m.bindTooltip(k, {permanent:true, direction:'top', offset:[0,-4], opacity:0.9});
+    else m.bindTooltip(k);
+    fg.push(m);
+  });
+  window.__layer = L.layerGroup(fg).addTo(map);
 }
 function fitTo(names){
-  let w=180, e=-180, s=90, n=-90, c=0;
+  let b=null;
   for(const nm of names){
-    const v = MARKED.get(nm); if(!v) continue;
-    c++;
-    w=Math.min(w,v.lng); e=Math.max(e,v.lng);
-    s=Math.min(s,v.lat); n=Math.max(n,v.lat);
+    const v=MARKED.get(nm); if(!v) continue;
+    const ll=L.latLng(v.lat, v.lng);
+    b = b ? b.extend(ll) : L.latLngBounds(ll, ll);
   }
-  if(!c) return;
-  if(c === 1){ map.setCenter(new TMap.LatLng(s, w)); map.setZoom(13); return; }
-  map.fitBounds(new TMap.LatLngBounds(
-    new TMap.LatLng(s-0.15, w-0.15), new TMap.LatLng(n+0.15, e+0.15)),
-    {padding:{top:60,bottom:60,left:60,right:60}});
+  if(!b) return;
+  if(b.getNorth()===b.getSouth() && b.getEast()===b.getWest()){
+    map.setView([b.getSouth(), b.getWest()], 13);
+  } else {
+    map.fitBounds(b, {padding:[60,60]});
+  }
 }
-function fitAll(){
-  if(!MARKED.size) return;
-  fitTo([...MARKED.keys()]);
-}
+function fitAll(){ if(MARKED.size) fitTo([...MARKED.keys()]); }
 
 const cls = k => ({start:'g', end:'r', via:'b', hit:'o'})[k] || 'g2';
 function renderList(){
   const order = {start:0, end:1, hit:2, via:3};
-  // 线路车站 + 搜索出来的站；没定位到的排最后并标灰
-  const arr = [...MARKED.entries()].sort((a,b)=>
-    (order[a[1].kind]??9)-(order[b[1].kind]??9));
+  const arr = [...MARKED.entries()].sort((a,b)=>(order[a[1].kind]??9)-(order[b[1].kind]??9));
   const miss = [...FAILED].filter(n=>!MARKED.has(n));
   let html = arr.length ? arr.map(([n,v])=>
-    `<div class="st ${cls(v.kind)}" data-n="${esc(n)}"><b></b>${esc(n)}
-      <span>${v.lat.toFixed(2)}, ${v.lng.toFixed(2)}</span></div>`).join('')
+    '<div class="st '+cls(v.kind)+'" data-n="'+esc(n)+'"><b></b>'+esc(n)
+    +'<span>'+v.lat.toFixed(2)+', '+v.lng.toFixed(2)+'</span></div>').join('')
     : '<div class="note">还没有车站被标注。</div>';
   if(miss.length){
-    const can = window.__TMAP_OK__ !== false;
-    html += '<h3 style="margin-top:10px">'
-      + (can ? '未能定位（点一下重试）' : '本线路涉及的车站') + '</h3>'
-      + miss.map(n=>`<div class="st fail g2" data-n="${esc(n)}"><b></b>${esc(n)}`
-          + (can ? '<span class="rt">重试</span>' : '') + `</div>`).join('');
+    html += '<h3 style="margin-top:10px">未能定位（点一下重试）</h3>'
+      + miss.map(n=>'<div class="st fail g2" data-n="'+esc(n)+'"><b></b>'+esc(n)
+        +'<span class="rt">重试</span></div>').join('');
   }
   $('list').innerHTML = html;
   [...$('list').children].forEach(d=>{
-    const n = d.dataset.n; if(!n) return;
+    const n=d.dataset.n; if(!n) return;
     d.onclick = async ()=>{
-      const v = MARKED.get(n);
-      if(v){ map.setCenter(new TMap.LatLng(v.lat, v.lng)); map.setZoom(12); return; }
-      d.querySelector('.rt').textContent = '定位中…';
-      const r = await geo(n);
-      if(r){
-        MARKED.set(n, {lat:r.poi.location.lat, lng:r.poi.location.lng,
-                       kind:'hit', title:r.poi.title || n});
-        FAILED.delete(n);
-        draw(); renderList();
-        map.setCenter(new TMap.LatLng(r.poi.location.lat, r.poi.location.lng));
-        map.setZoom(12);
+      const v=MARKED.get(n);
+      if(v){ map.setView([v.lat, v.lng], 12); return; }
+      const sp=d.querySelector('.rt'); if(sp) sp.textContent='定位中…';
+      const c = await getCoord(n);
+      if(c){
+        MARKED.set(n,{lat:c[1],lng:c[0],kind:'hit',title:n}); FAILED.delete(n);
+        draw(); renderList(); map.setView([c[1],c[0]],12);
       }else{
-        renderList();
-        note('「' + esc(n) + '」还是没定位到，可能站名写法特殊。', true);
+        if(sp) sp.textContent='重试';
+        note('「'+esc(n)+'」还是没定位到（网络或城市名不匹配）。', true);
       }
     };
   });
 }
 
-if(document.readyState === 'complete' || document.readyState === 'interactive'){
-  setTimeout(boot, 0);
-}else{
-  window.addEventListener('DOMContentLoaded', boot);
+function note(html, err){
+  const el=$('note'); el.innerHTML=html; el.className='note'+(err?' err':'');
 }
+
+/* ---------- 启动 ---------- */
+(async function(){
+  const ok = await ensureLeaflet();
+  if(!ok){ $('hint').textContent='地图组件未加载';
+    note('地图组件加载失败：无法连接地图库 CDN（cdnjs/unpkg/jsdelivr）。请检查网络后刷新。', true);
+    return; }
+  boot();
+})();
 </script>
 </body>
 </html>
