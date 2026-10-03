@@ -427,6 +427,7 @@ td .na{color:var(--red);font-weight:600}
   <div class="status" id="st"><span class="dot off" id="dot"></span><span id="stxt">检测本地服务…</span></div>
   <a href="map.html" style="font-size:12.5px;white-space:nowrap">🗺 车站地图</a>
   <a href="trip.html" style="font-size:12.5px;white-space:nowrap">✈️ 行程攻略</a>
+  <button class="lnk" id="intro-toggle" type="button">使用说明</button>
 </div></header>
 
 <div class="wrap">
@@ -516,7 +517,7 @@ td .na{color:var(--red);font-weight:600}
   </div>
 
   <div class="popwrap">
-    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span><button class="lnk" id="intro-toggle" type="button">使用说明</button></div>
+    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span></div>
     <div class="pop" id="pop"></div>
   </div>
 
@@ -1711,16 +1712,20 @@ function showIntro(){ const e=$('intro'); if(e) e.style.display=''; }
 /* 指南/能力/FAQ 只在首次进入时展示；查过一次之后默认收起，可点「使用说明」再展开 */
 function introSeen(){ try{ return localStorage.getItem('irt_intro_seen')==='1'; }catch(err){ return false; } }
 function markIntroSeen(){ try{ localStorage.setItem('irt_intro_seen','1'); }catch(err){} }
+function syncIntroBtn(){
+  const b=$('intro-toggle'), e=$('intro'); if(!b||!e) return;
+  b.textContent = (e.style.display!=='none') ? '收起说明' : '使用说明';
+}
 function bindIntroToggle(){
   const b = $('intro-toggle'); if(!b) return;
   b.onclick = ()=>{
     const e = $('intro'); if(!e) return;
-    const visible = e.style.display !== 'none';
-    if(visible){ hideIntro(); b.textContent = '使用说明'; }
+    if(e.style.display !== 'none'){ hideIntro(); }
     else{
-      showIntro(); b.textContent = '收起说明';
+      showIntro();
       if(e.scrollIntoView) e.scrollIntoView({behavior:'smooth',block:'start'});
     }
+    syncIntroBtn();
   };
 }
 
@@ -1732,6 +1737,7 @@ function boot(){
   bindAttrClose(); bindIntroToggle();
   // 首次进入才展示「三步搞定 / 核心能力 / FAQ」；看过一次后自动收起
   if(introSeen()) hideIntro();
+  syncIntroBtn();
   // 刷新即回到默认状态：出发地预填「济南」，目的地留空；
   // 不读取历史 URL 参数，也不自动重跑上次查询，避免刷新被上一次结果带偏。
   const jn = classify('济南');

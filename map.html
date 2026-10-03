@@ -84,6 +84,7 @@ header{background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(12px
     <button class="btn main" id="go">定位</button>
     <button class="btn" id="fit">回到全部</button>
     <button class="btn" id="base">切换底图</button>
+    <button class="btn" id="bgbtn">全部车站</button>
   </div>
   <div class="hint" id="hint">正在加载地图…</div>
   <a class="btn" href="index.html">← 路线查询</a>
@@ -122,6 +123,7 @@ for(const [city, arr] of Object.entries(CITY || {}))
   for(const s of (arr||[])) CITYREV[s] = city;
 
 let map, baseA, baseO, baseLayer = 'amap';
+let canvasRenderer = null, bgLayer = null, bgOn = true;   // 「全部车站」背景层
 const MARKED = new Map();          // 站名 -> {lat,lng,kind,title}
 const FAILED = new Set();          // 定位失败的站名
 const LS = id => { try{ return localStorage.getItem(id); }catch(e){ return null; } };
@@ -167,6 +169,7 @@ function loadScript(src){return new Promise((res,rej)=>{const s=document.createE
 function loadCSS(href){return new Promise((res)=>{const l=document.createElement('link');
   l.rel='stylesheet'; l.href=href; l.onload=res; l.onerror=res; document.head.appendChild(l);});}
 const LEAFLET_CDNS=[
+  'vendor/leaflet',   // 本地打包（国内稳定，优先）
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4',
   'https://unpkg.com/leaflet@1.9.4/dist',
   'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist'
@@ -213,6 +216,7 @@ function boot(){
     return;
   }
   map = L.map('map', {zoomControl:true, attributionControl:true}).setView([35.5, 105], 5);
+  canvasRenderer = L.canvas({padding:0.4});   // 背景层用 Canvas 渲染，2897 个点也流畅
 
   // 高德路网瓦片：国内确定可达、免密钥，坐标系 GCJ-02
   baseA = L.tileLayer(
@@ -230,8 +234,11 @@ function boot(){
   $('q').onkeydown = e=>{ if(e.key==='Enter') doSearch(); };
   $('fit').onclick = fitAll;
   $('base').onclick = switchBase;
+  $('bgbtn').onclick = toggleBG;
   bindSuggest();
 
+  drawBG();
+  $('bgbtn').textContent = bgOn ? '隐藏车站' : '全部车站';   // 初始已显示全部车站
   renderList();
   loadAll();
 }
@@ -241,6 +248,28 @@ function switchBase(){
   else { map.removeLayer(baseO); baseA.addTo(map); baseLayer='amap'; }
   $('hint').textContent = '底图：' + (baseLayer==='amap' ? '高德地图' : 'OpenStreetMap');
   draw();   // 切换坐标系后重画，保证圆点与底图对齐
+  drawBG(); // 背景层坐标系也要跟着换
+}
+
+/* 全部车站背景层：把内置 GEO 的所有车站画成淡色小点，让地图更“满”。
+   用 Canvas 渲染（2897 个点也流畅），非交互不抢点击，路线车站仍用彩色大点盖在上面。 */
+function drawBG(){
+  if(bgLayer){ bgLayer.remove(); bgLayer=null; }
+  if(!bgOn || !GEO) return;
+  const pts=[];
+  for(const n in GEO){
+    const c=GEO[n]; if(!c) continue;
+    pts.push(L.circleMarker(toMap(c[1],c[0]),{renderer:canvasRenderer,radius:2,
+      stroke:false,fillColor:'#8aa0b4',fillOpacity:.38,interactive:false}));
+  }
+  bgLayer=L.layerGroup(pts).addTo(map);
+}
+function toggleBG(){
+  bgOn=!bgOn;
+  drawBG();
+  const b=$('bgbtn'); if(b) b.textContent = bgOn ? '隐藏车站' : '全部车站';
+  note(bgOn ? ('已显示全部 <b>'+Object.keys(GEO||{}).length+'</b> 个车站（淡色小点），彩色大点为本线路车站。')
+            : '已隐藏背景车站，只保留本线路车站。');
 }
 
 /* ---------- 加载线路车站（并发 + 进度） ---------- */

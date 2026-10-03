@@ -108,21 +108,20 @@ function haversine(a,b){
 function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
 function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
 
-function kmeans(pts,K){
-  if(K<=1) return [pts];
-  let cents=[pts[0]];
-  while(cents.length<K){
-    let far=pts[0],fd=-1;
-    pts.forEach(p=>{ let d=Math.min(...cents.map(c=>haversine(p,c))); if(d>fd){fd=d;far=p;} });
-    cents.push(far);
+/* 地理最近邻串线：从最北的点出发，把景点串成一条尽量顺路的线。
+   之后沿这条线均匀切段，就能得到“每天景点数均衡 + 地理相邻”的分天方案。 */
+function nnPath(pts){
+  if(!pts.length) return [];
+  let pool=pts.slice();
+  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);   // 从最北的点开始
+  pool.splice(pool.indexOf(cur),1);
+  const out=[cur];
+  while(pool.length){
+    let ni=0,nd=1e9;
+    pool.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}});
+    cur=pool.splice(ni,1)[0]; out.push(cur);
   }
-  let groups;
-  for(let it=0;it<12;it++){
-    groups=Array.from({length:K},()=>[]);
-    pts.forEach(p=>{ let bi=0,bd=1e9; cents.forEach((c,i)=>{const d=haversine(p,c); if(d<bd){bd=d;bi=i;}}); groups[bi].push(p); });
-    cents=groups.map(g=> g.length? {lat:g.reduce((s,p)=>s+p.lat,0)/g.length, lng:g.reduce((s,p)=>s+p.lng,0)/g.length} : cents[0]);
-  }
-  return groups;
+  return out;
 }
 
 function buildDay(group, idx){
@@ -153,9 +152,16 @@ function plan(data, days, prefs){
   let spots=data.spots.map(s=>({...s}));
   spots.forEach(s=>{ const hit=(s.tags||[]).filter(t=>prefs.has(t)).length; s._score=1+hit*2+((s.tags||[]).includes('必去')?1:0); });
   spots.sort((a,b)=>b._score-a._score);
-  const sel=spots.slice(0, Math.min(days*4, spots.length));
+  const sel=spots.slice(0, Math.min(days*3, spots.length));
   const K=Math.min(days, sel.length);
-  const groups=kmeans(sel,K);
+  // 先按地理最近邻串成一条顺路的线，再均匀切成 K 段连续线路：
+  // 每天景点数尽量均衡（±1），且同一天内景点地理相邻、不绕路。
+  const order=nnPath(sel);
+  const groups=[];
+  for(let i=0;i<K;i++){
+    const a=Math.floor(i*order.length/K), b=Math.floor((i+1)*order.length/K);
+    groups.push(order.slice(a,b));
+  }
   return groups.map((g,i)=>buildDay(g,i));
 }
 
