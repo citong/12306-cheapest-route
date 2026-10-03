@@ -1300,6 +1300,11 @@ function boot(){
     if(p.types!=null) $('types').value=p.types;
     if(p.hops) $('hops').value=p.hops;
   }
+  // 内置默认出发地：未通过网址参数指定出发地时，预填「济南」，目的地保持为空
+  if(!$('from').value){
+    const jn = classify('济南');
+    applySel('from', (jn && jn.kind !== 'station') ? jn.kind : 'city', '济南');
+  }
   const pf = $('ps-foot'); if(pf) pf.textContent = String(PRESALE);
   detect().then(()=>{
     const m = BUNDLE && BUNDLE.meta;
