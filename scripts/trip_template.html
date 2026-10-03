@@ -96,6 +96,14 @@ h1{font-size:22px;margin:6px 0 2px}
   color:var(--mut);font-size:12px}
 .daysmall .leaflet-tooltip{font-size:12px;font-weight:700}
 .daysmall .leaflet-container{font-family:inherit}
+
+/* ---- 去程卡片（P3） ---- */
+.tcard{background:linear-gradient(135deg,#eef5ff,#f6fbff);border-color:#cfe2ff}
+.tcard-h{font-weight:700;font-size:14px;margin-bottom:4px}
+.tcard-r{font-size:13px;color:var(--ink);margin-bottom:7px}
+.tcard-s{font-size:13px;color:var(--mut);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.tcard-link{color:var(--blue);text-decoration:none;font-weight:600}
+.btn.sm{display:inline-block;padding:5px 12px;font-size:13px;margin:0}
 </style>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <script src="vendor/leaflet/leaflet.js"></script>
@@ -114,6 +122,9 @@ h1{font-size:22px;margin:6px 0 2px}
 
   <div class="panel">
     <div class="row">
+      <div class="fld">出发地（用于查询去程车次）
+        <input id="from" type="text" value="济南" style="width:110px">
+      </div>
       <div class="fld">城市
         <select id="city"></select>
       </div>
@@ -157,7 +168,47 @@ function haversine(a,b){
 }
 function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
 function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+function dur(min){ const n=Math.round(min||0); const h=Math.floor(n/60),m=n%60;
+  return h>0? (h+'小时'+(m?m+'分':'')) : (m+'分钟'); }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- 去程卡片（P3）：出发地→目的地 查最便宜车次，并回填 ---------- */
+function normCity(s){ return String(s||'').replace(/[\s|/、]/g,''); }
+function matchStoredRoute(fromCity, destCity, date){
+  try{
+    const raw=localStorage.getItem('irt_last_route');
+    if(!raw) return null;
+    const o=JSON.parse(raw);
+    if(!o || !o.fromLabel || !o.toLabel) return null;
+    const f=normCity(fromCity), t=normCity(destCity);
+    const sf=normCity(o.fromLabel), st=normCity(o.toLabel);
+    const fm=(sf.indexOf(f)>=0||f.indexOf(sf)>=0);
+    const tm=(st.indexOf(t)>=0||t.indexOf(st)>=0);
+    const dm=(!o.date || !date || o.date===date);
+    return (fm&&tm&&dm)? o : null;
+  }catch(e){ return null; }
+}
+function renderTransitCard(fromCity, destCity, date){
+  const link='index.html?from='+encodeURIComponent(fromCity)
+            +'&to='+encodeURIComponent(destCity)+'&date='+encodeURIComponent(date||'');
+  const m=matchStoredRoute(fromCity, destCity, date);
+  if(m){
+    const parts=[];
+    if(m.code) parts.push('<b>'+esc(m.code)+'</b> 等');
+    if(m.spanMin) parts.push('全程 '+dur(m.spanMin));
+    if(m.price!=null) parts.push('最低 <b style="color:var(--green)">¥'+m.price+'</b>');
+    if(m.transfers>0) parts.push('换乘 '+m.transfers+' 次');
+    const summary=parts.length? parts.join(' · ') : '已为你查询';
+    return '<div class="panel tcard"><div class="tcard-h">🚄 去程（第 1 天交通）</div>'
+      +'<div class="tcard-r">'+esc(m.fromLabel)+' → '+esc(m.toLabel)+' · '+esc(m.date||date||'')+'</div>'
+      +'<div class="tcard-s">✅ 已查到：'+summary
+      +' <a class="tcard-link" href="'+link+'" target="_blank" rel="noopener">重新查询 →</a></div></div>';
+  }
+  return '<div class="panel tcard"><div class="tcard-h">🚄 去程（第 1 天交通）</div>'
+    +'<div class="tcard-r">'+esc(fromCity)+' → '+esc(destCity)+' · 出发日期 '+esc(date||'（同行程开始日）')+'</div>'
+    +'<div class="tcard-s">还没查过去程车次。'
+    +'<a class="btn sm" href="'+link+'" target="_blank" rel="noopener">查询最便宜车次 →</a></div></div>';
+}
 
 /* WGS-84 -> GCJ-02（火星坐标系），用于在高德底图上精确对齐。
    景点坐标是真实经纬度(WGS84)，高德瓦片是 GCJ02，必须转换，否则偏几百米。 */
@@ -298,6 +349,11 @@ function render(data, days, dateStr, budget){
     +'<div class="kpi"><b>¥'+(MEAL_PER_DAY*days)+'</b><span>餐饮估算</span></div>'
     +'<div class="kpi"><b>'+totalWalk.toFixed(1)+'km</b><span>市内总里程</span></div>'
     +'</div>';
+
+  // ---------- 去程卡片（P3） ----------
+  const fromCity=(document.getElementById('from').value||'济南').trim();
+  const tripDate=(document.getElementById('date').value||'') ;
+  h+=renderTransitCard(fromCity, data.city, tripDate);
 
   // ---------- 天数 tab ----------
   h+='<div class="tabs" id="tabs">';

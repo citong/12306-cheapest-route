@@ -1247,6 +1247,7 @@ function run(f,t,want){
     RESULT = JSON.parse(e.data);
     RESULT.meta = mkMeta(RESULT.meta);
     render();
+    rememberRoute();   // 写入 localStorage，供行程页"去程"卡片回填
     // 服务端被暂停后也会带着已有结果收尾，这时候按钮保持在「继续查询」
     if(RESULT.meta && RESULT.meta.cancelled) stoppedLook();
     else finish();
@@ -1752,6 +1753,46 @@ function bindIntroToggle(){
 }
 
 /* ---------- 启动 ---------- */
+/* 跨页深链：行程页"去程"卡片带 ?from=&to=&date= 跳过来，自动填好并查询 */
+function applyDeepLink(){
+  try{
+    const q = new URLSearchParams(location.search);
+    const f = (q.get('from')||'').trim(), t = (q.get('to')||'').trim(), d = (q.get('date')||'').trim();
+    if(!f || !t) return;
+    const cf = classify(f), ct = classify(t);
+    applySel('from', cf ? cf.kind : 'city', f);
+    applySel('to',   ct ? ct.kind : 'city', t);
+    if(d && /^\d{4}-\d{2}-\d{2}$/.test(d)){ $('date').value = d; updDate(); }
+    const sf = joinStations('from'), st = joinStations('to'), sd = $('date').value;
+    if(sf && st){ hideIntro(); markIntroSeen(); run(sf, st, sd); }
+  }catch(e){ /* 深链失败静默降级，用户仍可手动查询 */ }
+}
+/* 查询完成后把结果摘要写入 localStorage，供行程页"去程"卡片回填 */
+function rememberRoute(){
+  try{
+    if(!RESULT || !LASTQ) return;
+    const best = (RESULT.routes && RESULT.routes[0]) || null;
+    const direct = RESULT.direct;
+    const dm = direct && direct.min_price != null ? direct.min_price : null;
+    const price = best ? (best.plan_price!=null?best.plan_price:best.total_price) : dm;
+    let code=null, ride=best&&best.ride_minutes, span=best&&best.span_minutes, transfers=best?best.transfers:0;
+    if(best){
+      const seg = (best.chosen && best.chosen[0]) || (best.legs && best.legs[0]) || null;
+      const tr = seg && ((seg.trains && seg.trains[0]) || seg._sample);
+      code = (tr && tr.code) ? tr.code : (best.path && best.path[0]) || null;
+    }
+    const payload = {
+      from: LASTQ.f, to: LASTQ.t, date: LASTQ.d,
+      fromLabel: labelOf('from'), toLabel: labelOf('to'),
+      price: price==null ? null : Math.round(price),
+      transfers: transfers||0,
+      rideMin: ride ? Math.round(ride) : null,
+      spanMin: span ? Math.round(span) : null,
+      code: code || null, ts: Date.now()
+    };
+    localStorage.setItem('irt_last_route', JSON.stringify(payload));
+  }catch(e){}
+}
 function boot(){
   if(!$('date').value) $('date').value = today(3);
   updDate();
@@ -1766,6 +1807,9 @@ function boot(){
   applySel('from', (jn && jn.kind !== 'station') ? jn.kind : 'city', '济南');
   const pf = $('ps-foot'); if(pf) pf.textContent = String(PRESALE);
   detect().then(()=>{
+    // 在 LIVE 状态确定后再处理跨页深链，避免开局 LIVE=false 时误走离线分支。
+    // 普通刷新（无参数）applyDeepLink 直接 no-op，仍按下面的离线内置数据展示。
+    applyDeepLink();
     const m = BUNDLE && BUNDLE.meta;
     if(!LIVE && m){ RESULT=BUNDLE; RESULT.meta = mkMeta(m); render(); }
   });
