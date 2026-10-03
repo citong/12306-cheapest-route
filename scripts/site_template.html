@@ -305,6 +305,84 @@ td .na{color:var(--red);font-weight:600}
   .row{gap:8px}.field{min-width:120px}.kpi .v{font-size:18px}
   .hero{padding:16px}
 }
+
+/* ===== 富内容：首屏 / 指南 / 能力 / 热门目的地 / FAQ / 景点图 ===== */
+.hero2{position:relative;overflow:hidden;border-radius:var(--radius);margin:18px 0 14px;
+  background:linear-gradient(135deg,#0f766e 0%,#10b981 52%,#059669 100%);color:#fff;
+  box-shadow:var(--shadow);display:flex;align-items:center;gap:20px;padding:26px 28px;
+  animation:fade .4s ease both}
+.hero2 .htxt{flex:1;min-width:0}
+.hero2 h1{margin:0 0 9px;font-size:24px;font-weight:800;letter-spacing:-.4px;line-height:1.28}
+.hero2 p{margin:0;font-size:13.5px;line-height:1.7;color:rgba(255,255,255,.92)}
+.hero2 .tags2{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.hero2 .tg{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+  border-radius:20px;padding:4px 12px;font-size:12.5px;backdrop-filter:blur(4px)}
+.hero2 .hpic{flex:none;width:188px;height:124px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.18))}
+@media(max-width:640px){.hero2{padding:20px}.hero2 .hpic{display:none}.hero2 h1{font-size:20px}}
+
+.sec-title{display:flex;align-items:center;gap:10px;margin:26px 0 12px}
+.sec-title h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px}
+.sec-title .ln{flex:1;height:1px;background:var(--line)}
+.sec-title .sub{font-size:12px;color:var(--sub)}
+
+.guide{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+@media(max-width:700px){.guide{grid-template-columns:1fr}}
+.gstep{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px 17px;
+  box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s}
+.gstep:hover{transform:translateY(-3px);box-shadow:var(--shadow)}
+.gstep .ic{width:40px;height:40px;margin-bottom:9px}
+.gstep .n{font-size:11.5px;font-weight:700;color:var(--green-2);letter-spacing:.08em}
+.gstep h4{margin:2px 0 6px;font-size:15px}
+.gstep p{margin:0;font-size:12.5px;color:var(--sub);line-height:1.65}
+
+.feats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:640px){.feats{grid-template-columns:1fr}}
+.feat{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius);padding:15px 16px;box-shadow:var(--shadow-sm);
+  transition:transform .18s,box-shadow .18s}
+.feat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.feat .ic{flex:none;width:38px;height:38px}
+.feat h4{margin:0 0 4px;font-size:14.5px}
+.feat p{margin:0;font-size:12.5px;color:var(--sub);line-height:1.6}
+
+.popwrap{margin:6px 0 2px}
+.pop{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:2px}
+@media(max-width:900px){.pop{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:560px){.pop{grid-template-columns:repeat(2,1fr)}}
+.pc{position:relative;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s,border-color .18s}
+.pc:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--green-line)}
+.pc .ph{display:block;width:100%;height:74px}
+.pc .pn{position:absolute;left:11px;bottom:34px;color:#fff;font-weight:800;font-size:16px;
+  text-shadow:0 1px 5px rgba(0,0,0,.5);letter-spacing:.5px}
+.pc .pd{font-size:12px;color:var(--sub);padding:8px 11px 11px;line-height:1.5;min-height:40px}
+.pc .go{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border:none;
+  border-radius:8px;font-size:11.5px;font-weight:700;color:var(--green-2);padding:3px 9px;cursor:pointer;
+  font-family:inherit;opacity:0;transform:translateY(-4px);transition:.15s}
+.pc:hover .go{opacity:1;transform:none}
+
+.faq{margin-top:14px}
+.faq details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:0 15px;
+  margin-bottom:8px;box-shadow:var(--shadow-sm)}
+.faq summary{cursor:pointer;font-weight:600;font-size:14px;padding:13px 0;list-style:none;
+  display:flex;align-items:center;gap:8px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"＋";color:var(--green);font-weight:800;font-size:16px;line-height:1}
+.faq details[open] summary::before{content:"－"}
+.faq .fa{font-size:13px;color:var(--sub);line-height:1.75;padding:0 0 14px}
+
+/* 景点抽屉：主题色 banner + 景点缩略图 */
+.attr-banner{height:96px;margin:-22px -24px 16px;position:relative;overflow:hidden}
+.attr-banner .ab-sub{position:absolute;right:14px;top:12px;color:#fff;font-size:11.5px;opacity:.92;
+  background:rgba(0,0,0,.18);border-radius:20px;padding:2px 10px}
+.attr-banner .ab-city{position:absolute;left:18px;bottom:11px;color:#fff;font-size:21px;font-weight:800;
+  text-shadow:0 1px 6px rgba(0,0,0,.45)}
+.attr-banner .ab-city small{font-size:13px;font-weight:500}
+.attr-spot{align-items:center}
+.attr-spot .sth{flex:none;width:46px;height:46px;border-radius:12px;overflow:hidden;
+  box-shadow:0 1px 4px rgba(15,23,42,.12);margin-right:2px}
+.attr-spot .scol{flex:1;min-width:0}
+.attr-spot .sd{margin-top:2px}
 </style>
 </head>
 <body>
@@ -315,6 +393,51 @@ td .na{color:var(--red);font-weight:600}
 </div></header>
 
 <div class="wrap">
+  <section id="intro">
+    <div class="hero2">
+      <div class="htxt">
+        <h1>用最少的钱，坐最远的车 🚆</h1>
+        <p>自动穷举 12306 多段换乘组合，在全网方案里帮你挑出总价最低的那一条。直达太贵？让它试试中转。</p>
+        <div class="tags2">
+          <span class="tg">💰 最低价优先</span>
+          <span class="tg">🔁 1~4 次换乘穷举</span>
+          <span class="tg">🏙 城市 / 省份级搜索</span>
+          <span class="tg">📅 未开售也能预估</span>
+        </div>
+      </div>
+      <svg class="hpic" viewBox="0 0 200 124" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M8 100 C 45 64, 70 104, 108 72 S 170 40, 196 58" stroke="#ffffff" stroke-width="3" fill="none" opacity=".55" stroke-dasharray="2 7" stroke-linecap="round"/>
+        <circle cx="8" cy="100" r="5.5" fill="#fff"/>
+        <circle cx="196" cy="58" r="5.5" fill="#fff"/>
+        <polygon points="18,116 40,76 60,116" fill="#ffffff" opacity=".20"/>
+        <polygon points="44,116 72,68 96,116" fill="#ffffff" opacity=".14"/>
+        <g transform="translate(92,50)">
+          <rect x="0" y="0" width="36" height="19" rx="6" fill="#fff"/>
+          <rect x="4" y="3" width="10" height="8" rx="2" fill="#10b981"/>
+          <rect x="17" y="3" width="10" height="8" rx="2" fill="#10b981"/>
+          <rect x="30" y="3" width="3" height="8" rx="1.5" fill="#0f766e"/>
+          <circle cx="9" cy="22" r="3.2" fill="#0f766e"/>
+          <circle cx="27" cy="22" r="3.2" fill="#0f766e"/>
+        </g>
+        <circle cx="162" cy="30" r="9" fill="#fde68a"/>
+      </svg>
+    </div>
+
+    <div class="sec-title"><h3>三步搞定</h3><span class="ln"></span><span class="sub">不用懂算法，照着填就行</span></div>
+    <div class="guide" id="guide"></div>
+
+    <div class="sec-title"><h3>它到底能帮你做什么</h3><span class="ln"></span><span class="sub">核心能力</span></div>
+    <div class="feats" id="feats"></div>
+
+    <div class="sec-title"><h3>还有疑问？</h3><span class="ln"></span><span class="sub">常见问题</span></div>
+    <div class="faq" id="faq">
+      <details><summary>直达太贵，中转真的会更便宜吗？</summary><div class="fa">很多时候会。比如热门干线直达动辄全价，经停一个枢纽城市换乘普速，总价常常能省两三成。本工具会把所有可能的换乘组合都查一遍，直接告诉你最便宜的一条，以及它比起直达省了多少。</div></details>
+      <details><summary>填城市 / 省份就行，还要一个个选车站吗？</summary><div class="fa">不用。填「济南」「云南」这类城市或省份名，页面会自动展开该市 / 该省的主要车站，一次搜索覆盖全部组合，并在每条路线里标出实际上下车站。想精细控制，点开还能勾选具体车站。</div></details>
+      <details><summary>想查的日期还没放票怎么办？</summary><div class="fa">12306 预售期约 15 天，且各站起售时间不同。超出预售期的日期会标「未开售」，并自动改用<b>同一星期几、且已开售</b>的日期实查作为预估——车次与票价通常稳定，可作参考；余票一定不同，请在放票后再查一次。</div></details>
+      <details><summary>票价和余票准吗？</summary><div class="fa">连上本机查询服务后是<b>实时</b>直连 12306 的当前状态；离线时看的是内置快照，可能随调图变动。购票请一律以 12306 官方为准，本页仅作比价与出行规划参考。</div></details>
+    </div>
+  </section>
+
   <div class="hero">
     <div class="row">
       <div class="field"><label>出发<span class="prov" id="kind-from"></span></label>
@@ -353,6 +476,11 @@ td .na{color:var(--red);font-weight:600}
       <span class="hint" style="margin:0" id="eta"></span>
     </div>
     <div class="hint" id="hint"></div>
+  </div>
+
+  <div class="popwrap">
+    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span></div>
+    <div class="pop" id="pop"></div>
   </div>
 
   <div class="fresh hide" id="fresh"></div>
@@ -522,14 +650,17 @@ function syncAttr(kind, name){
 }
 function showAttr(k){
   const e = ATTR[k]; if(!e) return;
-  let h = '<div class="attr-city">'+esc(k)
+  const hue = attrHue(k);
+  let h = '<div class="attr-banner">'+ skylineHue(hue)
+        + '<div class="ab-sub">旅行攻略</div>'
+        + '<div class="ab-city">'+esc(k)
         + (e.city && e.city !== k ? ' <small>'+esc(e.city)+'</small>' : '')
-        + '</div>'
-        + '<div class="attr-intro">'+esc(e.intro||'')+'</div>'
-        + '<div class="attr-h">推荐打卡</div>';
+        + '</div></div>';
+  h += '<div class="attr-intro">'+esc(e.intro||'')+'</div>';
+  h += '<div class="attr-h">推荐打卡</div>';
   (e.spots||[]).forEach((s,i)=>{
-    h += '<div class="attr-spot"><div class="dotn">'+String(i+1)+'</div>'
-       + '<div><div class="sn">'+esc(s.n)+'</div>'
+    h += '<div class="attr-spot">'+ scene(i)
+       + '<div class="scol"><div class="sn">'+esc(s.n)+'</div>'
        + '<div class="sd">'+esc(s.d||'')+'</div></div></div>';
   });
   h += '<div class="attr-tip">目的地卡片为内置旅行信息，仅供参考；开放时间、门票以景区官方为准。</div>';
@@ -989,6 +1120,7 @@ $('go').onclick = ()=>{
 function run(f,t,want){
   if(ES){ ES.close(); ES=null; }
   RESULT = null; $('out').innerHTML='';
+  hideIntro();
   if(!LIVE){ offline(f,t,want); return; }
   // 预售期外的日期：改用「同星期几、且已开售」的参照日期实查，结果明确标注为预估
   EST = null;
@@ -1383,10 +1515,124 @@ function applyFilter(){
   renderList(list);
 }
 
+/* ---------- 富内容：插画 / 图标 / 热门目的地 ---------- */
+/* 小型线性图标（内联 SVG，离线可用） */
+const ICON = {
+  search:`<svg viewBox="0 0 40 40" fill="none"><circle cx="17" cy="17" r="11" stroke="#10b981" stroke-width="3"/><line x1="25" y1="25" x2="34" y2="34" stroke="#10b981" stroke-width="3" stroke-linecap="round"/></svg>`,
+  transfer:`<svg viewBox="0 0 40 40"><circle cx="9" cy="11" r="5" fill="#10b981"/><circle cx="31" cy="11" r="5" fill="#34d399"/><circle cx="20" cy="30" r="5" fill="#059669"/><line x1="13" y1="14" x2="18" y2="26" stroke="#94a3b8" stroke-width="2.5"/><line x1="27" y1="14" x2="22" y2="26" stroke="#94a3b8" stroke-width="2.5"/></svg>`,
+  tag:`<svg viewBox="0 0 40 40"><path d="M7 7 H26 L33 14 V33 H7 Z" fill="none" stroke="#10b981" stroke-width="3" stroke-linejoin="round"/><circle cx="14" cy="15" r="3" fill="#10b981"/></svg>`,
+  train:`<svg viewBox="0 0 40 40" fill="none"><rect x="10" y="6" width="20" height="24" rx="6" stroke="#10b981" stroke-width="3"/><line x1="10" y1="20" x2="30" y2="20" stroke="#10b981" stroke-width="3"/><circle cx="15" cy="14" r="2.5" fill="#10b981"/><circle cx="25" cy="14" r="2.5" fill="#10b981"/><line x1="13" y1="33" x2="11" y2="37" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="33" x2="29" y2="37" stroke="#94a3b8" stroke-width="3" stroke-linecap="round"/></svg>`,
+  city:`<svg viewBox="0 0 40 40" fill="none"><rect x="6" y="18" width="8" height="16" stroke="#10b981" stroke-width="2.5"/><rect x="16" y="10" width="8" height="24" stroke="#10b981" stroke-width="2.5"/><rect x="26" y="22" width="8" height="12" stroke="#34d399" stroke-width="2.5"/><line x1="4" y1="34" x2="36" y2="34" stroke="#94a3b8" stroke-width="2.5"/></svg>`,
+  calendar:`<svg viewBox="0 0 40 40" fill="none"><rect x="6" y="9" width="28" height="25" rx="4" stroke="#10b981" stroke-width="3"/><line x1="6" y1="16" x2="34" y2="16" stroke="#10b981" stroke-width="3"/><line x1="13" y1="4" x2="13" y2="12" stroke="#10b981" stroke-width="3" stroke-linecap="round"/><line x1="27" y1="4" x2="27" y2="12" stroke="#10b981" stroke-width="3" stroke-linecap="round"/><text x="20" y="29" font-size="11" fill="#059669" text-anchor="middle" font-family="sans-serif" font-weight="700">15</text></svg>`,
+  coin:`<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="13" fill="none" stroke="#10b981" stroke-width="3"/><text x="20" y="26" font-size="15" fill="#10b981" text-anchor="middle" font-family="sans-serif" font-weight="800">¥</text></svg>`,
+};
+/* 城市名 -> 稳定色相，用于景点 banner / 天际线 */
+function attrHue(s){ let h=0; for(const c of String(s||'')) h=(h*31+c.charCodeAt(0))%360; return h; }
+/* 城市天际线插画（热门目的地卡片 & 景点 banner 复用） */
+function skyline(i){
+  const hues=[205,160,32,280,350,190,48,120,255,20,140,300];
+  const hue=hues[i%hues.length], h2=(hue+30)%360;
+  return `<svg class="ph" viewBox="0 0 200 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g${i}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="hsl(${hue},68%,62%)"/>
+      <stop offset="1" stop-color="hsl(${h2},62%,40%)"/></linearGradient></defs>
+    <rect width="200" height="74" fill="url(#g${i})"/>
+    <g fill="rgba(255,255,255,.92)">
+      <rect x="14" y="40" width="16" height="34"/><rect x="36" y="26" width="13" height="48"/>
+      <rect x="55" y="46" width="20" height="28"/><rect x="82" y="18" width="12" height="56"/>
+      <rect x="100" y="36" width="18" height="38"/><rect x="124" y="30" width="13" height="44"/>
+      <rect x="143" y="48" width="18" height="26"/><rect x="168" y="34" width="16" height="40"/>
+    </g>
+    <circle cx="176" cy="16" r="8" fill="rgba(255,255,255,.85)"/>
+  </svg>`;
+}
+function skylineHue(hue){
+  const h2=(hue+28)%360, id='ag'+hue;
+  return `<svg class="ph" viewBox="0 0 200 96" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="height:96px">
+    <defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="hsl(${hue},65%,60%)"/>
+      <stop offset="1" stop-color="hsl(${h2},60%,40%)"/></linearGradient></defs>
+    <rect width="200" height="96" fill="url(#${id})"/>
+    <g fill="rgba(255,255,255,.9)">
+      <rect x="14" y="52" width="16" height="44"/><rect x="36" y="34" width="13" height="62"/>
+      <rect x="55" y="60" width="20" height="36"/><rect x="82" y="24" width="12" height="72"/>
+      <rect x="100" y="46" width="18" height="50"/><rect x="124" y="38" width="13" height="58"/>
+      <rect x="143" y="62" width="18" height="34"/><rect x="168" y="44" width="16" height="52"/>
+    </g>
+    <circle cx="176" cy="20" r="9" fill="rgba(255,255,255,.85)"/>
+  </svg>`;
+}
+/* 景点缩略图：4 种场景循环 */
+function scene(i){
+  const v=i%4;
+  const bg=['#dbeafe','#dcfce7','#fef3c7','#fae8ff'][v];
+  const fg=['#3b82f6','#10b981','#f59e0b','#a855f7'][v];
+  let m='';
+  if(v===0){ m=`<polygon points="0,46 14,20 24,40 34,16 46,46" fill="${fg}" opacity=".85"/><polygon points="0,46 10,30 18,46" fill="${fg}" opacity=".5"/>`; }
+  else if(v===1){ m=`<rect x="20" y="10" width="6" height="36" fill="${fg}"/><polygon points="13,16 33,16 23,5" fill="${fg}"/><rect x="16" y="22" width="14" height="5" fill="${fg}"/><rect x="15" y="32" width="16" height="5" fill="${fg}"/>`; }
+  else if(v===2){ m=`<rect x="0" y="30" width="46" height="16" fill="${fg}" opacity=".32"/><path d="M2 30 q11 -9 22 0 t22 0" stroke="${fg}" stroke-width="2" fill="none"/><rect x="22" y="13" width="2" height="17" fill="${fg}"/><rect x="14" y="20" width="2" height="10" fill="${fg}" opacity=".6"/>`; }
+  else { m=`<rect x="14" y="12" width="18" height="34" fill="${fg}"/><polygon points="10,12 36,12 23,2" fill="${fg}"/><rect x="20" y="22" width="6" height="14" fill="${bg}"/>`; }
+  return `<svg class="sth" viewBox="0 0 46 46"><rect width="46" height="46" fill="${bg}"/>${m}<circle cx="36" cy="10" r="5" fill="#fde68a"/></svg>`;
+}
+
+const GUIDE = [
+  ['search','输入出发 / 到达','支持车站、城市甚至省份。填「济南」「云南」会自动展开主要车站，一次搜索覆盖全部组合。'],
+  ['transfer','自动穷举换乘','逐段查 12306，BFS 找出 1~4 次换乘的全部组合，不怕漏掉便宜的中转方案。'],
+  ['tag','比价选最便宜','汇总所有方案的总价、历时与余票，自动标出最便宜的一条，并以直达价作基准对比。'],
+];
+const FEATS = [
+  ['train','多段换乘穷举','直达太贵？自动尝试经停城市中转，常能省下三成左右的票价。'],
+  ['city','城市 / 省份级搜索','不用记具体车站，填城市名就展开全部车站；省份名可勾选下属城市。'],
+  ['calendar','未开售也能预估','预售期外的日期，自动按同星期几的已开售日实查，给出可参考的预估。'],
+  ['coin','实时余票比价','连上本机服务后直连 12306，票价、席别、余票均为当前实时状态。'],
+];
+/* 热门目的地：键必须是 attractions.json 里存在的城市 */
+const POP = [
+  ['北京','故宫 · 长城 · 胡同烟火'],
+  ['上海','外滩 · 豫园 · 迪士尼'],
+  ['成都','熊猫 · 火锅 · 宽窄巷子'],
+  ['西安','兵马俑 · 城墙 · 回民街'],
+  ['杭州','西湖 · 灵隐 · 宋城'],
+  ['重庆','洪崖洞 · 轻轨 · 火锅'],
+  ['广州','早茶 · 小蛮腰 · 老城'],
+  ['三亚','天涯海角 · 椰风海韵'],
+  ['昆明','石林 · 滇池 · 春城'],
+  ['厦门','鼓浪屿 · 环岛路'],
+  ['桂林','漓江 · 喀斯特峰林'],
+  ['丽江','古城 · 玉龙雪山'],
+];
+function buildGuide(){
+  const el=$('guide'); if(!el) return;
+  el.innerHTML = GUIDE.map(([ic,t,d],i)=>
+    `<div class="gstep"><div class="ic">${ICON[ic]||''}</div>`
+    + `<div class="n">STEP ${i+1}</div><h4>${esc(t)}</h4><p>${esc(d)}</p></div>`).join('');
+}
+function buildFeats(){
+  const el=$('feats'); if(!el) return;
+  el.innerHTML = FEATS.map(([ic,t,d])=>
+    `<div class="feat"><div class="ic">${ICON[ic]||''}</div>`
+    + `<div><h4>${esc(t)}</h4><p>${esc(d)}</p></div></div>`).join('');
+}
+function buildPop(){
+  const el=$('pop'); if(!el) return;
+  el.innerHTML = POP.map(([c,d],i)=>
+    `<div class="pc" data-c="${esc(c)}"><button class="go" type="button">选为到达</button>`
+    + skyline(i) + `<div class="pn">${esc(c)}</div><div class="pd">${esc(d)}</div></div>`).join('');
+  el.querySelectorAll('.pc').forEach(pc=>{
+    pc.onclick = ()=>{
+      applySel('to','city',pc.dataset.c);
+      const hero = document.querySelector('.hero');
+      if(hero && hero.scrollIntoView) hero.scrollIntoView({behavior:'smooth',block:'start'});
+    };
+  });
+}
+function hideIntro(){ const e=$('intro'); if(e) e.style.display='none'; }
+
 /* ---------- 启动 ---------- */
 function boot(){
   if(!$('date').value) $('date').value = today(3);
   updDate();
+  buildGuide(); buildFeats(); buildPop();
   // 刷新即回到默认状态：出发地预填「济南」，目的地留空；
   // 不读取历史 URL 参数，也不自动重跑上次查询，避免刷新被上一次结果带偏。
   const jn = classify('济南');
