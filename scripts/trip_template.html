@@ -86,7 +86,19 @@ h1{font-size:22px;margin:6px 0 2px}
 .foot a{color:var(--blue);text-decoration:none}
 .warn{font-size:12px;color:var(--warn);background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:10px}
 .empty{text-align:center;color:var(--mut);font-size:13px;padding:26px 0}
+
+/* ---- 每日小地图 ---- */
+.daysmall{height:208px;border-radius:12px;overflow:hidden;border:1px solid var(--line);
+  margin:0 0 14px;background:#eef2f7;position:relative}
+.daysmall .mlabel{position:absolute;top:8px;left:10px;z-index:500;background:rgba(15,23,42,.72);
+  color:#fff;font-size:12px;padding:3px 10px;border-radius:8px;backdrop-filter:blur(3px)}
+.daysmall .merr{position:absolute;inset:0;display:none;align-items:center;justify-content:center;
+  color:var(--mut);font-size:12px}
+.daysmall .leaflet-tooltip{font-size:12px;font-weight:700}
+.daysmall .leaflet-container{font-family:inherit}
 </style>
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<script src="vendor/leaflet/leaflet.js"></script>
 </head>
 <body>
 <header><div class="hd">
@@ -146,6 +158,27 @@ function haversine(a,b){
 function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
 function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* WGS-84 -> GCJ-02（火星坐标系），用于在高德底图上精确对齐。
+   景点坐标是真实经纬度(WGS84)，高德瓦片是 GCJ02，必须转换，否则偏几百米。 */
+function wgs84ToGcj02(lng,lat){
+  if(!(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55)) return [lng,lat];
+  const a=6378245.0, ee=0.00669342162296594323;
+  let dLat=-100+2*lng+3*lat+0.2*lat*lat+0.1*lng*lat+0.2*Math.sqrt(Math.abs(lng));
+  dLat+=(20*Math.sin(6*lng*Math.PI)+20*Math.sin(2*lng*Math.PI))*2/3;
+  dLat+=(20*Math.sin(lat*Math.PI)+40*Math.sin(lat/3*Math.PI))*2/3;
+  dLat+=(160*Math.sin(lat/12*Math.PI)+320*Math.sin(lat*Math.PI/30))*2/3;
+  let dLng=300+lng+2*lat+0.1*lng*lng+0.1*lng*lat+0.1*Math.sqrt(Math.abs(lng));
+  dLng+=(20*Math.sin(6*lng*Math.PI)+20*Math.sin(2*lng*Math.PI))*2/3;
+  dLng+=(20*Math.sin(lng*Math.PI)+40*Math.sin(lng/3*Math.PI))*2/3;
+  dLng+=(150*Math.sin(lng/12*Math.PI)+300*Math.sin(lng/30*Math.PI))*2/3;
+  const radLat=lat/180*Math.PI;
+  let magic=Math.sin(radLat); magic=1-ee*magic*magic;
+  const sqrtMagic=Math.sqrt(magic);
+  dLat=(dLat*180.0)/((a*(1-ee))/(magic*sqrtMagic)*Math.PI);
+  dLng=(dLng*180.0)/(a/sqrtMagic*Math.cos(radLat)*Math.PI);
+  return [lng+dLng, lat+dLat];
+}
 
 /* 地理最近邻串线：从最北的点出发，把景点串成一条尽量顺路的线。
    之后沿这条线均匀切段，就能得到"每天景点数均衡 + 地理相邻"的分天方案。 */
@@ -294,8 +327,11 @@ function render(data, days, dateStr, budget){
   document.getElementById('out').innerHTML=h;
 
   // ---------- 每日面板 ----------
+  let dayMapSeq=0;
   const draw=d=>{
-    let p='<div class="tl">';
+    let p='<div class="daysmall" id="daysmall"><span class="mlabel">📍 当日路线地图</span>'
+        +'<div class="merr">地图瓦片需联网加载（高德），当前网络不可用</div></div>';
+    p+='<div class="tl">';
     let lastTransit=null;
     d.items.forEach(it=>{
       if(it.transit!==undefined){ lastTransit=it; return; }
@@ -320,7 +356,38 @@ function render(data, days, dateStr, budget){
       + (d.theme?(' · 主题：'+esc(d.theme)):'') + '</div>';
     p+='<div class="transit" style="margin-top:6px">🍽 '+esc(d.dinnerNote||'晚餐自理')+'</div>';
     document.getElementById('daypanel').innerHTML=p;
+    // 每天的小地图：只给有坐标的景点画
+    const seq = ++dayMapSeq;
+    setTimeout(()=> initDayMap(seq, d), 0);
   };
+
+/* 在 #daysmall 内渲染当日景点序号 Markers + 游览顺序连线 */
+function initDayMap(seq, d){
+  const el=document.getElementById('daysmall');
+  if(!el) return;
+  if(!window.L){ const e2=el.querySelector('.merr'); if(e2) e2.style.display='flex'; return; }
+  const pts=d.items.filter(it=>it.spot && it.spot.lat!=null && it.spot.lng!=null).map(it=>it.spot);
+  if(pts.length===0){ el.querySelector('.merr').style.display='flex'; return; }
+  const ll=pts.map((s,i)=>{ const g=wgs84ToGcj02(s.lng,s.lat); return {ll:[g[1],g[0]], n:s.n, i}; });
+  const map=L.map(el,{zoomControl:true,scrollWheelZoom:false,attributionControl:false})
+    .setView(ll[0].ll, 12);
+  const amap=L.tileLayer(
+    'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    {maxZoom:18, subdomains:'1234', attribution:'© 高德地图'});
+  amap.addTo(map);
+  let amapErr=0;
+  amap.on('tileerror', ()=>{ if(++amapErr>=3) el.querySelector('.merr').style.display='flex'; });
+  const latlngs=ll.map(o=>o.ll);
+  if(latlngs.length>1){
+    L.polyline(latlngs,{color:'#2563eb',weight:3,opacity:.85,dashArray:'5 6'}).addTo(map);
+  }
+  ll.forEach(o=>{
+    L.marker(o.ll,{title:o.n}).addTo(map)
+      .bindTooltip((o.i+1)+'. '+o.n,{permanent:false,direction:'top'});
+  });
+  if(latlngs.length>1) map.fitBounds(latlngs,{padding:[26,26]});
+  setTimeout(()=> map.invalidateSize(), 40);
+}
   draw(planOut[0]);
   document.querySelectorAll('#tabs .tab').forEach(t=> t.onclick=()=>{
     document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('act'));
