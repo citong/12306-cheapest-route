@@ -58,6 +58,26 @@ header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0
 .sug div{padding:7px 12px;cursor:pointer;font-size:13.5px;display:flex;justify-content:space-between;gap:8px}
 .sug div:hover,.sug div.sel{background:var(--soft)}
 .sug span{color:var(--sub);font-size:12px}
+.sug.big{max-height:330px}
+.sug div.sg{background:#f8fafc;padding:6px 12px;font-size:11.5px;color:#6b7280;
+  cursor:default;align-items:center;border-top:1px solid var(--line);gap:6px}
+.sug div.sg:first-child{border-top:none}
+.sug div.sg b{font-weight:600;color:var(--ink);font-size:12px}
+.sug div.sg:hover{background:#f8fafc}
+.sug .cl{margin-left:auto;border:none;background:none;color:#9ca3af;cursor:pointer;
+  font-size:11.5px;font-family:inherit;padding:0}
+.sug .cl:hover{color:#dc2626}
+.sug div.abc{padding:6px 10px;display:flex;flex-wrap:wrap;gap:3px;cursor:default;background:#fff}
+.sug div.abc:hover{background:#fff}
+.sug div.abc i{font-style:normal;min-width:21px;text-align:center;border:1px solid var(--line);
+  border-radius:6px;font-size:11.5px;color:var(--sub);cursor:pointer;line-height:18px;
+  font-family:ui-monospace,Menlo,Consolas,monospace}
+.sug div.abc i:hover{border-color:var(--green);color:var(--green)}
+.sug div.abc i.on{background:var(--green);border-color:var(--green);color:#fff}
+.sug #slist{padding:0;display:block;cursor:default;background:#fff}
+.sug #slist:hover{background:#fff}
+.sug .sn{padding:10px 12px;color:#9ca3af;font-size:12.5px;cursor:default;background:#fff}
+.sug .sn:hover{background:#fff}
 .field input.hasrnd{padding-right:40px}
 .rnd{position:absolute;right:6px;bottom:8px;width:27px;height:27px;
   border:1px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;
@@ -471,10 +491,105 @@ function renderPick(id){
   });
 }
 
-/* ---------- 补全：车站 / 城市 / 省份 混排 ---------- */
+/* ---------- 搜索历史 ---------- */
+const HIST_KEY = 'tcr.hist.v1';
+const KIND_CN  = {city:'城市', prov:'省份', station:'车站'};
+function kindCN(k){ return KIND_CN[k] || ''; }
+function normKind(k){ return k === 'stn' ? 'station' : (k || 'station'); }
+
+function getHist(){
+  try{
+    const h = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+    return Array.isArray(h) ? h.filter(x=>x && x.n) : [];
+  }catch(e){ return []; }
+}
+function pushHist(kind, name){
+  name = (name || '').trim();
+  if(!name) return;
+  try{
+    const h = getHist().filter(x => x.n !== name);
+    h.unshift({n:name, k:normKind(kind), t:Date.now()});
+    localStorage.setItem(HIST_KEY, JSON.stringify(h.slice(0, 12)));
+  }catch(e){ /* 隐私模式下 localStorage 不可用，历史功能静默降级 */ }
+}
+function clearHist(){ try{ localStorage.removeItem(HIST_KEY); }catch(e){} }
+
+/* ---------- 车站表：按拼音字母排序（空输入时列出全部） ---------- */
+const ABC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+let ST_SORTED = null, ST_LETTERS = {}, SUG_LETTER = '';
+function sortedStations(){
+  if(ST_SORTED) return ST_SORTED;
+  ST_SORTED = (STATIONS || []).slice().sort((a,b)=>
+    a.p < b.p ? -1 : a.p > b.p ? 1 : (a.n < b.n ? -1 : a.n > b.n ? 1 : 0));
+  ST_LETTERS = {};
+  for(const s of ST_SORTED){
+    const c = (s.p[0] || '').toUpperCase();
+    ST_LETTERS[c] = (ST_LETTERS[c] || 0) + 1;
+  }
+  return ST_SORTED;
+}
+
+/* ---------- 输入框为空时的下拉：最近搜索 + 按字母排序的全部车站 ---------- */
+function openEmpty(box, id){
+  const hist = getHist();
+  const all  = sortedStations();
+  const list = SUG_LETTER ? all.filter(s=>(s.p[0]||'').toUpperCase() === SUG_LETTER) : all;
+  let html = '';
+  if(hist.length){
+    html += `<div class="sg"><b>最近搜索</b><span>${hist.length} 条</span>`
+          + `<button class="cl" data-clr="1">清除</button></div>`;
+    html += hist.slice(0, 6).map(h=>
+      `<div data-t="hist" data-k="${esc(normKind(h.k))}" data-n="${esc(h.n)}">🕘 ${esc(h.n)}`
+      + `<span>${esc(kindCN(normKind(h.k)))}</span></div>`).join('');
+  }
+  html += `<div class="sg"><b>${SUG_LETTER ? '字母 '+SUG_LETTER : '全部车站 · 按字母排序'}</b>`
+        + `<span>${list.length} 个${SUG_LETTER ? '' : ' · 点字母快速跳转'}</span></div>`;
+  html += '<div class="abc">' + ABC.map(L=>{
+      const n = ST_LETTERS[L] || 0;
+      return `<i data-l="${L}"${SUG_LETTER===L?' class="on"':''}`
+           + `${n ? '' : ' style="opacity:.35"'} title="${n} 个">${L}</i>`;
+    }).join('') + (SUG_LETTER ? '<i data-l="">全&nbsp;部</i>' : '') + '</div>';
+  html += '<div id="slist"></div>';
+  if(!list.length) html += '<div class="sn">这个字母下面没有车站</div>';
+
+  box.innerHTML = html;
+  box.classList.add('on', 'big');
+
+  // 3404 个站一次性铺开太重：先渲染 80 个，滚到底再追加
+  const wrap = box.querySelector('#slist');
+  let n = 0;
+  const more = ()=>{
+    if(n >= list.length) return;
+    const frag = document.createElement('div');
+    frag.innerHTML = list.slice(n, n+80).map(s=>{
+      const pv = provOf(s.n);
+      return `<div data-t="stn" data-k="station" data-n="${esc(s.n)}">🚉 ${esc(s.n)}`
+           + `${pv?'<em>'+esc(pv)+'</em>':''}<span>${esc(s.p)}</span></div>`;
+    }).join('');
+    while(frag.firstChild) wrap.appendChild(frag.firstChild);
+    n = Math.min(n + 80, list.length);
+  };
+  more();
+  box.onscroll = ()=>{ if(box.scrollTop + box.clientHeight >= box.scrollHeight - 60) more(); };
+
+  box.querySelectorAll('.abc i').forEach(el=>{
+    el.onclick = ()=>{ SUG_LETTER = el.dataset.l || ''; openEmpty(box, id); };
+  });
+  const cl = box.querySelector('[data-clr]');
+  if(cl) cl.onclick = ()=>{ clearHist(); openEmpty(box, id); };
+  bindSug(box, id);
+}
+
+/* 候选项点击：车站走「车站」模式，城市/省份会展开成多站 */
+function bindSug(box, id){
+  box.querySelectorAll('[data-t]').forEach(d=>{
+    d.onclick = ()=>{ applySel(id, normKind(d.dataset.k || d.dataset.t), d.dataset.n); };
+  });
+}
+
 function suggest(inp, box, id){
   const kw = inp.value.trim();
-  if(!kw){ box.classList.remove('on'); return; }
+  if(!kw){ openEmpty(box, id); return; }
   const low = kw.toLowerCase();
   const out = [];
   // 1) 省份（精确前缀优先）
@@ -502,21 +617,24 @@ function suggest(inp, box, id){
   }
   if(!out.length){ box.classList.remove('on'); return; }
   const icon = {prov:'🏞', city:'🏙', stn:'🚉'};
+  box.classList.remove('big');
   box.innerHTML = out.map(o=>{
     const pv = o.t==='stn' ? provOf(o.n) : '';
-    return `<div data-t="${o.t}" data-n="${esc(o.n)}">${icon[o.t]} ${esc(o.n)}`
-         + `${pv?'<em>'+esc(pv)+'</em>':''}<span>${esc(o.sub)}</span></div>`;
+    return `<div data-t="${o.t}" data-k="${o.t==='stn'?'station':o.t}" data-n="${esc(o.n)}">`
+         + `${icon[o.t]} ${esc(o.n)}${pv?'<em>'+esc(pv)+'</em>':''}`
+         + `<span>${esc(o.sub)}</span></div>`;
   }).join('');
   box.classList.add('on');
-  [...box.children].forEach(d=>d.onclick=()=>{
-    applySel(id, d.dataset.t==='stn' ? 'station' : d.dataset.t, d.dataset.n);
-  });
+  bindSug(box, id);
 }
 ['from','to'].forEach(id=>{
   const inp=$(id), box=$('sug-'+id);
+  // 关键点：下拉上按下鼠标时不要让输入框失焦，否则还没来得及点击就被 blur 关掉了
+  box.addEventListener('mousedown', e=>e.preventDefault());
   inp.addEventListener('input',()=>{ SEL[id].kind='station'; suggest(inp,box,id); });
   inp.addEventListener('focus',()=>suggest(inp,box,id));
-  inp.addEventListener('blur',()=>setTimeout(()=>box.classList.remove('on'),180));
+  inp.addEventListener('click',()=>{ if(!box.classList.contains('on')) suggest(inp,box,id); });
+  inp.addEventListener('blur',()=>setTimeout(()=>{ box.classList.remove('on'); SUG_LETTER=''; },180));
 });
 $('swap').onclick = ()=>{
   const a = SEL.from, b = SEL.to;
@@ -697,6 +815,13 @@ $('go').onclick = ()=>{
   const f=joinStations('from'), t=joinStations('to'), d=$('date').value;
   if(!f||!t){ alert('请填写出发和到达'); return; }
   if(!d){ alert('请选择日期'); return; }
+  // 记入搜索历史（输入框空着、或被点开时，下拉里会优先列出）
+  ['from','to'].forEach(id=>{
+    const raw = (SEL[id].label || $(id).value || '').trim();
+    if(!raw) return;
+    const c = classify(raw);
+    pushHist(SEL[id].label ? SEL[id].kind : (c ? c.kind : 'station'), raw);
+  });
   location.hash = 'from='+encodeURIComponent(labelOf('from'))
                 + '&to='+encodeURIComponent(labelOf('to'))+'&date='+d
                 + '&types='+$('types').value+'&hops='+$('hops').value;
