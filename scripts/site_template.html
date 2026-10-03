@@ -141,6 +141,15 @@ header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0
 .bar.indet>i{width:35%!important;animation:sl 1.1s infinite}
 @keyframes sl{0%{margin-left:-35%}100%{margin-left:100%}}
 .prog .msg{font-size:13px;color:var(--sub)}
+.prog .ptop{display:flex;align-items:center;gap:10px}
+.prog .ptop .msg{flex:1;min-width:0}
+.pbtn{flex:none;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:9px;font-size:13px;font-family:inherit;padding:5px 12px;cursor:pointer;
+  white-space:nowrap;line-height:1.5}
+.pbtn:hover{border-color:#dc2626;color:#dc2626;background:#fef2f2}
+.pbtn.res{border-color:var(--green);color:var(--green)}
+.pbtn.res:hover{background:var(--soft);border-color:var(--green);color:var(--green)}
+.prog.stopped .bar>i{background:#f59e0b;animation:none;width:100%!important}
 
 /* kpi */
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
@@ -284,7 +293,10 @@ td .na{color:var(--red);font-weight:600}
   <div class="fresh hide" id="fresh"></div>
 
   <div class="prog" id="prog">
-    <div id="pmsg" class="msg">准备中…</div>
+    <div class="ptop">
+      <div id="pmsg" class="msg">准备中…</div>
+      <button class="pbtn" id="pstop" type="button">⏸ 暂停</button>
+    </div>
     <div class="bar indet" id="pbar"><i></i></div>
     <div class="msg" id="psub">穷举多段换乘需要逐段查询 12306，请稍候</div>
   </div>
@@ -804,9 +816,55 @@ function mkMeta(base){
 }
 function setProg(on, msg, sub){
   const p=$('prog'); p.classList.toggle('on',on);
+  if(!on) p.classList.remove('stopped');
   if(msg!=null) $('pmsg').textContent=msg;
   if(sub!=null) $('psub').textContent=sub;
 }
+/* ---------- 暂停 ---------- */
+/* 点暂停会同时做两件事：
+   1) 关掉 SSE —— 页面不再收新数据，已有的部分结果原样保留
+   2) 通知服务端 /api/cancel —— 服务端已跑完这句就收尾，不再继续打 12306
+      只做第 1 步的话，后台还在查询，白白消耗请求额度（被限流时最贵）
+   「继续」会重跑一次同样的查询：服务端没有中断续跑的状态，只能从头再来。 */
+let QID = null, LASTQ = null;
+function stoppedLook(msg){
+  if(ES){ ES.close(); ES=null; }
+  $('go').disabled = false;
+  const p = $('prog');
+  p.classList.add('on', 'stopped');
+  $('pmsg').textContent = '已暂停';
+  $('psub').textContent = msg || '下面的是暂停前查到的部分结果 —— 换乘组合没穷举完，可能还有更便宜的';
+  $('pstop').textContent = '▶ 继续查询';
+  $('pstop').classList.add('res');
+}
+function resumeBtn(){
+  const b = $('pstop');
+  b.textContent = '⏸ 暂停';
+  b.classList.remove('res');
+}
+function pauseQuery(){
+  if(!ES) return;
+  const qid = QID;
+  if(ES){ ES.close(); ES=null; }          // 页面不再收新数据
+  if(qid){                                // 服务端也别再查了
+    try{ fetch(`${API}/api/cancel?qid=${encodeURIComponent(qid)}`); }catch(e){}
+  }
+  stoppedLook();
+  if(RESULT){
+    RESULT.meta = Object.assign(RESULT.meta || {}, {cancelled:true, live:true});
+    render();
+  }
+}
+$('pstop').onclick = ()=>{
+  if($('pstop').classList.contains('res')){      // 已是暂停态 → 同条件重跑
+    if(LASTQ) run(LASTQ.f, LASTQ.t, LASTQ.d);
+    return;
+  }
+  pauseQuery();
+};
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && ES) pauseQuery();
+});
 /* 显示用的起终点名（城市/省份模式要显示城市名，而不是「北京|北京南」） */
 function labelOf(id){
   return (SEL[id].label || $(id).value.trim() || '').replace(/\|/g, ' / ');
@@ -840,15 +898,20 @@ function run(f,t,want){
     const r = refDate(want);
     if(r){ d = r; EST = {want:want, ref:r}; }
   }
+  resumeBtn();
+  $('prog').classList.remove('stopped');      // 上一次若停在暂停态，这次要回到正常进度条
   const types=$('types').value, hops=$('hops').value;
   CURQ = {date:d, want:want, est:EST};
   const nf = f.split('|').length, nt = t.split('|').length;
+  LASTQ = {f:f, t:t, d:want};
+  QID = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   $('go').disabled=true;
   setProg(true,'正在连接 12306…',
     (nf*nt > 1 ? `城市级搜索：${nf} 个出发站 × ${nt} 个到达站，一次 BFS 全部覆盖 · ` : '')
     + '首次查询需要几十秒到几分钟，取决于换乘次数');
   const url = `${API}/api/query?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}`
-            + `&date=${d}&types=${encodeURIComponent(types)}&hops=${hops}&top=40`;
+            + `&date=${d}&types=${encodeURIComponent(types)}&hops=${hops}&top=40`
+            + `&qid=${encodeURIComponent(QID)}`;
   const partial = [];
   ES = new EventSource(url);
   ES.addEventListener('progress', e=>{
@@ -870,23 +933,34 @@ function run(f,t,want){
     r.id = partial.length+1;
     partial.push(r);
     partial.sort((a,b)=>(a.total_price==null?1e9:a.total_price)-(b.total_price==null?1e9:b.total_price));
-    if(RESULT){ RESULT.routes = partial; RESULT.best = partial[0]; render(); }
+    // 直达事件还没到（或直达查不到）也要能出结果，否则中途点了暂停会看到一片空白
+    if(!RESULT) RESULT = {meta:mkMeta(), direct:{trains:[],min_price:null}, routes:partial, best:null};
+    RESULT.routes = partial; RESULT.best = partial[0]; render();
   });
   ES.addEventListener('result', e=>{
     RESULT = JSON.parse(e.data);
     RESULT.meta = mkMeta(RESULT.meta);
-    render(); finish();
+    render();
+    // 服务端被暂停后也会带着已有结果收尾，这时候按钮保持在「继续查询」
+    if(RESULT.meta && RESULT.meta.cancelled) stoppedLook();
+    else finish();
   });
   ES.addEventListener('error', e=>{
     if(e.data){ try{ const d=JSON.parse(e.data); alert('查询出错：'+d.msg); }catch(_){} }
     finish();
+  });
+  // 服务端确认收到暂停后会带着已有结果收尾（meta.cancelled=true），
+  // 页面同步显示「正在停止」；这里不动 UI，最后统一由 result 事件收尾。
+  ES.addEventListener('cancelled', e=>{
+    const d = JSON.parse(e.data);
+    setProg(true, '正在停止…', `已探测 ${d.scanned} 个区间，找到 ${d.routes} 条路线`);
   });
   ES.addEventListener('end', ()=>{ finish(); });
   ES.onerror = ()=>{ /* EventSource 关闭时也会触发 */ };
 }
 function finish(){
   if(ES){ ES.close(); ES=null; }
-  $('go').disabled=false; setProg(false);
+  $('go').disabled=false; setProg(false); resumeBtn();
 }
 
 function offline(f,t,d){
@@ -951,6 +1025,12 @@ function render(){
     html += '<div class="fresh warn"><b class="k"></b><div>其中 ' + meta.cached_segments
           + ' 个区间取自本地缓存（' + (meta.cache_ttl_days || 2) + ' 天内）。'
           + '票价与时刻可用，但<b>余票是缓存那一刻的状态</b>，请以 12306 实时为准。</div></div>';
+  }
+  if(meta && meta.cancelled){
+    html += '<div class="fresh warn paused"><b class="k"></b><div><b>本次查询被中途暂停</b> —— '
+          + '下面是停止前已经查到的 ' + (routes ? routes.length : 0) + ' 条路线，'
+          + '换乘组合<b>没有穷举完</b>，换成更多的方案可能存在更便宜的组合。'
+          + '点右上角「▶ 继续查询」会以同样条件重跑。</div></div>';
   }
   if(best) html += bestCard(best, dm);
   if(direct && direct.trains && direct.trains.length) html += directCard(direct, meta);

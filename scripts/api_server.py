@@ -38,6 +38,11 @@ MAX_CONSEC_FAIL = 24              # 连续多少个区间无响应就判定被�
 BACKOFF_AFTER = 6                 # 连续失败到这个数就开始放慢节奏（退避重试）
 BACKOFF_SEC = 2.5                 # 每次退避等待秒数
 
+# 正在跑的查询：qid -> {"flag": bool}。前端点「暂停」会调 /api/cancel 置真，
+# 查询循环检测到就立刻收尾并吐出已有结果 —— 否则关掉 SSE 连接后服务端还在
+# 继续打 12306，白白消耗请求额度（限流时这是最贵的资源）。
+CANCELS = {}
+
 # 全国性主要枢纽。请求数与枢纽数的平方成正比，且容易触发 12306 限流，
 # 因此默认只用这批核心枢纽（约 20 个），而不是 ZTK_HUBS 的全部 34 个。
 CORE_HUBS = {
@@ -141,7 +146,24 @@ def enrich_route(route, idx):
     return out
 
 
-async def run_query(frm, to, date, types, hops, top, emit):
+def new_cancel(qid):
+    """为一次查询建立取消标记。 /api/cancel 会把 flag 置真，查询循环检测到就收尾。"""
+    if not qid:
+        return {"flag": False}
+    tok = CANCELS.setdefault(qid, {"flag": False})
+    tok["flag"] = False          # 复用同名 qid 时先复位
+    return tok
+
+
+def drop_cancel(qid):
+    if qid:
+        CANCELS.pop(qid, None)
+
+
+async def run_query(frm, to, date, types, hops, top, emit, qid=None):
+    tok = new_cancel(qid)
+    def cancelled():
+        return bool(tok.get("flag"))
     # 起终点都支持多站（城市级搜索：北京 -> 昆明 会展开成 北京/北京南/北京西 -> 昆明/昆明南）。
     # 用 "|" 分隔，服务端一次 BFS 覆盖全部组合，中转站的探测结果可共享。
     from_names = [x.strip() for x in frm.split("|") if x.strip()]
@@ -224,6 +246,9 @@ async def run_query(frm, to, date, types, hops, top, emit):
                       "from": frm, "to": to}
             emit("direct", {"trains": direct["trains"], "min_price": direct["min_price"],
                             "from": frm, "to": to})
+            if cancelled():
+                emit("cancelled", {"scanned": 0, "routes": 0})
+                return
 
             # 2) 分层 beam 搜索：段内只查直达，换乘由搜索组合。
             #    每层只保留累计票价最低的 BEAM 个枢纽继续展开，
@@ -321,20 +346,38 @@ async def run_query(frm, to, date, types, hops, top, emit):
                                            "interline", sblocks[:3])
                 return None
 
+            stopreq = False        # 前端点了「暂停」
+
+            def cancelled_stop():
+                nonlocal stopreq
+                if not cancelled():
+                    return False
+                if not stopreq:    # emit 一次就够，别在每个探针退出时重复发
+                    stopreq = True
+                    emit("cancelled", {"scanned": scanned, "routes": len(found)})
+                return True
+
             layer = [(c, [], 0.0) for _, c in f_pairs]
             consec_fail = 0
             throttled = False
             for depth in range(hops):
+                if cancelled_stop():
+                    break
                 if not layer or time.time() > deadline or throttled:
                     if time.time() > deadline:
                         stopped = True
                     break
                 cands = []
                 for cur_code, path, cost in layer:
+                    if cancelled_stop():
+                        break
                     tasks = [(hn, hc, asyncio.create_task(probe(cur_code, hn, hc)))
                              for hn, hc in hubs.items()
                              if hc != cur_code and hc not in f_codes]
                     for hn, hc, tk in tasks:
+                        if cancelled_stop():
+                            tk.cancel()
+                            break
                         remain = deadline - time.time()
                         if remain <= 0:
                             stopped = True
@@ -390,6 +433,10 @@ async def run_query(frm, to, date, types, hops, top, emit):
                             })
                         elif hc not in visited:
                             cands.append((hc, path + [step], cost + (step["price"] or 0)))
+                    if stopreq:
+                        break          # 暂停：跳出「当前起点」这一层
+                if stopreq:
+                    break              # 跳出整个 BFS
                 # 下一层：去重后按累计票价取最便宜的 BEAM 个
                 cands.sort(key=lambda x: x[2])
                 nxt, seen = [], set()
@@ -439,6 +486,7 @@ async def run_query(frm, to, date, types, hops, top, emit):
                                     .isoformat(timespec="seconds"),
                     "scanned": scanned,
                     "truncated": stopped,
+                    "cancelled": stopreq,
                     "throttled": throttled,
                     "live": True,
                     "cached_segments": cache_hits,
@@ -518,6 +566,14 @@ class Handler(BaseHTTPRequestHandler):
                     break
             return self._json(out)
 
+        if path == "/api/cancel":
+            # 前端点「暂停」：置标记，正在跑的查询会自己收尾，不再继续打 12306
+            qid = (q.get("qid") or [""])[0].strip()
+            tok = CANCELS.get(qid)
+            if tok is not None:
+                tok["flag"] = True
+            return self._json({"ok": True, "found": tok is not None, "running": len(CANCELS)})
+
         if path == "/api/query":
             frm = (q.get("from") or [""])[0].strip()
             to = (q.get("to") or [""])[0].strip()
@@ -525,6 +581,7 @@ class Handler(BaseHTTPRequestHandler):
             types = (q.get("types") or ["ZTK"])[0].strip() or None
             hops = int((q.get("hops") or ["4"])[0])
             top = int((q.get("top") or ["40"])[0])
+            qid = (q.get("qid") or [""])[0].strip()
             if not frm or not to or not date:
                 return self._json({"error": "缺少 from/to/date"}, 400)
 
@@ -545,10 +602,11 @@ class Handler(BaseHTTPRequestHandler):
                     pass
 
             try:
-                asyncio.run(run_query(frm, to, date, types, hops, top, emit))
+                asyncio.run(run_query(frm, to, date, types, hops, top, emit, qid))
             except Exception as e:
                 emit("error", {"msg": f"{type(e).__name__}: {e}"})
             finally:
+                drop_cancel(qid)
                 try:
                     self.wfile.write(b"event: end\ndata: {}\n\n")
                     self.wfile.flush()
