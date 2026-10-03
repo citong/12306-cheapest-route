@@ -36,22 +36,22 @@ header{background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(12px
 
 /* search */
 .hero{background:#fff;border:1px solid var(--line);border-radius:var(--radius);
-  padding:20px;margin:18px 0 14px;box-shadow:var(--shadow);transition:box-shadow .25s}
+  padding:26px;margin:20px 0 16px;box-shadow:var(--shadow);transition:box-shadow .25s}
 .hero:hover{box-shadow:var(--shadow-lg)}
 .row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
 .field{flex:1;min-width:150px;position:relative}
 .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:6px;font-weight:600;letter-spacing:.2px}
 .field input,.field select{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);
-  padding:10px 13px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fbfcfe;
+  padding:12px 15px;font-size:15px;font-family:inherit;color:var(--ink);background:#fbfcfe;
   transition:border-color .15s,box-shadow .15s,background .15s}
 .field input:hover,.field select:hover{border-color:#cbd5e1}
 .field input:focus,.field select:focus{outline:none;border-color:var(--green);background:#fff;
   box-shadow:0 0 0 4px var(--green-soft)}
-.swap{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:#fff;
+.swap{width:42px;height:42px;border:1px solid var(--line);border-radius:12px;background:#fff;
   cursor:pointer;font-size:16px;color:var(--sub);flex:none;margin-bottom:1px;transition:transform .25s,border-color .15s,color .15s}
 .swap:hover{border-color:var(--green);color:var(--green);transform:rotate(180deg)}
 .btn{border:none;border-radius:var(--radius-sm);background:var(--grad);color:#fff;font-weight:700;
-  font-size:14.5px;padding:11px 24px;cursor:pointer;font-family:inherit;height:40px;
+  font-size:15px;padding:12px 26px;cursor:pointer;font-family:inherit;height:42px;
   box-shadow:0 4px 12px rgba(16,185,129,.35);transition:transform .12s,box-shadow .2s,filter .2s}
 .btn:hover{filter:brightness(1.04);box-shadow:0 8px 20px rgba(16,185,129,.42);transform:translateY(-1px)}
 .btn:active{transform:translateY(0)}
@@ -265,7 +265,13 @@ td .na{color:var(--red);font-weight:600}
   transition:transform .3s cubic-bezier(.22,.61,.36,1);z-index:1200;
   overflow:auto;padding:22px 24px 30px}
 #attr.on{transform:none}
-.attr-x{position:absolute;top:14px;right:16px;width:32px;height:32px;border:none;
+/* 抽屉遮罩：点击空白处 / 按 ESC 也能关闭 */
+#attr-mask{position:fixed;inset:0;background:rgba(15,23,42,.34);backdrop-filter:blur(2px);
+  opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:1100}
+#attr-mask.on{opacity:1;pointer-events:auto}
+.attr-x{position:absolute;top:14px;right:16px;width:32px;height:32px;z-index:2;
+  border-radius:50%;background:#fff;color:#6b7280;font-size:15px;cursor:pointer;border:1px solid #e5e7eb;
+  line-height:30px;text-align:center;transition:background .15s,color .15s,transform .15s}
   border-radius:50%;background:#f1f2f4;color:#6b7280;font-size:15px;cursor:pointer;
   line-height:32px;text-align:center;transition:background .15s,color .15s}
 .attr-x:hover{background:#e5e7eb;color:#111827}
@@ -324,6 +330,10 @@ td .na{color:var(--red);font-weight:600}
 .sec-title h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px}
 .sec-title .ln{flex:1;height:1px;background:var(--line)}
 .sec-title .sub{font-size:12px;color:var(--sub)}
+.lnk{border:1px solid var(--line);background:#fff;color:var(--green-2);font-family:inherit;
+  font-size:12px;font-weight:600;border-radius:9px;padding:4px 10px;cursor:pointer;
+  white-space:nowrap;transition:border-color .15s,color .15s,background .15s}
+.lnk:hover{border-color:var(--green);background:var(--green-soft)}
 
 .guide{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 @media(max-width:700px){.guide{grid-template-columns:1fr}}
@@ -352,9 +362,11 @@ td .na{color:var(--red);font-weight:600}
 .pc{position:relative;cursor:pointer;background:#fff;border:1px solid var(--line);border-radius:14px;
   overflow:hidden;box-shadow:var(--shadow-sm);transition:transform .18s,box-shadow .18s,border-color .18s}
 .pc:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--green-line)}
-.pc .ph{display:block;width:100%;height:74px}
-.pc .pn{position:absolute;left:11px;bottom:34px;color:#fff;font-weight:800;font-size:16px;
-  text-shadow:0 1px 5px rgba(0,0,0,.5);letter-spacing:.5px}
+.pc .cover{position:relative;display:block;width:100%;height:106px;overflow:hidden;background:var(--grad)}
+.pc .cover .sky,.pc .cover .cimg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.pc .cover .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.6) 100%)}
+.pc .pn{position:absolute;left:12px;bottom:9px;z-index:2;color:#fff;font-weight:800;font-size:17px;
+  text-shadow:0 1px 6px rgba(0,0,0,.55);letter-spacing:.5px}
 .pc .pd{font-size:12px;color:var(--sub);padding:8px 11px 11px;line-height:1.5;min-height:40px}
 .pc .go{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.92);border:none;
   border-radius:8px;font-size:11.5px;font-weight:700;color:var(--green-2);padding:3px 9px;cursor:pointer;
@@ -372,7 +384,11 @@ td .na{color:var(--red);font-weight:600}
 .faq .fa{font-size:13px;color:var(--sub);line-height:1.75;padding:0 0 14px}
 
 /* 景点抽屉：主题色 banner + 景点缩略图 */
-.attr-banner{height:96px;margin:-22px -24px 16px;position:relative;overflow:hidden}
+.attr-banner{height:132px;margin:-22px -24px 16px;position:relative;overflow:hidden;background:var(--grad)}
+.attr-banner .ab-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.attr-banner .ab-sub,.attr-banner .ab-city{z-index:2}
+.attr-banner::after{content:"";position:absolute;inset:0;z-index:1;
+  background:linear-gradient(180deg,rgba(0,0,0,.05) 45%,rgba(0,0,0,.5) 100%)}
 .attr-banner .ab-sub{position:absolute;right:14px;top:12px;color:#fff;font-size:11.5px;opacity:.92;
   background:rgba(0,0,0,.18);border-radius:20px;padding:2px 10px}
 .attr-banner .ab-city{position:absolute;left:18px;bottom:11px;color:#fff;font-size:21px;font-weight:800;
@@ -390,6 +406,7 @@ td .na{color:var(--red);font-weight:600}
   <div class="logo">🚂 12306 最便宜路线</div>
   <div class="status" id="st"><span class="dot off" id="dot"></span><span id="stxt">检测本地服务…</span></div>
   <a href="map.html" style="font-size:12.5px;white-space:nowrap">🗺 车站地图</a>
+  <a href="trip.html" style="font-size:12.5px;white-space:nowrap">✈️ 行程攻略</a>
 </div></header>
 
 <div class="wrap">
@@ -479,7 +496,7 @@ td .na{color:var(--red);font-weight:600}
   </div>
 
   <div class="popwrap">
-    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span></div>
+    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span><button class="lnk" id="intro-toggle" type="button">使用说明</button></div>
     <div class="pop" id="pop"></div>
   </div>
 
@@ -507,8 +524,9 @@ td .na{color:var(--red);font-weight:600}
   </div>
 </div>
 
+<div id="attr-mask"></div>
 <aside id="attr" aria-hidden="true">
-  <button class="attr-x" id="attr-x" type="button" title="关闭">✕</button>
+  <button class="attr-x" id="attr-x" type="button" title="关闭（Esc）">✕</button>
   <div id="attr-body"></div>
 </aside>
 
@@ -651,7 +669,11 @@ function syncAttr(kind, name){
 function showAttr(k){
   const e = ATTR[k]; if(!e) return;
   const hue = attrHue(k);
-  let h = '<div class="attr-banner">'+ skylineHue(hue)
+  const img = POP_IMG[k];
+  const banner = img
+    ? '<img class="ab-img" src="'+esc(img)+'" alt="'+esc(k)+'" onerror="this.style.display=\'none\'">'
+    : skylineHue(hue);
+  let h = '<div class="attr-banner">'+ banner
         + '<div class="ab-sub">旅行攻略</div>'
         + '<div class="ab-city">'+esc(k)
         + (e.city && e.city !== k ? ' <small>'+esc(e.city)+'</small>' : '')
@@ -667,10 +689,22 @@ function showAttr(k){
   $('attr-body').innerHTML = h;
   $('attr').classList.add('on');
   $('attr').setAttribute('aria-hidden','false');
+  const mk = $('attr-mask'); if(mk) mk.classList.add('on');
+  $('attr').scrollTop = 0;
 }
 function hideAttr(){
-  const a = $('attr'); if(!a) return;
-  a.classList.remove('on'); a.setAttribute('aria-hidden','true');
+  const a = $('attr');
+  if(a){ a.classList.remove('on'); a.setAttribute('aria-hidden','true'); }
+  const mk = $('attr-mask'); if(mk) mk.classList.remove('on');
+}
+/* 抽屉关闭方式：右上角 ✕ / 点击遮罩空白处 / 按 Esc */
+function bindAttrClose(){
+  const x = $('attr-x'), mk = $('attr-mask');
+  if(x) x.onclick = hideAttr;
+  if(mk) mk.onclick = hideAttr;
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' || e.key === 'Esc') hideAttr();
+  });
 }
 
 /* 车站勾选区 */
@@ -1120,7 +1154,7 @@ $('go').onclick = ()=>{
 function run(f,t,want){
   if(ES){ ES.close(); ES=null; }
   RESULT = null; $('out').innerHTML='';
-  hideIntro();
+  hideIntro(); markIntroSeen();
   if(!LIVE){ offline(f,t,want); return; }
   // 预售期外的日期：改用「同星期几、且已开售」的参照日期实查，结果明确标注为预估
   EST = null;
@@ -1532,7 +1566,7 @@ function attrHue(s){ let h=0; for(const c of String(s||'')) h=(h*31+c.charCodeAt
 function skyline(i){
   const hues=[205,160,32,280,350,190,48,120,255,20,140,300];
   const hue=hues[i%hues.length], h2=(hue+30)%360;
-  return `<svg class="ph" viewBox="0 0 200 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  return `<svg class="sky" viewBox="0 0 200 74" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <defs><linearGradient id="g${i}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="hsl(${hue},68%,62%)"/>
       <stop offset="1" stop-color="hsl(${h2},62%,40%)"/></linearGradient></defs>
@@ -1588,19 +1622,22 @@ const FEATS = [
 ];
 /* 热门目的地：键必须是 attractions.json 里存在的城市 */
 const POP = [
-  ['北京','故宫 · 长城 · 胡同烟火'],
-  ['上海','外滩 · 豫园 · 迪士尼'],
-  ['成都','熊猫 · 火锅 · 宽窄巷子'],
-  ['西安','兵马俑 · 城墙 · 回民街'],
-  ['杭州','西湖 · 灵隐 · 宋城'],
-  ['重庆','洪崖洞 · 轻轨 · 火锅'],
-  ['广州','早茶 · 小蛮腰 · 老城'],
-  ['三亚','天涯海角 · 椰风海韵'],
-  ['昆明','石林 · 滇池 · 春城'],
-  ['厦门','鼓浪屿 · 环岛路'],
-  ['桂林','漓江 · 喀斯特峰林'],
-  ['丽江','古城 · 玉龙雪山'],
+  ['北京','故宫 · 长城 · 胡同烟火','images/pop-beijing.jpg'],
+  ['上海','外滩 · 豫园 · 迪士尼','images/pop-shanghai.jpg'],
+  ['成都','熊猫 · 火锅 · 宽窄巷子','images/pop-chengdu.jpg'],
+  ['西安','兵马俑 · 城墙 · 回民街','images/pop-xian.jpg'],
+  ['杭州','西湖 · 灵隐 · 宋城','images/pop-hangzhou.jpg'],
+  ['重庆','洪崖洞 · 轻轨 · 火锅','images/pop-chongqing.jpg'],
+  ['广州','早茶 · 小蛮腰 · 老城','images/pop-guangzhou.jpg'],
+  ['三亚','天涯海角 · 椰风海韵','images/pop-sanya.jpg'],
+  ['昆明','石林 · 滇池 · 春城','images/pop-kunming.jpg'],
+  ['厦门','鼓浪屿 · 环岛路','images/pop-xiamen.jpg'],
+  ['桂林','漓江 · 喀斯特峰林','images/pop-guilin.jpg'],
+  ['丽江','古城 · 玉龙雪山','images/pop-lijiang.jpg'],
 ];
+/* 城市 -> 当地图片（热门目的地卡片 & 景点抽屉 banner 复用） */
+const POP_IMG = {};
+POP.forEach(p=>{ if(p[2]) POP_IMG[p[0]] = p[2]; });
 function buildGuide(){
   const el=$('guide'); if(!el) return;
   el.innerHTML = GUIDE.map(([ic,t,d],i)=>
@@ -1615,9 +1652,12 @@ function buildFeats(){
 }
 function buildPop(){
   const el=$('pop'); if(!el) return;
-  el.innerHTML = POP.map(([c,d],i)=>
+  el.innerHTML = POP.map(([c,d,img],i)=>
     `<div class="pc" data-c="${esc(c)}"><button class="go" type="button">选为到达</button>`
-    + skyline(i) + `<div class="pn">${esc(c)}</div><div class="pd">${esc(d)}</div></div>`).join('');
+    + `<div class="cover">` + skyline(i)
+    + (img ? `<img class="cimg" src="${esc(img)}" alt="${esc(c)}" loading="lazy" onerror="this.style.display='none'">` : '')
+    + `<span class="scrim"></span><span class="pn">${esc(c)}</span></div>`
+    + `<div class="pd">${esc(d)}</div></div>`).join('');
   el.querySelectorAll('.pc').forEach(pc=>{
     pc.onclick = ()=>{
       applySel('to','city',pc.dataset.c);
@@ -1627,12 +1667,31 @@ function buildPop(){
   });
 }
 function hideIntro(){ const e=$('intro'); if(e) e.style.display='none'; }
+function showIntro(){ const e=$('intro'); if(e) e.style.display=''; }
+/* 指南/能力/FAQ 只在首次进入时展示；查过一次之后默认收起，可点「使用说明」再展开 */
+function introSeen(){ try{ return localStorage.getItem('irt_intro_seen')==='1'; }catch(err){ return false; } }
+function markIntroSeen(){ try{ localStorage.setItem('irt_intro_seen','1'); }catch(err){} }
+function bindIntroToggle(){
+  const b = $('intro-toggle'); if(!b) return;
+  b.onclick = ()=>{
+    const e = $('intro'); if(!e) return;
+    const visible = e.style.display !== 'none';
+    if(visible){ hideIntro(); b.textContent = '使用说明'; }
+    else{
+      showIntro(); b.textContent = '收起说明';
+      if(e.scrollIntoView) e.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+  };
+}
 
 /* ---------- 启动 ---------- */
 function boot(){
   if(!$('date').value) $('date').value = today(3);
   updDate();
   buildGuide(); buildFeats(); buildPop();
+  bindAttrClose(); bindIntroToggle();
+  // 首次进入才展示「三步搞定 / 核心能力 / FAQ」；看过一次后自动收起
+  if(introSeen()) hideIntro();
   // 刷新即回到默认状态：出发地预填「济南」，目的地留空；
   // 不读取历史 URL 参数，也不自动重跑上次查询，避免刷新被上一次结果带偏。
   const jn = classify('济南');

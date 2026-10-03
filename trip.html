@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>行程攻略 · 12306 最便宜路线</title>
+<style>
+:root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  background:var(--bg);color:#1f2937;line-height:1.5}
+.hd{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#0f172a;color:#fff}
+.logo{font-weight:800;font-size:16px}
+.hd a{color:#cbd5e1;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:8px}
+.hd a.act{background:#1e293b;color:#fff}
+.hd a:hover{color:#fff}
+.wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+h1{font-size:22px;margin:6px 0 2px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:16px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;
+  box-shadow:0 1px 3px rgba(15,23,42,.04)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--mut)}
+.fld select,.fld input{padding:8px 10px;border:1px solid var(--line);border-radius:9px;font-size:14px;color:#111;background:#fff}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.tg{font-size:12.5px;padding:5px 11px;border:1px solid var(--line);border-radius:20px;cursor:pointer;user-select:none;background:#fff;color:#374151}
+.tg.on{background:var(--ind);border-color:var(--ind);color:#fff}
+.btn{margin-top:14px;display:inline-block;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;border:0;
+  padding:11px 22px;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer}
+.btn:hover{filter:brightness(1.06)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
+.tab{padding:7px 15px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
+.tab.act{background:var(--blue);color:#fff;border-color:var(--blue)}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{flex:1;min-width:120px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.kpi b{display:block;font-size:18px;color:var(--ind)}
+.kpi span{font-size:12px;color:var(--mut)}
+.tl{position:relative;margin-left:8px}
+.ti{display:flex;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.ti:last-child{border-bottom:0}
+.dot{width:12px;height:12px;border-radius:50%;background:var(--blue);margin-top:5px;flex:none;box-shadow:0 0 0 4px #dbeafe}
+.time{font-weight:700;font-size:13px;color:#111;width:46px;flex:none}
+.body{flex:1;min-width:0}
+.nm{font-weight:700;font-size:15px}
+.meta{font-size:12px;color:var(--mut);margin-top:2px}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px;vertical-align:middle}
+.b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:#b45309}
+.meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:8px 12px;margin:6px 0;font-size:13px;color:#9a3412}
+.note{font-size:12px;color:#475569;margin-top:3px}
+.hotel{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hotel a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 16px;text-decoration:none;color:var(--blue);font-weight:600}
+.foot{color:var(--mut);font-size:12px;text-align:center;margin-top:24px;line-height:1.7}
+.foot a{color:var(--blue);text-decoration:none}
+.warn{font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:8px}
+</style>
+</head>
+<body>
+<header><div class="hd">
+  <div class="logo">🚂 12306 最便宜路线</div>
+  <a href="index.html">🎫 查路线</a>
+  <a href="map.html">🗺 车站地图</a>
+  <a href="trip.html" class="act">✈️ 行程攻略</a>
+</div></header>
+
+<div class="wrap">
+  <h1>✈️ 自动行程攻略</h1>
+  <div class="sub">选城市、天数和偏好，自动把景点按地理就近分到每天、排出当天动线，并附酒店预订入口。</div>
+
+  <div class="panel">
+    <div class="row">
+      <div class="fld">城市
+        <select id="city"></select>
+      </div>
+      <div class="fld">天数
+        <input id="days" type="number" min="1" max="7" value="3" style="width:74px">
+      </div>
+      <div class="fld">出发日期（用于酒店预订）
+        <input id="date" type="date">
+      </div>
+    </div>
+    <div class="fld" style="margin-top:12px">偏好（影响景点优先级）
+      <div class="tags" id="prefs"></div>
+    </div>
+    <button class="btn" id="go">生成行程</button>
+    <div class="warn">提示：景点开放时间 / 门票为公开资料整理，出行前请再次核实；酒店仅提供预订入口，价格以平台为准。</div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="foot">
+    交通部分由 <a href="index.html">12306 最便宜路线</a> 负责（去程 / 返程可在这里查最便宜车次）。<br>
+    本页为离线规划演示，数据依据公开旅游资料，仅供参考。
+  </div>
+</div>
+
+<script>
+const CITIES = {"北京":{"city":"北京","py":"beijing","center":[39.91,116.4],"days_suggest":4,"spots":[{"n":"故宫博物院","lat":39.916,"lng":116.397,"dur":240,"tags":["历史","必去"],"open":"08:30-17:00(周一闭)","ticket":60,"note":"需提前预约，建议上午入馆"},{"n":"天安门广场","lat":39.905,"lng":116.397,"dur":60,"tags":["历史","免费"],"open":"全天(需预约领票)","ticket":0,"note":"看升旗需极早，紧邻故宫"},{"n":"八达岭长城","lat":40.359,"lng":116.02,"dur":240,"tags":["自然","历史","必去"],"open":"07:30-16:30","ticket":40,"note":"距市区约1.5小时车程，单独留一天"},{"n":"颐和园","lat":39.999,"lng":116.275,"dur":180,"tags":["历史","自然"],"open":"06:30-18:00","ticket":30,"note":"昆明湖泛舟"},{"n":"天坛","lat":39.882,"lng":116.406,"dur":120,"tags":["历史"],"open":"08:00-17:30","ticket":15,"note":"祈年殿必看"},{"n":"南锣鼓巷","lat":39.936,"lng":116.403,"dur":90,"tags":["美食","购物","免费"],"open":"全天","ticket":0,"note":"胡同+文创+小吃"},{"n":"圆明园","lat":40.008,"lng":116.298,"dur":150,"tags":["历史","自然"],"open":"07:00-19:00","ticket":10,"note":"遗址沧桑，近颐和园可同天"},{"n":"雍和宫","lat":39.947,"lng":116.417,"dur":90,"tags":["历史","宗教"],"open":"09:00-16:30","ticket":25,"note":"香火旺盛，邻近国子监"}]},"成都":{"city":"成都","py":"chengdu","center":[30.66,104.07],"days_suggest":3,"spots":[{"n":"大熊猫繁育研究基地","lat":30.734,"lng":104.146,"dur":180,"tags":["自然","亲子","必去"],"open":"07:30-18:00","ticket":55,"note":"早上去看活跃的熊猫，9点前最佳"},{"n":"宽窄巷子","lat":30.67,"lng":104.056,"dur":120,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"茶馆+小吃+老民居"},{"n":"锦里","lat":30.641,"lng":104.056,"dur":90,"tags":["美食","历史"],"open":"全天","ticket":0,"note":"武侯祠旁，夜景不错"},{"n":"武侯祠","lat":30.641,"lng":104.058,"dur":120,"tags":["历史"],"open":"08:00-21:00","ticket":50,"note":"三国文化，锦里相连"},{"n":"杜甫草堂","lat":30.66,"lng":104.025,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":50,"note":"诗意园林，清幽"},{"n":"春熙路·IFS","lat":30.658,"lng":104.081,"dur":90,"tags":["购物","美食"],"open":"全天","ticket":0,"note":"爬墙熊猫打卡，太古里相邻"},{"n":"金沙遗址博物馆","lat":30.69,"lng":104.01,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":70,"note":"太阳神鸟出土地"},{"n":"太古里","lat":30.656,"lng":104.084,"dur":90,"tags":["购物","历史"],"open":"全天","ticket":0,"note":"低密街区，古今混搭"}]},"杭州":{"city":"杭州","py":"hangzhou","center":[30.25,120.15],"days_suggest":3,"spots":[{"n":"西湖","lat":30.259,"lng":120.149,"dur":180,"tags":["自然","免费","必去"],"open":"全天","ticket":0,"note":"环湖步行或游船，建议上午，断桥·白堤·苏堤一线"},{"n":"灵隐寺","lat":30.242,"lng":120.101,"dur":150,"tags":["历史","宗教"],"open":"07:00-18:00","ticket":75,"note":"先买飞来峰门票再入寺"},{"n":"西溪湿地","lat":30.27,"lng":120.07,"dur":150,"tags":["自然"],"open":"08:00-17:30","ticket":80,"note":"摇橹船穿芦苇，下午光线好"},{"n":"雷峰塔","lat":30.231,"lng":120.148,"dur":90,"tags":["历史","必去"],"open":"08:00-20:30","ticket":40,"note":"登塔看西湖全景与音乐喷泉"},{"n":"河坊街","lat":30.241,"lng":120.17,"dur":90,"tags":["美食","购物","夜游"],"open":"全天","ticket":0,"note":"晚上更热闹，小吃集中"},{"n":"宋城","lat":30.17,"lng":120.13,"dur":240,"tags":["演出","亲子"],"open":"09:00-21:00","ticket":320,"note":"《宋城千古情》演出需另约场次"},{"n":"太子湾公园","lat":30.225,"lng":120.135,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"樱花季极美，紧邻苏堤"},{"n":"京杭大运河·桥西历史街区","lat":30.32,"lng":120.15,"dur":120,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"老厂房改造，刀剪剑博物馆免费"},{"n":"浙江省博物馆(孤山)","lat":30.255,"lng":120.145,"dur":90,"tags":["历史","免费"],"open":"09:00-17:00(周一闭)","ticket":0,"note":"需提前预约，雷峰塔旁"},{"n":"清河坊·南宋御街","lat":30.244,"lng":120.168,"dur":90,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"与河坊街相连，老字号集中"}]},"西安":{"city":"西安","py":"xian","center":[34.27,108.95],"days_suggest":3,"spots":[{"n":"兵马俑","lat":34.385,"lng":109.273,"dur":180,"tags":["历史","必去"],"open":"08:30-17:00","ticket":120,"note":"距市区较远，预留单程1小时"},{"n":"大雁塔","lat":34.218,"lng":108.964,"dur":120,"tags":["历史","必去"],"open":"08:00-21:00","ticket":50,"note":"北广场音乐喷泉晚间开放"},{"n":"西安城墙","lat":34.265,"lng":108.946,"dur":120,"tags":["历史","必去"],"open":"08:00-22:00","ticket":54,"note":"可租自行车绕城一圈"},{"n":"回民街","lat":34.267,"lng":108.939,"dur":90,"tags":["美食","免费"],"open":"全天","ticket":0,"note":"小吃集中，同侧有西羊市"},{"n":"钟鼓楼","lat":34.261,"lng":108.947,"dur":90,"tags":["历史"],"open":"08:30-21:00","ticket":30,"note":"夜景亮灯好看"},{"n":"陕西历史博物馆","lat":34.226,"lng":108.961,"dur":150,"tags":["历史","免费"],"open":"09:00-17:30(需预约)","ticket":0,"note":"免费但必须提前预约"},{"n":"华清宫","lat":34.372,"lng":109.29,"dur":150,"tags":["历史"],"open":"07:30-18:00","ticket":120,"note":"与兵马俑同方向，可一天安排"},{"n":"大唐芙蓉园","lat":34.21,"lng":108.967,"dur":150,"tags":["历史","夜游"],"open":"09:00-21:00","ticket":120,"note":"晚间水幕电影，紧邻大雁塔"}]}};
+
+const ALL_TAGS = ["自然","历史","美食","亲子","免费","购物","宗教","演出","夜游","必去"];
+const MEAL_PER_DAY = 120; // 餐饮估算（元/天）
+
+function haversine(a,b){
+  const R=6371,toR=x=>x*Math.PI/180;
+  const dLat=toR(b.lat-a.lat),dLng=toR(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2+Math.cos(toR(a.lat))*Math.cos(toR(b.lat))*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));
+}
+function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
+function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+
+function kmeans(pts,K){
+  if(K<=1) return [pts];
+  let cents=[pts[0]];
+  while(cents.length<K){
+    let far=pts[0],fd=-1;
+    pts.forEach(p=>{ let d=Math.min(...cents.map(c=>haversine(p,c))); if(d>fd){fd=d;far=p;} });
+    cents.push(far);
+  }
+  let groups;
+  for(let it=0;it<12;it++){
+    groups=Array.from({length:K},()=>[]);
+    pts.forEach(p=>{ let bi=0,bd=1e9; cents.forEach((c,i)=>{const d=haversine(p,c); if(d<bd){bd=d;bi=i;}}); groups[bi].push(p); });
+    cents=groups.map(g=> g.length? {lat:g.reduce((s,p)=>s+p.lat,0)/g.length, lng:g.reduce((s,p)=>s+p.lng,0)/g.length} : cents[0]);
+  }
+  return groups;
+}
+
+function buildDay(group, idx){
+  if(!group.length) return {day:idx+1,items:[],cost:0};
+  const cen={lat:group.reduce((s,p)=>s+p.lat,0)/group.length, lng:group.reduce((s,p)=>s+p.lng,0)/group.length};
+  // nearest-neighbor order from centroid
+  let pool=group.slice(), order=[];
+  let cur=pool.reduce((a,b)=> haversine(a,cen)<haversine(b,cen)?a:b);
+  pool.splice(pool.indexOf(cur),1); order.push(cur);
+  while(pool.length){ let ni=0,nd=1e9; pool.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}}); cur=pool.splice(ni,1)[0]; order.push(cur); }
+  // meal spot in this group
+  const meal=group.find(s=>s.tags&&s.tags.includes('美食'));
+  let t=9*60, items=[], cost=0, prev=null;
+  order.forEach((s,i)=>{
+    if(i>0){ const m=transitMin(prev,s); items[items.length-1].transit=m; t+=m; }
+    items.push({t, spot:s, dur:s.dur, transit:0});
+    cost+= (s.ticket||0);
+    t+=s.dur; prev=s;
+  });
+  // insert lunch around 12:00
+  let li=items.findIndex(it=>it.t>=12*60);
+  const lunchNote = meal? ('午餐可在「'+meal.n+'」附近解决') : '午餐自理';
+  items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
+  return {day:idx+1, items, cost};
+}
+
+function plan(data, days, prefs){
+  let spots=data.spots.map(s=>({...s}));
+  spots.forEach(s=>{ const hit=(s.tags||[]).filter(t=>prefs.has(t)).length; s._score=1+hit*2+((s.tags||[]).includes('必去')?1:0); });
+  spots.sort((a,b)=>b._score-a._score);
+  const sel=spots.slice(0, Math.min(days*4, spots.length));
+  const K=Math.min(days, sel.length);
+  const groups=kmeans(sel,K);
+  return groups.map((g,i)=>buildDay(g,i));
+}
+
+function render(data, days, dateStr){
+  const prefs=new Set([...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t));
+  const planOut=plan(data, days, prefs);
+  const hotelPy=data.py||'';
+  const ci=dateStr||'';
+  const co=ci? shiftDate(ci,days):'';
+  const hotelUrl='https://hotel.qunar.com/city/'+hotelPy+'/'+(ci?('?fromDate='+ci+'&toDate='+co):'');
+  let totalTicket=planOut.reduce((s,d)=>s+d.cost,0);
+  let h='';
+  // KPIs
+  h+='<div class="kpis">'
+    +'<div class="kpi"><b>'+planOut.length+'</b><span>规划天数</span></div>'
+    +'<div class="kpi"><b>'+planOut.reduce((s,d)=>s+d.items.filter(i=>!i.meal).length,0)+'</b><span>安排景点</span></div>'
+    +'<div class="kpi"><b>¥'+(totalTicket)+'</b><span>门票合计</span></div>'
+    +'<div class="kpi"><b>¥'+(MEAL_PER_DAY*days)+'</b><span>餐饮估算</span></div>'
+    +'</div>';
+  // tabs
+  h+='<div class="tabs" id="tabs">';
+  planOut.forEach((d,i)=> h+='<div class="tab'+(i===0?' act':'')+'" data-d="'+i+'">第'+(i+1)+'天</div>');
+  h+='</div>';
+  // day panel
+  h+='<div class="panel" id="daypanel"></div>';
+  // hotel
+  h+='<div class="panel"><div class="hotel"><b>🏨 住宿</b>'
+    +'<a href="'+hotelUrl+'" target="_blank">在去哪儿查看 '+data.city+' 酒店 →</a>'
+    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'</span></div></div>';
+  document.getElementById('out').innerHTML=h;
+  const draw=d=>{
+    let p='<div class="tl">';
+    d.items.forEach(it=>{
+      if(it.meal){ p+='<div class="meal">'+it.text+'</div>'; return; }
+      const s=it.spot;
+      const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+t+'</span>').join('');
+      const tr=it.transit? '<span class="badge b-tr">↔ '+it.transit+'min</span>':'';
+      p+='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
+        +'<div class="body"><div class="nm">'+s.n+'</div>'
+        +'<div class="meta">'+tags+tr+'⏱ '+Math.round(s.dur/60*10)/10+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+' · 🕒 '+(s.open||'')+'</div>'
+        +(s.note?'<div class="note">'+s.note+'</div>':'')+'</div></div>';
+    });
+    p+='</div>';
+    p+='<div class="meta" style="margin-top:8px">当日门票合计 ¥'+d.cost+'</div>';
+    document.getElementById('daypanel').innerHTML=p;
+  };
+  draw(planOut[0]);
+  document.querySelectorAll('#tabs .tab').forEach(t=> t.onclick=()=>{
+    document.querySelectorAll('#tabs .tab').forEach(x=>x.classList.remove('act'));
+    t.classList.add('act'); draw(planOut[+t.dataset.d]);
+  });
+}
+function shiftDate(s,n){ const d=new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+
+// init
+const citySel=document.getElementById('city');
+Object.keys(CITIES).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=CITIES[c].city; citySel.appendChild(o); });
+citySel.value=Object.keys(CITIES)[0];
+const prefsBox=document.getElementById('prefs');
+ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; e.dataset.t=t; e.textContent=t;
+  e.onclick=()=>e.classList.toggle('on'); prefsBox.appendChild(e); });
+// default date = today+14
+const def=new Date(); def.setDate(def.getDate()+14);
+document.getElementById('date').value=def.toISOString().slice(0,10);
+document.getElementById('go').onclick=()=>{
+  const c=CITIES[citySel.value]; const days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
+  document.getElementById('days').value=days;
+  render(c, days, document.getElementById('date').value);
+};
+// first render
+render(CITIES[citySel.value], 3, document.getElementById('date').value);
+</script>
+</body>
+</html>
