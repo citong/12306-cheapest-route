@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>行程攻略 · 12306 最便宜路线</title>
 <style>
-:root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a}
+:root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a;--warn:#b45309}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
   background:var(--bg);color:#1f2937;line-height:1.5}
@@ -14,7 +14,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Pi
 .hd a{color:#cbd5e1;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:8px}
 .hd a.act{background:#1e293b;color:#fff}
 .hd a:hover{color:#fff}
-.wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 60px}
 h1{font-size:22px;margin:6px 0 2px}
 .sub{color:var(--mut);font-size:13px;margin-bottom:16px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;
@@ -28,30 +28,64 @@ h1{font-size:22px;margin:6px 0 2px}
 .btn{margin-top:14px;display:inline-block;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;border:0;
   padding:11px 22px;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer}
 .btn:hover{filter:brightness(1.06)}
+
+/* ---- 城市封面 ---- */
+.hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 16px rgba(15,23,42,.12)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .hbg{position:absolute;inset:0;background:linear-gradient(105deg,rgba(15,23,42,.82) 8%,rgba(15,23,42,.55) 55%,rgba(15,23,42,.2) 100%)}
+.hero .hin{position:relative;padding:22px 20px;color:#fff}
+.hero h2{margin:0 0 4px;font-size:24px;font-weight:800;letter-spacing:.5px}
+.hero .hmeta{font-size:12.5px;opacity:.92;margin-bottom:8px}
+.hero .hintro{font-size:13px;opacity:.95;line-height:1.75;max-width:640px}
+.hero .hchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hero .hchip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:4px 12px;font-size:12px;backdrop-filter:blur(4px)}
+
+/* ---- KPI ---- */
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{flex:1;min-width:112px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.kpi b{display:block;font-size:18px;color:var(--ind)}
+.kpi span{font-size:12px;color:var(--mut)}
+
+/* ---- 天数 tab ---- */
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
 .tab{padding:7px 15px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
 .tab.act{background:var(--blue);color:#fff;border-color:var(--blue)}
-.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.kpi{flex:1;min-width:120px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
-.kpi b{display:block;font-size:18px;color:var(--ind)}
-.kpi span{font-size:12px;color:var(--mut)}
+
+/* ---- 每日时间轴 ---- */
 .tl{position:relative;margin-left:8px}
-.ti{display:flex;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.ti{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
 .ti:last-child{border-bottom:0}
 .dot{width:12px;height:12px;border-radius:50%;background:var(--blue);margin-top:5px;flex:none;box-shadow:0 0 0 4px #dbeafe}
-.time{font-weight:700;font-size:13px;color:#111;width:46px;flex:none}
+.time{font-weight:700;font-size:13px;color:#111;width:48px;flex:none;padding-top:1px}
 .body{flex:1;min-width:0}
-.nm{font-weight:700;font-size:15px}
-.meta{font-size:12px;color:var(--mut);margin-top:2px}
-.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px;vertical-align:middle}
-.b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:#b45309}
-.meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:8px 12px;margin:6px 0;font-size:13px;color:#9a3412}
-.note{font-size:12px;color:#475569;margin-top:3px}
+.nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sph{width:60px;height:44px;border-radius:8px;object-fit:cover;flex:none;border:1px solid var(--line)}
+.meta{font-size:12px;color:var(--mut);margin-top:3px}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px}
+.b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:var(--warn)}
+.meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:9px 13px;margin:8px 0;font-size:13px;color:#9a3412}
+.transit{font-size:12px;color:#64748b;margin:2px 0 0;padding-left:2px;display:flex;align-items:center;gap:5px}
+.note{font-size:12px;color:#475569;margin-top:5px;background:#f8fafc;border-left:3px solid #cbd5e1;
+  padding:6px 10px;border-radius:0 8px 8px 0;line-height:1.65}
+.dayend{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--mut)}
+
+/* ---- 预算 / 清单 / 住宿 ---- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.blk{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.blk h4{margin:0 0 8px;font-size:13.5px;color:#0f172a;display:flex;align-items:center;gap:6px}
+.blk ul{margin:0;padding-left:18px;font-size:12.5px;color:#475569;line-height:1.85}
+.blk .price{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;color:#475569}
+.blk .price b{color:#0f172a}
+.blk .price.total{border-top:1px dashed #cbd5e1;margin-top:6px;padding-top:7px;font-weight:700}
 .hotel{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hotel a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 16px;text-decoration:none;color:var(--blue);font-weight:600}
+.hotel a:hover{border-color:var(--blue)}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:24px;line-height:1.7}
 .foot a{color:var(--blue);text-decoration:none}
-.warn{font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:8px}
+.warn{font-size:12px;color:var(--warn);background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:10px}
+.empty{text-align:center;color:var(--mut);font-size:13px;padding:26px 0}
 </style>
 </head>
 <body>
@@ -64,7 +98,7 @@ h1{font-size:22px;margin:6px 0 2px}
 
 <div class="wrap">
   <h1>✈️ 自动行程攻略</h1>
-  <div class="sub">选城市、天数和偏好，自动把景点按地理就近分到每天、排出当天动线，并附酒店预订入口。</div>
+  <div class="sub">选城市、天数和偏好，自动把景点按地理就近分到每天、排出当天动线，并给出交通、餐饮与预算明细。</div>
 
   <div class="panel">
     <div class="row">
@@ -74,11 +108,14 @@ h1{font-size:22px;margin:6px 0 2px}
       <div class="fld">天数
         <input id="days" type="number" min="1" max="7" value="3" style="width:74px">
       </div>
-      <div class="fld">出发日期（用于酒店预订）
+      <div class="fld">出发日期（用于住宿与天气提示）
         <input id="date" type="date">
       </div>
+      <div class="fld">每天预算（元，不含住宿与交通）
+        <input id="budget" type="number" min="0" step="10" value="300" style="width:96px">
+      </div>
     </div>
-    <div class="fld" style="margin-top:12px">偏好（影响景点优先级）
+    <div class="fld" style="margin-top:12px">偏好（影响景点优先级与排序）
       <div class="tags" id="prefs"></div>
     </div>
     <button class="btn" id="go">生成行程</button>
@@ -94,10 +131,11 @@ h1{font-size:22px;margin:6px 0 2px}
 </div>
 
 <script>
-const CITIES = {"三亚":{"city":"三亚","py":"sanya","center":[18.25,109.51],"days_suggest":4,"spots":[{"n":"亚龙湾","lat":18.215,"lng":109.65,"dur":240,"tags":["自然","亲子","必去"],"open":"全天","ticket":0,"note":"天下第一湾，白沙碧水"},{"n":"天涯海角","lat":18.295,"lng":109.35,"dur":150,"tags":["自然","必去"],"open":"07:30-18:30","ticket":68,"note":"刻字巨石经典地标"},{"n":"南山文化旅游区","lat":18.3,"lng":109.19,"dur":240,"tags":["宗教","自然"],"open":"08:00-17:30","ticket":108,"note":"108米海上观音"},{"n":"蜈支洲岛","lat":18.31,"lng":109.76,"dur":300,"tags":["自然","亲子"],"open":"08:00-17:30","ticket":144,"note":"潜水胜地，单独留一天"},{"n":"大东海","lat":18.22,"lng":109.52,"dur":120,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"市区最近的海湾"},{"n":"椰梦长廊","lat":18.24,"lng":109.48,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"三亚湾日落骑行"},{"n":"鹿回头","lat":18.23,"lng":109.49,"dur":90,"tags":["自然","夜游"],"open":"07:30-22:00","ticket":45,"note":"俯瞰三亚全景"},{"n":"第一市场","lat":18.24,"lng":109.5,"dur":90,"tags":["美食"],"open":"全天","ticket":0,"note":"海鲜现买现加工"}]},"上海":{"city":"上海","py":"shanghai","center":[31.23,121.47],"days_suggest":3,"spots":[{"n":"外滩","lat":31.24,"lng":121.49,"dur":90,"tags":["历史","免费","夜游","必去"],"open":"全天","ticket":0,"note":"万国建筑群对望陆家嘴，夜景最出片"},{"n":"豫园","lat":31.227,"lng":121.492,"dur":120,"tags":["历史"],"open":"08:30-17:00","ticket":40,"note":"毗邻城隍庙小吃街"},{"n":"东方明珠","lat":31.24,"lng":121.5,"dur":120,"tags":["必去"],"open":"08:30-21:30","ticket":199,"note":"登塔看浦东天际线"},{"n":"南京路步行街","lat":31.235,"lng":121.475,"dur":90,"tags":["购物","免费","夜游"],"open":"全天","ticket":0,"note":"老字号与霓虹橱窗"},{"n":"上海博物馆","lat":31.23,"lng":121.475,"dur":150,"tags":["历史","免费"],"open":"09:00-17:00(周一闭)","ticket":0,"note":"青铜陶瓷馆藏丰富，需预约"},{"n":"田子坊","lat":31.209,"lng":121.466,"dur":90,"tags":["购物","美食"],"open":"全天","ticket":0,"note":"弄堂文创与咖啡"},{"n":"陆家嘴环路","lat":31.235,"lng":121.505,"dur":60,"tags":["免费","夜游"],"open":"全天","ticket":0,"note":"三件套天际线摄影点"},{"n":"朱家角古镇","lat":31.108,"lng":121.052,"dur":180,"tags":["历史","自然"],"open":"全天","ticket":0,"note":"江南水乡，距市区约1小时"}]},"丽江":{"city":"丽江","py":"lijiang","center":[26.87,100.23],"days_suggest":4,"spots":[{"n":"丽江古城(大研)","lat":26.877,"lng":100.233,"dur":240,"tags":["历史","夜游","必去","免费"],"open":"全天","ticket":0,"note":"四方街与木府，夜景迷人"},{"n":"玉龙雪山","lat":27.1,"lng":100.18,"dur":360,"tags":["自然","必去"],"open":"07:00-16:00","ticket":100,"note":"冰川公园+蓝月谷，单独留一天"},{"n":"束河古镇","lat":26.92,"lng":100.2,"dur":150,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"比大研更安静"},{"n":"黑龙潭公园","lat":26.89,"lng":100.23,"dur":90,"tags":["自然","免费"],"open":"07:00-19:00","ticket":0,"note":"拍玉龙雪山倒影"},{"n":"木府","lat":26.875,"lng":100.232,"dur":90,"tags":["历史"],"open":"08:30-17:30","ticket":60,"note":"纳西土司府邸"},{"n":"白沙古镇","lat":26.94,"lng":100.18,"dur":120,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"白沙壁画"},{"n":"拉市海","lat":26.82,"lng":100.13,"dur":150,"tags":["自然","亲子"],"open":"08:00-18:00","ticket":30,"note":"湿地骑马划船"},{"n":"狮子山万古楼","lat":26.88,"lng":100.23,"dur":60,"tags":["自然"],"open":"08:00-18:30","ticket":35,"note":"俯瞰古城全景"}]},"北京":{"city":"北京","py":"beijing","center":[39.91,116.4],"days_suggest":4,"spots":[{"n":"故宫博物院","lat":39.916,"lng":116.397,"dur":240,"tags":["历史","必去"],"open":"08:30-17:00(周一闭)","ticket":60,"note":"需提前预约，建议上午入馆"},{"n":"天安门广场","lat":39.905,"lng":116.397,"dur":60,"tags":["历史","免费"],"open":"全天(需预约领票)","ticket":0,"note":"看升旗需极早，紧邻故宫"},{"n":"八达岭长城","lat":40.359,"lng":116.02,"dur":240,"tags":["自然","历史","必去"],"open":"07:30-16:30","ticket":40,"note":"距市区约1.5小时车程，单独留一天"},{"n":"颐和园","lat":39.999,"lng":116.275,"dur":180,"tags":["历史","自然"],"open":"06:30-18:00","ticket":30,"note":"昆明湖泛舟"},{"n":"天坛","lat":39.882,"lng":116.406,"dur":120,"tags":["历史"],"open":"08:00-17:30","ticket":15,"note":"祈年殿必看"},{"n":"南锣鼓巷","lat":39.936,"lng":116.403,"dur":90,"tags":["美食","购物","免费"],"open":"全天","ticket":0,"note":"胡同+文创+小吃"},{"n":"圆明园","lat":40.008,"lng":116.298,"dur":150,"tags":["历史","自然"],"open":"07:00-19:00","ticket":10,"note":"遗址沧桑，近颐和园可同天"},{"n":"雍和宫","lat":39.947,"lng":116.417,"dur":90,"tags":["历史","宗教"],"open":"09:00-16:30","ticket":25,"note":"香火旺盛，邻近国子监"}]},"厦门":{"city":"厦门","py":"xiamen","center":[24.48,118.09],"days_suggest":3,"spots":[{"n":"鼓浪屿","lat":24.447,"lng":118.067,"dur":300,"tags":["历史","必去"],"open":"全天","ticket":0,"note":"船票约¥35需预约，登日光岩"},{"n":"厦门大学","lat":24.438,"lng":118.09,"dur":150,"tags":["历史","免费"],"open":"全天(需预约)","ticket":0,"note":"芙蓉隧道涂鸦"},{"n":"环岛路","lat":24.43,"lng":118.13,"dur":150,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"骑行观海黄金海岸"},{"n":"曾厝垵","lat":24.435,"lng":118.115,"dur":120,"tags":["美食","免费"],"open":"全天","ticket":0,"note":"文艺渔村小吃"},{"n":"南普陀寺","lat":24.442,"lng":118.087,"dur":90,"tags":["宗教","免费"],"open":"08:00-17:00","ticket":0,"note":"紧邻厦大"},{"n":"沙坡尾","lat":24.44,"lng":118.08,"dur":90,"tags":["美食","购物"],"open":"全天","ticket":0,"note":"避风坞文创"},{"n":"胡里山炮台","lat":24.428,"lng":118.1,"dur":90,"tags":["历史"],"open":"08:00-18:00","ticket":25,"note":"克虏伯大炮"},{"n":"集美学村","lat":24.58,"lng":118.09,"dur":150,"tags":["历史"],"open":"全天","ticket":0,"note":"嘉庚建筑与龙舟池"}]},"广州":{"city":"广州","py":"guangzhou","center":[23.13,113.26],"days_suggest":3,"spots":[{"n":"广州塔","lat":23.106,"lng":113.324,"dur":90,"tags":["必去","夜游"],"open":"09:30-22:30","ticket":150,"note":"小蛮腰，花城广场看夜景"},{"n":"陈家祠","lat":23.127,"lng":113.245,"dur":90,"tags":["历史"],"open":"08:30-17:30","ticket":10,"note":"岭南建筑雕刻精华"},{"n":"沙面岛","lat":23.108,"lng":113.24,"dur":90,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"欧陆风情租界建筑"},{"n":"北京路步行街","lat":23.122,"lng":113.27,"dur":90,"tags":["购物","美食","免费"],"open":"全天","ticket":0,"note":"千年古道遗址"},{"n":"越秀公园","lat":23.14,"lng":113.262,"dur":120,"tags":["自然","免费"],"open":"06:00-21:00","ticket":0,"note":"五羊雕像与镇海楼"},{"n":"上下九步行街","lat":23.116,"lng":113.248,"dur":90,"tags":["美食","购物","免费"],"open":"全天","ticket":0,"note":"骑楼老街喝早茶"},{"n":"珠江夜游","lat":23.11,"lng":113.29,"dur":90,"tags":["夜游"],"open":"19:00-22:00","ticket":88,"note":"船上看两岸灯火"},{"n":"圣心大教堂","lat":23.116,"lng":113.255,"dur":60,"tags":["历史","宗教","免费"],"open":"08:30-17:00","ticket":0,"note":"石室哥特式建筑"}]},"成都":{"city":"成都","py":"chengdu","center":[30.66,104.07],"days_suggest":3,"spots":[{"n":"大熊猫繁育研究基地","lat":30.734,"lng":104.146,"dur":180,"tags":["自然","亲子","必去"],"open":"07:30-18:00","ticket":55,"note":"早上去看活跃的熊猫，9点前最佳"},{"n":"宽窄巷子","lat":30.67,"lng":104.056,"dur":120,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"茶馆+小吃+老民居"},{"n":"锦里","lat":30.641,"lng":104.056,"dur":90,"tags":["美食","历史"],"open":"全天","ticket":0,"note":"武侯祠旁，夜景不错"},{"n":"武侯祠","lat":30.641,"lng":104.058,"dur":120,"tags":["历史"],"open":"08:00-21:00","ticket":50,"note":"三国文化，锦里相连"},{"n":"杜甫草堂","lat":30.66,"lng":104.025,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":50,"note":"诗意园林，清幽"},{"n":"春熙路·IFS","lat":30.658,"lng":104.081,"dur":90,"tags":["购物","美食"],"open":"全天","ticket":0,"note":"爬墙熊猫打卡，太古里相邻"},{"n":"金沙遗址博物馆","lat":30.69,"lng":104.01,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":70,"note":"太阳神鸟出土地"},{"n":"太古里","lat":30.656,"lng":104.084,"dur":90,"tags":["购物","历史"],"open":"全天","ticket":0,"note":"低密街区，古今混搭"}]},"昆明":{"city":"昆明","py":"kunming","center":[25.04,102.71],"days_suggest":3,"spots":[{"n":"石林","lat":24.81,"lng":103.32,"dur":240,"tags":["自然","必去"],"open":"08:00-18:00","ticket":130,"note":"距市区约1.5小时，单独留一天"},{"n":"滇池海埂大坝","lat":24.98,"lng":102.66,"dur":120,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"冬季喂红嘴鸥"},{"n":"云南民族村","lat":24.97,"lng":102.67,"dur":180,"tags":["历史","亲子"],"open":"09:00-18:00","ticket":90,"note":"26个民族风情"},{"n":"翠湖公园","lat":25.05,"lng":102.7,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"城中绿肺"},{"n":"西山龙门","lat":24.96,"lng":102.62,"dur":180,"tags":["自然"],"open":"08:30-17:30","ticket":40,"note":"俯瞰滇池全景"},{"n":"大观楼","lat":24.98,"lng":102.68,"dur":90,"tags":["历史"],"open":"08:00-19:00","ticket":20,"note":"天下第一长联"},{"n":"金马碧鸡坊","lat":25.04,"lng":102.71,"dur":60,"tags":["历史","美食","免费"],"open":"全天","ticket":0,"note":"市中心地标夜市"},{"n":"官渡古镇","lat":24.95,"lng":102.75,"dur":120,"tags":["历史","美食"],"open":"全天","ticket":0,"note":"滇味小吃云集"}]},"杭州":{"city":"杭州","py":"hangzhou","center":[30.25,120.15],"days_suggest":3,"spots":[{"n":"西湖","lat":30.259,"lng":120.149,"dur":180,"tags":["自然","免费","必去"],"open":"全天","ticket":0,"note":"环湖步行或游船，建议上午，断桥·白堤·苏堤一线"},{"n":"灵隐寺","lat":30.242,"lng":120.101,"dur":150,"tags":["历史","宗教"],"open":"07:00-18:00","ticket":75,"note":"先买飞来峰门票再入寺"},{"n":"西溪湿地","lat":30.27,"lng":120.07,"dur":150,"tags":["自然"],"open":"08:00-17:30","ticket":80,"note":"摇橹船穿芦苇，下午光线好"},{"n":"雷峰塔","lat":30.231,"lng":120.148,"dur":90,"tags":["历史","必去"],"open":"08:00-20:30","ticket":40,"note":"登塔看西湖全景与音乐喷泉"},{"n":"河坊街","lat":30.241,"lng":120.17,"dur":90,"tags":["美食","购物","夜游"],"open":"全天","ticket":0,"note":"晚上更热闹，小吃集中"},{"n":"宋城","lat":30.17,"lng":120.13,"dur":240,"tags":["演出","亲子"],"open":"09:00-21:00","ticket":320,"note":"《宋城千古情》演出需另约场次"},{"n":"太子湾公园","lat":30.225,"lng":120.135,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"樱花季极美，紧邻苏堤"},{"n":"京杭大运河·桥西历史街区","lat":30.32,"lng":120.15,"dur":120,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"老厂房改造，刀剪剑博物馆免费"},{"n":"浙江省博物馆(孤山)","lat":30.255,"lng":120.145,"dur":90,"tags":["历史","免费"],"open":"09:00-17:00(周一闭)","ticket":0,"note":"需提前预约，雷峰塔旁"},{"n":"清河坊·南宋御街","lat":30.244,"lng":120.168,"dur":90,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"与河坊街相连，老字号集中"}]},"桂林":{"city":"桂林","py":"guilin","center":[25.27,110.29],"days_suggest":3,"spots":[{"n":"漓江竹筏(杨堤-兴坪)","lat":25.0,"lng":110.5,"dur":240,"tags":["自然","必去"],"open":"08:00-17:00","ticket":118,"note":"二十里画廊精华段"},{"n":"象鼻山","lat":25.27,"lng":110.29,"dur":90,"tags":["自然","必去"],"open":"07:00-18:30","ticket":55,"note":"桂林城徽"},{"n":"阳朔西街","lat":24.778,"lng":110.496,"dur":120,"tags":["美食","夜游","免费"],"open":"全天","ticket":0,"note":"洋人街与啤酒鱼"},{"n":"遇龙河漂流","lat":24.79,"lng":110.42,"dur":180,"tags":["自然"],"open":"08:00-17:00","ticket":160,"note":"人称小漓江"},{"n":"两江四湖","lat":25.28,"lng":110.29,"dur":90,"tags":["自然","夜游"],"open":"全天","ticket":0,"note":"环城水系夜景"},{"n":"龙脊梯田","lat":25.75,"lng":110.1,"dur":300,"tags":["自然"],"open":"全天","ticket":80,"note":"距市区约2小时，单独留一天"},{"n":"银子岩","lat":24.85,"lng":110.45,"dur":120,"tags":["自然"],"open":"08:00-17:30","ticket":65,"note":"喀斯特溶洞奇观"},{"n":"东西巷","lat":25.285,"lng":110.295,"dur":90,"tags":["历史","美食","免费"],"open":"全天","ticket":0,"note":"明清街巷"}]},"西安":{"city":"西安","py":"xian","center":[34.27,108.95],"days_suggest":3,"spots":[{"n":"兵马俑","lat":34.385,"lng":109.273,"dur":180,"tags":["历史","必去"],"open":"08:30-17:00","ticket":120,"note":"距市区较远，预留单程1小时"},{"n":"大雁塔","lat":34.218,"lng":108.964,"dur":120,"tags":["历史","必去"],"open":"08:00-21:00","ticket":50,"note":"北广场音乐喷泉晚间开放"},{"n":"西安城墙","lat":34.265,"lng":108.946,"dur":120,"tags":["历史","必去"],"open":"08:00-22:00","ticket":54,"note":"可租自行车绕城一圈"},{"n":"回民街","lat":34.267,"lng":108.939,"dur":90,"tags":["美食","免费"],"open":"全天","ticket":0,"note":"小吃集中，同侧有西羊市"},{"n":"钟鼓楼","lat":34.261,"lng":108.947,"dur":90,"tags":["历史"],"open":"08:30-21:00","ticket":30,"note":"夜景亮灯好看"},{"n":"陕西历史博物馆","lat":34.226,"lng":108.961,"dur":150,"tags":["历史","免费"],"open":"09:00-17:30(需预约)","ticket":0,"note":"免费但必须提前预约"},{"n":"华清宫","lat":34.372,"lng":109.29,"dur":150,"tags":["历史"],"open":"07:30-18:00","ticket":120,"note":"与兵马俑同方向，可一天安排"},{"n":"大唐芙蓉园","lat":34.21,"lng":108.967,"dur":150,"tags":["历史","夜游"],"open":"09:00-21:00","ticket":120,"note":"晚间水幕电影，紧邻大雁塔"}]},"重庆":{"city":"重庆","py":"chongqing","center":[29.56,106.55],"days_suggest":3,"spots":[{"n":"洪崖洞","lat":29.562,"lng":106.578,"dur":90,"tags":["夜游","免费","必去"],"open":"全天","ticket":0,"note":"千厮门大桥回望最出片"},{"n":"长江索道","lat":29.558,"lng":106.585,"dur":60,"tags":["必去"],"open":"07:30-22:30","ticket":30,"note":"空中俯瞰两江四岸"},{"n":"解放碑","lat":29.557,"lng":106.577,"dur":60,"tags":["购物","免费"],"open":"全天","ticket":0,"note":"市中心地标商圈"},{"n":"磁器口古镇","lat":29.581,"lng":106.449,"dur":150,"tags":["历史","美食"],"open":"全天","ticket":0,"note":"陈麻花与川剧"},{"n":"李子坝轻轨站","lat":29.535,"lng":106.538,"dur":30,"tags":["免费"],"open":"全天","ticket":0,"note":"轻轨穿楼奇观"},{"n":"鹅岭二厂","lat":29.552,"lng":106.531,"dur":90,"tags":["购物"],"open":"全天","ticket":0,"note":"文创园区看江景"},{"n":"南山一棵树","lat":29.52,"lng":106.6,"dur":60,"tags":["自然","夜游"],"open":"09:00-22:30","ticket":30,"note":"看渝中半岛夜景"},{"n":"武隆天生三桥","lat":29.35,"lng":107.8,"dur":300,"tags":["自然","必去"],"open":"08:00-17:00","ticket":135,"note":"距市区约2.5小时，单独留一天"}]}};
+const CITIES = {"三亚":{"city":"三亚","py":"sanya","center":[18.25,109.51],"days_suggest":4,"intro":"天涯海角，中国最南端的热带滨海度假天堂。椰风海韵、碧海白沙，是冬日避寒的理想去处。 紫外线极强，防晒必备；蜈支洲岛与亚龙湾相距较远，建议分两天。","spots":[{"n":"亚龙湾","lat":18.215,"lng":109.65,"dur":240,"tags":["自然","亲子","必去"],"open":"全天","ticket":0,"note":"天下第一湾，白沙碧水","img":"images/pop-sanya.jpg"},{"n":"天涯海角","lat":18.295,"lng":109.35,"dur":150,"tags":["自然","必去"],"open":"07:30-18:30","ticket":68,"note":"刻字巨石经典地标","img":"images/spot-sanya-2.jpg"},{"n":"南山文化旅游区","lat":18.3,"lng":109.19,"dur":240,"tags":["宗教","自然"],"open":"08:00-17:30","ticket":108,"note":"108米海上观音","img":"images/spot-sanya-3.jpg"},{"n":"蜈支洲岛","lat":18.31,"lng":109.76,"dur":300,"tags":["自然","亲子"],"open":"08:00-17:30","ticket":144,"note":"潜水胜地，单独留一天","img":"images/pop-sanya.jpg"},{"n":"大东海","lat":18.22,"lng":109.52,"dur":120,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"市区最近的海湾","img":"images/pop-sanya.jpg"},{"n":"椰梦长廊","lat":18.24,"lng":109.48,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"三亚湾日落骑行","img":"images/pop-sanya.jpg"},{"n":"鹿回头","lat":18.23,"lng":109.49,"dur":90,"tags":["自然","夜游"],"open":"07:30-22:00","ticket":45,"note":"俯瞰三亚全景","img":"images/pop-sanya.jpg"},{"n":"第一市场","lat":18.24,"lng":109.5,"dur":90,"tags":["美食"],"open":"全天","ticket":0,"note":"海鲜现买现加工","img":"images/pop-sanya.jpg"}]},"上海":{"city":"上海","py":"shanghai","center":[31.23,121.47],"days_suggest":3,"intro":"中国最大的经济中心城市。外滩的万国建筑与陆家嘴的天际线隔江相望，老弄堂与摩天楼在同一座城里呼吸。 外滩看夜景最佳在 19:00 后；迪士尼建议全天单独安排，地铁 11 号线直达。","spots":[{"n":"外滩","lat":31.24,"lng":121.49,"dur":90,"tags":["历史","免费","夜游","必去"],"open":"全天","ticket":0,"note":"万国建筑群对望陆家嘴，夜景最出片","img":"images/pop-shanghai.jpg"},{"n":"豫园","lat":31.227,"lng":121.492,"dur":120,"tags":["历史"],"open":"08:30-17:00","ticket":40,"note":"毗邻城隍庙小吃街","img":"images/spot-shanghai-2.jpg"},{"n":"东方明珠","lat":31.24,"lng":121.5,"dur":120,"tags":["必去"],"open":"08:30-21:30","ticket":199,"note":"登塔看浦东天际线","img":"images/spot-shanghai-3.jpg"},{"n":"南京路步行街","lat":31.235,"lng":121.475,"dur":90,"tags":["购物","免费","夜游"],"open":"全天","ticket":0,"note":"老字号与霓虹橱窗","img":"images/pop-shanghai.jpg"},{"n":"上海博物馆","lat":31.23,"lng":121.475,"dur":150,"tags":["历史","免费"],"open":"09:00-17:00(周一闭)","ticket":0,"note":"青铜陶瓷馆藏丰富，需预约","img":"images/pop-shanghai.jpg"},{"n":"田子坊","lat":31.209,"lng":121.466,"dur":90,"tags":["购物","美食"],"open":"全天","ticket":0,"note":"弄堂文创与咖啡","img":"images/pop-shanghai.jpg"},{"n":"陆家嘴环路","lat":31.235,"lng":121.505,"dur":60,"tags":["免费","夜游"],"open":"全天","ticket":0,"note":"三件套天际线摄影点","img":"images/pop-shanghai.jpg"},{"n":"朱家角古镇","lat":31.108,"lng":121.052,"dur":180,"tags":["历史","自然"],"open":"全天","ticket":0,"note":"江南水乡，距市区约1小时","img":"images/pop-shanghai.jpg"}]},"丽江":{"city":"丽江","py":"lijiang","center":[26.87,100.23],"days_suggest":4,"intro":"玉龙雪山下的纳西古城。小桥流水、四方街的灯火与东巴文化，让时光在这里慢下来。 玉龙雪山需提前预约大索道与蓝月谷；古城夜里安静，适合住在四方街附近。","spots":[{"n":"丽江古城(大研)","lat":26.877,"lng":100.233,"dur":240,"tags":["历史","夜游","必去","免费"],"open":"全天","ticket":0,"note":"四方街与木府，夜景迷人","img":"images/pop-lijiang.jpg"},{"n":"玉龙雪山","lat":27.1,"lng":100.18,"dur":360,"tags":["自然","必去"],"open":"07:00-16:00","ticket":100,"note":"冰川公园+蓝月谷，单独留一天","img":"images/spot-lijiang-2.jpg"},{"n":"束河古镇","lat":26.92,"lng":100.2,"dur":150,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"比大研更安静","img":"images/spot-lijiang-3.jpg"},{"n":"黑龙潭公园","lat":26.89,"lng":100.23,"dur":90,"tags":["自然","免费"],"open":"07:00-19:00","ticket":0,"note":"拍玉龙雪山倒影","img":"images/pop-lijiang.jpg"},{"n":"木府","lat":26.875,"lng":100.232,"dur":90,"tags":["历史"],"open":"08:30-17:30","ticket":60,"note":"纳西土司府邸","img":"images/pop-lijiang.jpg"},{"n":"白沙古镇","lat":26.94,"lng":100.18,"dur":120,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"白沙壁画","img":"images/pop-lijiang.jpg"},{"n":"拉市海","lat":26.82,"lng":100.13,"dur":150,"tags":["自然","亲子"],"open":"08:00-18:00","ticket":30,"note":"湿地骑马划船","img":"images/pop-lijiang.jpg"},{"n":"狮子山万古楼","lat":26.88,"lng":100.23,"dur":60,"tags":["自然"],"open":"08:00-18:30","ticket":35,"note":"俯瞰古城全景","img":"images/pop-lijiang.jpg"}]},"北京":{"city":"北京","py":"beijing","center":[39.91,116.4],"days_suggest":4,"spots":[{"n":"故宫博物院","lat":39.916,"lng":116.397,"dur":240,"tags":["历史","必去"],"open":"08:30-17:00(周一闭)","ticket":60,"note":"需提前预约，建议上午入馆","img":"images/pop-beijing.jpg"},{"n":"天安门广场","lat":39.905,"lng":116.397,"dur":60,"tags":["历史","免费"],"open":"全天(需预约领票)","ticket":0,"note":"看升旗需极早，紧邻故宫","img":"images/spot-beijing-2.jpg"},{"n":"八达岭长城","lat":40.359,"lng":116.02,"dur":240,"tags":["自然","历史","必去"],"open":"07:30-16:30","ticket":40,"note":"距市区约1.5小时车程，单独留一天","img":"images/spot-beijing-3.jpg"},{"n":"颐和园","lat":39.999,"lng":116.275,"dur":180,"tags":["历史","自然"],"open":"06:30-18:00","ticket":30,"note":"昆明湖泛舟","img":"images/pop-beijing.jpg"},{"n":"天坛","lat":39.882,"lng":116.406,"dur":120,"tags":["历史"],"open":"08:00-17:30","ticket":15,"note":"祈年殿必看","img":"images/pop-beijing.jpg"},{"n":"南锣鼓巷","lat":39.936,"lng":116.403,"dur":90,"tags":["美食","购物","免费"],"open":"全天","ticket":0,"note":"胡同+文创+小吃","img":"images/pop-beijing.jpg"},{"n":"圆明园","lat":40.008,"lng":116.298,"dur":150,"tags":["历史","自然"],"open":"07:00-19:00","ticket":10,"note":"遗址沧桑，近颐和园可同天","img":"images/pop-beijing.jpg"},{"n":"雍和宫","lat":39.947,"lng":116.417,"dur":90,"tags":["历史","宗教"],"open":"09:00-16:30","ticket":25,"note":"香火旺盛，邻近国子监","img":"images/pop-beijing.jpg"}],"intro":"中国首都，三千年建城史、八百年建都史。故宫的红墙金瓦、长城的雄关漫道，与胡同里的烟火气并存，是值得慢慢品的城市。 故宫与天安门均需提前预约，务必先抢票再安排动线；国博、毛馆周一闭馆。"},"厦门":{"city":"厦门","py":"xiamen","center":[24.48,118.09],"days_suggest":3,"intro":"海上花园城市。鼓浪屿的琴声、环岛路的椰风海韵、八市的烟火，小清新与市井气兼得。 鼓浪屿船票与日光岩都要提前预约；环岛路骑行适合下午到日落时段。","spots":[{"n":"鼓浪屿","lat":24.447,"lng":118.067,"dur":300,"tags":["历史","必去"],"open":"全天","ticket":0,"note":"船票约¥35需预约，登日光岩","img":"images/pop-xiamen.jpg"},{"n":"厦门大学","lat":24.438,"lng":118.09,"dur":150,"tags":["历史","免费"],"open":"全天(需预约)","ticket":0,"note":"芙蓉隧道涂鸦","img":"images/spot-xiamen-2.jpg"},{"n":"环岛路","lat":24.43,"lng":118.13,"dur":150,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"骑行观海黄金海岸","img":"images/spot-xiamen-3.jpg"},{"n":"曾厝垵","lat":24.435,"lng":118.115,"dur":120,"tags":["美食","免费"],"open":"全天","ticket":0,"note":"文艺渔村小吃","img":"images/pop-xiamen.jpg"},{"n":"南普陀寺","lat":24.442,"lng":118.087,"dur":90,"tags":["宗教","免费"],"open":"08:00-17:00","ticket":0,"note":"紧邻厦大","img":"images/pop-xiamen.jpg"},{"n":"沙坡尾","lat":24.44,"lng":118.08,"dur":90,"tags":["美食","购物"],"open":"全天","ticket":0,"note":"避风坞文创","img":"images/pop-xiamen.jpg"},{"n":"胡里山炮台","lat":24.428,"lng":118.1,"dur":90,"tags":["历史"],"open":"08:00-18:00","ticket":25,"note":"克虏伯大炮","img":"images/pop-xiamen.jpg"},{"n":"集美学村","lat":24.58,"lng":118.09,"dur":150,"tags":["历史"],"open":"全天","ticket":0,"note":"嘉庚建筑与龙舟池","img":"images/pop-xiamen.jpg"}]},"广州":{"city":"广州","py":"guangzhou","center":[23.13,113.26],"days_suggest":3,"intro":"千年商都。一盅两件的早茶、骑楼里的市井、珠江畔的小蛮腰，藏着最地道的岭南烟火气。 早茶要赶早市（一盅两件）；陈家祠与沙面适合下午，珠江夜游在 19:00 后。","spots":[{"n":"广州塔","lat":23.106,"lng":113.324,"dur":90,"tags":["必去","夜游"],"open":"09:30-22:30","ticket":150,"note":"小蛮腰，花城广场看夜景","img":"images/pop-guangzhou.jpg"},{"n":"陈家祠","lat":23.127,"lng":113.245,"dur":90,"tags":["历史"],"open":"08:30-17:30","ticket":10,"note":"岭南建筑雕刻精华","img":"images/spot-guangzhou-2.jpg"},{"n":"沙面岛","lat":23.108,"lng":113.24,"dur":90,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"欧陆风情租界建筑","img":"images/spot-guangzhou-3.jpg"},{"n":"北京路步行街","lat":23.122,"lng":113.27,"dur":90,"tags":["购物","美食","免费"],"open":"全天","ticket":0,"note":"千年古道遗址","img":"images/pop-guangzhou.jpg"},{"n":"越秀公园","lat":23.14,"lng":113.262,"dur":120,"tags":["自然","免费"],"open":"06:00-21:00","ticket":0,"note":"五羊雕像与镇海楼","img":"images/pop-guangzhou.jpg"},{"n":"上下九步行街","lat":23.116,"lng":113.248,"dur":90,"tags":["美食","购物","免费"],"open":"全天","ticket":0,"note":"骑楼老街喝早茶","img":"images/pop-guangzhou.jpg"},{"n":"珠江夜游","lat":23.11,"lng":113.29,"dur":90,"tags":["夜游"],"open":"19:00-22:00","ticket":88,"note":"船上看两岸灯火","img":"images/pop-guangzhou.jpg"},{"n":"圣心大教堂","lat":23.116,"lng":113.255,"dur":60,"tags":["历史","宗教","免费"],"open":"08:30-17:00","ticket":0,"note":"石室哥特式建筑","img":"images/pop-guangzhou.jpg"}]},"成都":{"city":"成都","py":"chengdu","center":[30.66,104.07],"days_suggest":3,"spots":[{"n":"大熊猫繁育研究基地","lat":30.734,"lng":104.146,"dur":180,"tags":["自然","亲子","必去"],"open":"07:30-18:00","ticket":55,"note":"早上去看活跃的熊猫，9点前最佳","img":"images/pop-chengdu.jpg"},{"n":"宽窄巷子","lat":30.67,"lng":104.056,"dur":120,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"茶馆+小吃+老民居","img":"images/spot-chengdu-2.jpg"},{"n":"锦里","lat":30.641,"lng":104.056,"dur":90,"tags":["美食","历史"],"open":"全天","ticket":0,"note":"武侯祠旁，夜景不错","img":"images/spot-chengdu-3.jpg"},{"n":"武侯祠","lat":30.641,"lng":104.058,"dur":120,"tags":["历史"],"open":"08:00-21:00","ticket":50,"note":"三国文化，锦里相连","img":"images/pop-chengdu.jpg"},{"n":"杜甫草堂","lat":30.66,"lng":104.025,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":50,"note":"诗意园林，清幽","img":"images/pop-chengdu.jpg"},{"n":"春熙路·IFS","lat":30.658,"lng":104.081,"dur":90,"tags":["购物","美食"],"open":"全天","ticket":0,"note":"爬墙熊猫打卡，太古里相邻","img":"images/pop-chengdu.jpg"},{"n":"金沙遗址博物馆","lat":30.69,"lng":104.01,"dur":120,"tags":["历史"],"open":"08:00-18:00","ticket":70,"note":"太阳神鸟出土地","img":"images/pop-chengdu.jpg"},{"n":"太古里","lat":30.656,"lng":104.084,"dur":90,"tags":["购物","历史"],"open":"全天","ticket":0,"note":"低密街区，古今混搭","img":"images/pop-chengdu.jpg"}],"intro":"天府之国、熊猫故乡。火锅的麻辣与茶馆的安逸构成成都的慢生活，来这儿就是把日子过舒坦。 熊猫基地务必早上 8 点前到（上午最活跃）；宽窄巷子与锦里傍晚氛围最好。"},"昆明":{"city":"昆明","py":"kunming","center":[25.04,102.71],"days_suggest":3,"intro":"春城昆明，四季如春。石林的奇峰、滇池的红嘴鸥、满城的鲜花，让这里一年到头都舒服。 石林距市区约 1.5 小时，需单独一天；滇池海埂大坝冬季有红嘴鸥。","spots":[{"n":"石林","lat":24.81,"lng":103.32,"dur":240,"tags":["自然","必去"],"open":"08:00-18:00","ticket":130,"note":"距市区约1.5小时，单独留一天","img":"images/pop-kunming.jpg"},{"n":"滇池海埂大坝","lat":24.98,"lng":102.66,"dur":120,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"冬季喂红嘴鸥","img":"images/spot-kunming-2.jpg"},{"n":"云南民族村","lat":24.97,"lng":102.67,"dur":180,"tags":["历史","亲子"],"open":"09:00-18:00","ticket":90,"note":"26个民族风情","img":"images/spot-kunming-3.jpg"},{"n":"翠湖公园","lat":25.05,"lng":102.7,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"城中绿肺","img":"images/pop-kunming.jpg"},{"n":"西山龙门","lat":24.96,"lng":102.62,"dur":180,"tags":["自然"],"open":"08:30-17:30","ticket":40,"note":"俯瞰滇池全景","img":"images/pop-kunming.jpg"},{"n":"大观楼","lat":24.98,"lng":102.68,"dur":90,"tags":["历史"],"open":"08:00-19:00","ticket":20,"note":"天下第一长联","img":"images/pop-kunming.jpg"},{"n":"金马碧鸡坊","lat":25.04,"lng":102.71,"dur":60,"tags":["历史","美食","免费"],"open":"全天","ticket":0,"note":"市中心地标夜市","img":"images/pop-kunming.jpg"},{"n":"官渡古镇","lat":24.95,"lng":102.75,"dur":120,"tags":["历史","美食"],"open":"全天","ticket":0,"note":"滇味小吃云集","img":"images/pop-kunming.jpg"}]},"杭州":{"city":"杭州","py":"hangzhou","center":[30.25,120.15],"days_suggest":3,"spots":[{"n":"西湖","lat":30.259,"lng":120.149,"dur":180,"tags":["自然","免费","必去"],"open":"全天","ticket":0,"note":"环湖步行或游船，建议上午，断桥·白堤·苏堤一线","img":"images/pop-hangzhou.jpg"},{"n":"灵隐寺","lat":30.242,"lng":120.101,"dur":150,"tags":["历史","宗教"],"open":"07:00-18:00","ticket":75,"note":"先买飞来峰门票再入寺","img":"images/spot-hangzhou-2.jpg"},{"n":"西溪湿地","lat":30.27,"lng":120.07,"dur":150,"tags":["自然"],"open":"08:00-17:30","ticket":80,"note":"摇橹船穿芦苇，下午光线好","img":"images/spot-hangzhou-3.jpg"},{"n":"雷峰塔","lat":30.231,"lng":120.148,"dur":90,"tags":["历史","必去"],"open":"08:00-20:30","ticket":40,"note":"登塔看西湖全景与音乐喷泉","img":"images/pop-hangzhou.jpg"},{"n":"河坊街","lat":30.241,"lng":120.17,"dur":90,"tags":["美食","购物","夜游"],"open":"全天","ticket":0,"note":"晚上更热闹，小吃集中","img":"images/pop-hangzhou.jpg"},{"n":"宋城","lat":30.17,"lng":120.13,"dur":240,"tags":["演出","亲子"],"open":"09:00-21:00","ticket":320,"note":"《宋城千古情》演出需另约场次","img":"images/pop-hangzhou.jpg"},{"n":"太子湾公园","lat":30.225,"lng":120.135,"dur":90,"tags":["自然","免费"],"open":"全天","ticket":0,"note":"樱花季极美，紧邻苏堤","img":"images/pop-hangzhou.jpg"},{"n":"京杭大运河·桥西历史街区","lat":30.32,"lng":120.15,"dur":120,"tags":["历史","免费"],"open":"全天","ticket":0,"note":"老厂房改造，刀剪剑博物馆免费","img":"images/pop-hangzhou.jpg"},{"n":"浙江省博物馆(孤山)","lat":30.255,"lng":120.145,"dur":90,"tags":["历史","免费"],"open":"09:00-17:00(周一闭)","ticket":0,"note":"需提前预约，雷峰塔旁","img":"images/pop-hangzhou.jpg"},{"n":"清河坊·南宋御街","lat":30.244,"lng":120.168,"dur":90,"tags":["美食","历史","免费"],"open":"全天","ticket":0,"note":"与河坊街相连，老字号集中","img":"images/pop-hangzhou.jpg"}],"intro":"人间天堂。西湖的烟柳画桥、龙井的茶香、运河的古韵，自古倾倒无数游人，适合放慢脚步。 西湖无需门票，断桥—白堤—苏堤可骑行一圈；灵隐飞来峰需另购景区票。"},"桂林":{"city":"桂林","py":"guilin","center":[25.27,110.29],"days_suggest":3,"intro":"桂林山水甲天下。漓江的水墨画卷与喀斯特峰林举世无双，泛舟其间如在画中游。 漓江竹筏需在码头购票，杨堤—兴坪是精华段；遇龙河漂流夏季最热。","spots":[{"n":"漓江竹筏(杨堤-兴坪)","lat":25.0,"lng":110.5,"dur":240,"tags":["自然","必去"],"open":"08:00-17:00","ticket":118,"note":"二十里画廊精华段","img":"images/pop-guilin.jpg"},{"n":"象鼻山","lat":25.27,"lng":110.29,"dur":90,"tags":["自然","必去"],"open":"07:00-18:30","ticket":55,"note":"桂林城徽","img":"images/spot-guilin-2.jpg"},{"n":"阳朔西街","lat":24.778,"lng":110.496,"dur":120,"tags":["美食","夜游","免费"],"open":"全天","ticket":0,"note":"洋人街与啤酒鱼","img":"images/spot-guilin-3.jpg"},{"n":"遇龙河漂流","lat":24.79,"lng":110.42,"dur":180,"tags":["自然"],"open":"08:00-17:00","ticket":160,"note":"人称小漓江","img":"images/pop-guilin.jpg"},{"n":"两江四湖","lat":25.28,"lng":110.29,"dur":90,"tags":["自然","夜游"],"open":"全天","ticket":0,"note":"环城水系夜景","img":"images/pop-guilin.jpg"},{"n":"龙脊梯田","lat":25.75,"lng":110.1,"dur":300,"tags":["自然"],"open":"全天","ticket":80,"note":"距市区约2小时，单独留一天","img":"images/pop-guilin.jpg"},{"n":"银子岩","lat":24.85,"lng":110.45,"dur":120,"tags":["自然"],"open":"08:00-17:30","ticket":65,"note":"喀斯特溶洞奇观","img":"images/pop-guilin.jpg"},{"n":"东西巷","lat":25.285,"lng":110.295,"dur":90,"tags":["历史","美食","免费"],"open":"全天","ticket":0,"note":"明清街巷","img":"images/pop-guilin.jpg"}]},"西安":{"city":"西安","py":"xian","center":[34.27,108.95],"days_suggest":3,"spots":[{"n":"兵马俑","lat":34.385,"lng":109.273,"dur":180,"tags":["历史","必去"],"open":"08:30-17:00","ticket":120,"note":"距市区较远，预留单程1小时","img":"images/pop-xian.jpg"},{"n":"大雁塔","lat":34.218,"lng":108.964,"dur":120,"tags":["历史","必去"],"open":"08:00-21:00","ticket":50,"note":"北广场音乐喷泉晚间开放","img":"images/spot-xian-2.jpg"},{"n":"西安城墙","lat":34.265,"lng":108.946,"dur":120,"tags":["历史","必去"],"open":"08:00-22:00","ticket":54,"note":"可租自行车绕城一圈","img":"images/spot-xian-3.jpg"},{"n":"回民街","lat":34.267,"lng":108.939,"dur":90,"tags":["美食","免费"],"open":"全天","ticket":0,"note":"小吃集中，同侧有西羊市","img":"images/pop-xian.jpg"},{"n":"钟鼓楼","lat":34.261,"lng":108.947,"dur":90,"tags":["历史"],"open":"08:30-21:00","ticket":30,"note":"夜景亮灯好看","img":"images/pop-xian.jpg"},{"n":"陕西历史博物馆","lat":34.226,"lng":108.961,"dur":150,"tags":["历史","免费"],"open":"09:00-17:30(需预约)","ticket":0,"note":"免费但必须提前预约","img":"images/pop-xian.jpg"},{"n":"华清宫","lat":34.372,"lng":109.29,"dur":150,"tags":["历史"],"open":"07:30-18:00","ticket":120,"note":"与兵马俑同方向，可一天安排","img":"images/pop-xian.jpg"},{"n":"大唐芙蓉园","lat":34.21,"lng":108.967,"dur":150,"tags":["历史","夜游"],"open":"09:00-21:00","ticket":120,"note":"晚间水幕电影，紧邻大雁塔","img":"images/pop-xian.jpg"}],"intro":"十三朝古都。兵马俑的千军万马、明城墙的巍峨厚重，还有回民街的烟火气，一起讲着盛世长安的故事。 兵马俑距市区约 40 公里，建议早上出发；城墙骑行约 2 小时，夜间灯光更美。"},"重庆":{"city":"重庆","py":"chongqing","center":[29.56,106.55],"days_suggest":3,"intro":"山城雾都。依山就势的立体交通、穿楼而过的轻轨、火辣滚烫的火锅，都是这座8D魔幻城市的名片。 地形立体，导航常失灵，按站点与楼层走更靠谱；洪崖洞夜景 19:00 后最热闹。","spots":[{"n":"洪崖洞","lat":29.562,"lng":106.578,"dur":90,"tags":["夜游","免费","必去"],"open":"全天","ticket":0,"note":"千厮门大桥回望最出片","img":"images/pop-chongqing.jpg"},{"n":"长江索道","lat":29.558,"lng":106.585,"dur":60,"tags":["必去"],"open":"07:30-22:30","ticket":30,"note":"空中俯瞰两江四岸","img":"images/spot-chongqing-2.jpg"},{"n":"解放碑","lat":29.557,"lng":106.577,"dur":60,"tags":["购物","免费"],"open":"全天","ticket":0,"note":"市中心地标商圈","img":"images/spot-chongqing-3.jpg"},{"n":"磁器口古镇","lat":29.581,"lng":106.449,"dur":150,"tags":["历史","美食"],"open":"全天","ticket":0,"note":"陈麻花与川剧","img":"images/pop-chongqing.jpg"},{"n":"李子坝轻轨站","lat":29.535,"lng":106.538,"dur":30,"tags":["免费"],"open":"全天","ticket":0,"note":"轻轨穿楼奇观","img":"images/pop-chongqing.jpg"},{"n":"鹅岭二厂","lat":29.552,"lng":106.531,"dur":90,"tags":["购物"],"open":"全天","ticket":0,"note":"文创园区看江景","img":"images/pop-chongqing.jpg"},{"n":"南山一棵树","lat":29.52,"lng":106.6,"dur":60,"tags":["自然","夜游"],"open":"09:00-22:30","ticket":30,"note":"看渝中半岛夜景","img":"images/pop-chongqing.jpg"},{"n":"武隆天生三桥","lat":29.35,"lng":107.8,"dur":300,"tags":["自然","必去"],"open":"08:00-17:00","ticket":135,"note":"距市区约2.5小时，单独留一天","img":"images/pop-chongqing.jpg"}]}};
 
 const ALL_TAGS = ["自然","历史","美食","亲子","免费","购物","宗教","演出","夜游","必去"];
-const MEAL_PER_DAY = 120; // 餐饮估算（元/天）
+const MEAL_PER_DAY = 120;      // 餐饮估算（元/天）
+const CITY_IMG = {"北京":"images/pop-beijing.jpg","天津":"images/pop-tianjin.jpg","上海":"images/pop-shanghai.jpg","重庆":"images/pop-chongqing.jpg","沈阳":"images/pop-shenyang.jpg","大连":"images/pop-dalian.jpg","长春":"images/pop-changchun.jpg","哈尔滨":"images/pop-haerbin.jpg","南京":"images/pop-nanjing.jpg","苏州":"images/pop-suzhou.jpg","无锡":"images/pop-wuxi.jpg","杭州":"images/pop-hangzhou.jpg","宁波":"images/pop-ningbo.jpg","福州":"images/pop-fuzhou.jpg","厦门":"images/pop-xiamen.jpg","济南":"images/pop-jinan.jpg","青岛":"images/pop-qingdao.jpg","烟台":"images/pop-yantai.jpg","威海":"images/pop-weihai.jpg","郑州":"images/pop-zhengzhou.jpg","洛阳":"images/pop-luoyang.jpg","开封":"images/pop-kaifeng.jpg","武汉":"images/pop-wuhan.jpg","长沙":"images/pop-changsha.jpg","广州":"images/pop-guangzhou.jpg","深圳":"images/pop-shenzhen.jpg","珠海":"images/pop-zhuhai.jpg","桂林":"images/pop-guilin.jpg","海口":"images/pop-haikou.jpg","三亚":"images/pop-sanya.jpg","成都":"images/pop-chengdu.jpg","乐山":"images/pop-leshan.jpg","昆明":"images/pop-kunming.jpg","大理":"images/pop-dali.jpg","丽江":"images/pop-lijiang.jpg","西双版纳":"images/pop-xishuangbanna.jpg","拉萨":"images/pop-lasa.jpg","西安":"images/pop-xian.jpg","延安":"images/pop-yanan.jpg","兰州":"images/pop-lanzhou.jpg","西宁":"images/pop-xining.jpg","乌鲁木齐":"images/pop-wulumuqi.jpg","承德":"images/pop-chengde.jpg","秦皇岛":"images/pop-qinhuangdao.jpg","泰安":"images/pop-taian.jpg","扬州":"images/pop-yangzhou.jpg","泉州":"images/pop-quanzhou.jpg","温州":"images/pop-wenzhou.jpg","黄山":"images/pop-huangshan.jpg","张家界":"images/pop-zhangjiajie.jpg","景德镇":"images/pop-jingdezhen.jpg","福州·平潭":"images/pop-pingtan.jpg"}; // 城市 -> 横幅图（与主站景点抽屉共用同一批实景图）
 
 function haversine(a,b){
   const R=6371,toR=x=>x*Math.PI/180;
@@ -107,13 +145,14 @@ function haversine(a,b){
 }
 function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
 function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* 地理最近邻串线：从最北的点出发，把景点串成一条尽量顺路的线。
-   之后沿这条线均匀切段，就能得到“每天景点数均衡 + 地理相邻”的分天方案。 */
+   之后沿这条线均匀切段，就能得到"每天景点数均衡 + 地理相邻"的分天方案。 */
 function nnPath(pts){
   if(!pts.length) return [];
   let pool=pts.slice();
-  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);   // 从最北的点开始
+  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);
   pool.splice(pool.indexOf(cur),1);
   const out=[cur];
   while(pool.length){
@@ -124,28 +163,38 @@ function nnPath(pts){
   return out;
 }
 
-function buildDay(group, idx){
-  if(!group.length) return {day:idx+1,items:[],cost:0};
+function buildDay(group, idx, ctx){
+  if(!group.length) return {day:idx+1,items:[],cost:0,walk:0,theme:''};
+  // 1) 组内动线：从最靠近本组重心的点出发，最近邻串线
   const cen={lat:group.reduce((s,p)=>s+p.lat,0)/group.length, lng:group.reduce((s,p)=>s+p.lng,0)/group.length};
-  // nearest-neighbor order from centroid
-  let pool=group.slice(), order=[];
-  let cur=pool.reduce((a,b)=> haversine(a,cen)<haversine(b,cen)?a:b);
-  pool.splice(pool.indexOf(cur),1); order.push(cur);
-  while(pool.length){ let ni=0,nd=1e9; pool.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}}); cur=pool.splice(ni,1)[0]; order.push(cur); }
-  // meal spot in this group
-  const meal=group.find(s=>s.tags&&s.tags.includes('美食'));
-  let t=9*60, items=[], cost=0, prev=null;
+  const order=nnPath(group);
+  // 2) 时间轴：09:00 出发，按停留时长累加，路上时间按地理距离估算
+  let t=9*60, items=[], cost=0, walk=0, prev=null;
   order.forEach((s,i)=>{
-    if(i>0){ const m=transitMin(prev,s); items[items.length-1].transit=m; t+=m; }
-    items.push({t, spot:s, dur:s.dur, transit:0});
-    cost+= (s.ticket||0);
+    if(i>0){
+      const km=haversine(prev,s);
+      const m=transitMin(prev,s);
+      walk+=km;
+      items.push({transit:m, km:km, from:prev.n, to:s.n});
+      t+=m;
+    }
+    items.push({t, spot:s});
+    cost+=(s.ticket||0);
     t+=s.dur; prev=s;
   });
-  // insert lunch around 12:00
-  let li=items.findIndex(it=>it.t>=12*60);
-  const lunchNote = meal? ('午餐可在「'+meal.n+'」附近解决') : '午餐自理';
+  // 3) 插入用餐：找第一个 12:00 之后的节点
+  const li=items.findIndex(it=>it.t!==undefined && it.t>=12*60);
+  const mealSpot=group.find(s=>(s.tags||[]).includes('美食')) || order[Math.floor(order.length/2)];
+  const lunchNote='午餐：'+(mealSpot?('在「'+mealSpot.n+'」附近解决'):'午餐自理');
+  const dinnerNote='晚餐：'+((order[order.length-1].tags||[]).includes('美食')
+      ? ('推荐「'+order[order.length-1].n+'」一带'):'建议在酒店附近解决');
   items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
-  return {day:idx+1, items, cost};
+  // 4) 当日主题：取评分最高的必去/自然/历史标签
+  let theme='城市漫游';
+  const best=order.slice().sort((a,b)=>(b.dur||0)-(a.dur||0))[0];
+  const tg=(best.tags||[])[0];
+  if(tg) theme=tg+' · '+best.n;
+  return {day:idx+1, items, cost, walk, theme, dinnerNote};
 }
 
 function plan(data, days, prefs){
@@ -162,50 +211,114 @@ function plan(data, days, prefs){
     const a=Math.floor(i*order.length/K), b=Math.floor((i+1)*order.length/K);
     groups.push(order.slice(a,b));
   }
-  return groups.map((g,i)=>buildDay(g,i));
+  return groups.map((g,i)=>buildDay(g,i,data));
 }
 
-function render(data, days, dateStr){
+/* 依据偏好生成行前清单 */
+function checklist(prefs, city, days, dateStr){
+  const li=[];
+  li.push('车票：本机查好去程 / 返程的最便宜组合，<b>提前 15 天</b>放票即抢');
+  li.push('身份证：预约类景点（故宫、布达拉宫、鼓浪屿等）需实名预约');
+  li.push('天气：出发前 3 天再确认<b>降水与气温</b>，' + city + (dateStr?('（'+dateStr+' 出发）'):'') + '山区与高原温差大，带一件薄外套');
+  if(prefs.has('自然')) li.push('自然景点多：防晒霜、驱蚊液、登山鞋');
+  if(prefs.has('历史')) li.push('历史人文为主：博物馆多<b>周一闭馆</b>，提前调开顺序');
+  if(prefs.has('美食')) li.push('美食偏好：夜市与小吃街集中在 18:00 后，留出晚餐时段');
+  if(prefs.has('亲子')) li.push('亲子出行：儿童票按身高/年龄核，带常用药与推车');
+  if(prefs.has('宗教')) li.push('寺庙 / 清真寺：注意着装（勿短裤露肩），部分需脱鞋');
+  if(city==='拉萨'||city==='西宁'||city==='昆明'||city==='丽江'||city==='大理') li.push('高原地区：<b>布达拉宫需提前预约</b>，首日不安排剧烈活动');
+  if(city==='三亚'||city==='海口'||city==='厦门'||city==='青岛'||city==='威海') li.push('海滨城市：泳衣、防晒、拖鞋，旺季住宿需提前订');
+  li.push('行程节奏：每天 3 个景点 + 2 餐，若想更宽松可把天数调大一天');
+  return li;
+}
+
+function render(data, days, dateStr, budget){
   const prefs=new Set([...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t));
   const planOut=plan(data, days, prefs);
   const hotelPy=data.py||'';
   const ci=dateStr||'';
   const co=ci? shiftDate(ci,days):'';
   const hotelUrl='https://hotel.qunar.com/city/'+hotelPy+'/'+(ci?('?fromDate='+ci+'&toDate='+co):'');
+  const key = data.city;
+  const cover = CITY_IMG[key] ? '<img src="'+esc(CITY_IMG[key])+'" alt="'+esc(key)+'" onerror="this.style.display=\'none\'">' : '';
+
   let totalTicket=planOut.reduce((s,d)=>s+d.cost,0);
+  let spotCount=planOut.reduce((s,d)=>s+d.items.filter(i=>i.t!==undefined&&i.spot).length,0);
+  let totalWalk=planOut.reduce((s,d)=>s+d.walk,0);
   let h='';
-  // KPIs
+
+  // ---------- 城市封面 ----------
+  h+='<div class="hero">'+cover+'<div class="hbg"></div><div class="hin">'
+    +'<h2>'+esc(data.city)+'</h2>'
+    +'<div class="hmeta">建议 '+days+' 天 · 共 '+spotCount+' 个景点 · 每日约 '+(budget||MEAL_PER_DAY+60)+' 元（门票+餐饮）</div>'
+    +'<div class="hintro">'+esc(data.intro||'')+'</div>'
+    +'<div class="hchips">'
+    +'<span class="hchip">🗓 建议 '+esc(data.days_suggest||days)+' 天</span>'
+    +'<span class="hchip">🚄 到达后先看地图</span>'
+    +'<span class="hchip">💰 门票合计 ¥'+totalTicket+'</span>'
+    +'</div></div></div>';
+
+  // ---------- KPI ----------
   h+='<div class="kpis">'
     +'<div class="kpi"><b>'+planOut.length+'</b><span>规划天数</span></div>'
-    +'<div class="kpi"><b>'+planOut.reduce((s,d)=>s+d.items.filter(i=>!i.meal).length,0)+'</b><span>安排景点</span></div>'
-    +'<div class="kpi"><b>¥'+(totalTicket)+'</b><span>门票合计</span></div>'
+    +'<div class="kpi"><b>'+spotCount+'</b><span>安排景点</span></div>'
+    +'<div class="kpi"><b>¥'+totalTicket+'</b><span>门票合计</span></div>'
     +'<div class="kpi"><b>¥'+(MEAL_PER_DAY*days)+'</b><span>餐饮估算</span></div>'
+    +'<div class="kpi"><b>'+totalWalk.toFixed(1)+'km</b><span>市内总里程</span></div>'
     +'</div>';
-  // tabs
+
+  // ---------- 天数 tab ----------
   h+='<div class="tabs" id="tabs">';
   planOut.forEach((d,i)=> h+='<div class="tab'+(i===0?' act':'')+'" data-d="'+i+'">第'+(i+1)+'天</div>');
   h+='</div>';
-  // day panel
   h+='<div class="panel" id="daypanel"></div>';
-  // hotel
+
+  // ---------- 预算 / 清单 / 住宿 ----------
+  h+='<div class="grid2">';
+  // 预算明细
+  h+='<div class="blk"><h4>💰 预算明细（按 '+days+' 天、不含往返大交通与住宿）</h4>';
+  h+='<div class="price"><span>门票合计（'+spotCount+' 个景点）</span><b>¥'+totalTicket+'</b></div>';
+  h+='<div class="price"><span>餐饮估算（¥'+MEAL_PER_DAY+'/天）</span><b>¥'+(MEAL_PER_DAY*days)+'</b></div>';
+  h+='<div class="price"><span>市内交通（地铁/公交/打车）</span><b>¥'+(30*days)+'</b></div>';
+  h+='<div class="price total"><span>合计参考</span><b>¥'+(totalTicket+MEAL_PER_DAY*days+30*days)+'</b></div>';
+  h+='</div>';
+  // 行前清单
+  h+='<div class="blk"><h4>🎒 行前清单</h4><ul>'+checklist(prefs,key,days,ci).map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';
+  h+='</div>';
+
+  // ---------- 住宿 ----------
   h+='<div class="panel"><div class="hotel"><b>🏨 住宿</b>'
-    +'<a href="'+hotelUrl+'" target="_blank">在去哪儿查看 '+data.city+' 酒店 →</a>'
-    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'</span></div></div>';
+    +'<a href="'+hotelUrl+'" target="_blank" rel="noopener">在去哪儿查看 '+esc(data.city)+' 酒店 →</a>'
+    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'（共 '+days+' 晚）</span></div>'
+    +'<div class="warn">住宿建议选<b>地铁 1 号线或景区周边</b>，可减少每日通勤；热门城市旺季请提前 2 周预订。</div></div>';
+
   document.getElementById('out').innerHTML=h;
+
+  // ---------- 每日面板 ----------
   const draw=d=>{
     let p='<div class="tl">';
+    let lastTransit=null;
     d.items.forEach(it=>{
-      if(it.meal){ p+='<div class="meal">'+it.text+'</div>'; return; }
+      if(it.transit!==undefined){ lastTransit=it; return; }
+      if(it.meal){ p+='<div class="meal">'+esc(it.text)+'</div>'; return; }
       const s=it.spot;
-      const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+t+'</span>').join('');
-      const tr=it.transit? '<span class="badge b-tr">↔ '+it.transit+'min</span>':'';
-      p+='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
-        +'<div class="body"><div class="nm">'+s.n+'</div>'
-        +'<div class="meta">'+tags+tr+'⏱ '+Math.round(s.dur/60*10)/10+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+' · 🕒 '+(s.open||'')+'</div>'
-        +(s.note?'<div class="note">'+s.note+'</div>':'')+'</div></div>';
+      const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+esc(t)+'</span>').join('');
+      const tr=lastTransit? '<span class="badge b-tr">↔ '+lastTransit.transit+'min</span>':'';
+      const img = s.img? '<img class="sph" src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy" onerror="this.style.display=\'none\'">':'';
+      let p2='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
+        +'<div class="body"><div class="nm">'+img+esc(s.n)+'</div>'
+        +'<div class="meta">'+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
+        +(s.note?'<div class="note">💡 '+esc(s.note)+'</div>':'')+'</div></div>';
+      if(lastTransit){
+        p+='<div class="transit">🚶 从「'+esc(lastTransit.from)+'」到「'+esc(lastTransit.to)+'」约 '
+          +lastTransit.transit+' 分钟（'+(lastTransit.km*2).toFixed(1)+'km）</div>';
+        lastTransit=null;
+      }
+      p+=p2;
     });
     p+='</div>';
-    p+='<div class="meta" style="margin-top:8px">当日门票合计 ¥'+d.cost+'</div>';
+    p+='<div class="dayend">🎫 当日门票 <b>¥'+d.cost+'</b> · 市内步行约 <b>'+d.walk.toFixed(1)+'km</b>'
+      + (d.theme?(' · 主题：'+esc(d.theme)):'') + '</div>';
+    p+='<div class="transit" style="margin-top:6px">🍽 '+esc(d.dinnerNote||'晚餐自理')+'</div>';
     document.getElementById('daypanel').innerHTML=p;
   };
   draw(planOut[0]);
@@ -223,16 +336,18 @@ citySel.value=Object.keys(CITIES)[0];
 const prefsBox=document.getElementById('prefs');
 ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; e.dataset.t=t; e.textContent=t;
   e.onclick=()=>e.classList.toggle('on'); prefsBox.appendChild(e); });
+// 默认勾选几个常见偏好
+['必去','美食','自然'].forEach(t=>{ const e=prefsBox.querySelector('[data-t="'+t+'"]'); if(e) e.classList.add('on'); });
 // default date = today+14
 const def=new Date(); def.setDate(def.getDate()+14);
 document.getElementById('date').value=def.toISOString().slice(0,10);
 document.getElementById('go').onclick=()=>{
   const c=CITIES[citySel.value]; const days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
   document.getElementById('days').value=days;
-  render(c, days, document.getElementById('date').value);
+  render(c, days, document.getElementById('date').value, +document.getElementById('budget').value);
 };
 // first render
-render(CITIES[citySel.value], 3, document.getElementById('date').value);
+render(CITIES[citySel.value], 3, document.getElementById('date').value, 300);
 </script>
 </body>
 </html>

@@ -85,9 +85,21 @@ CITIES = {
 }
 
 def main():
+    # 城市简介取自主站景点数据（attractions.json），避免两处各写一份
+    attr_path = os.path.join(os.path.dirname(HERE), "attractions.json")
+    intros = {}
+    if os.path.exists(attr_path):
+        with open(attr_path, encoding="utf-8") as f:
+            for k, v in json.load(f).items():
+                if v.get("intro"):
+                    intros[k] = v["intro"]
+                    if v.get("tip"):
+                        intros[k] += " " + v["tip"]
+
     n=0
     for name,d in CITIES.items():
-        obj={"city":name,"py":d["py"],"center":d["center"],"days_suggest":d["days_suggest"],"spots":d["spots"]}
+        obj={"city":name,"py":d["py"],"center":d["center"],"days_suggest":d["days_suggest"],
+             "intro":intros.get(name,""),"spots":d["spots"]}
         p=os.path.join(OUT,name+".json")
         with open(p,"w",encoding="utf-8") as f:
             json.dump(obj,f,ensure_ascii=False,indent=2)

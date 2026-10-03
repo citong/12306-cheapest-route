@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>行程攻略 · 12306 最便宜路线</title>
 <style>
-:root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a}
+:root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a;--warn:#b45309}
 *{box-sizing:border-box}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
   background:var(--bg);color:#1f2937;line-height:1.5}
@@ -14,7 +14,7 @@ body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Pi
 .hd a{color:#cbd5e1;text-decoration:none;font-size:13px;padding:5px 10px;border-radius:8px}
 .hd a.act{background:#1e293b;color:#fff}
 .hd a:hover{color:#fff}
-.wrap{max-width:880px;margin:0 auto;padding:18px 16px 60px}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 60px}
 h1{font-size:22px;margin:6px 0 2px}
 .sub{color:var(--mut);font-size:13px;margin-bottom:16px}
 .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px;
@@ -28,30 +28,64 @@ h1{font-size:22px;margin:6px 0 2px}
 .btn{margin-top:14px;display:inline-block;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;border:0;
   padding:11px 22px;border-radius:11px;font-size:15px;font-weight:700;cursor:pointer}
 .btn:hover{filter:brightness(1.06)}
+
+/* ---- 城市封面 ---- */
+.hero{position:relative;border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 4px 16px rgba(15,23,42,.12)}
+.hero img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero .hbg{position:absolute;inset:0;background:linear-gradient(105deg,rgba(15,23,42,.82) 8%,rgba(15,23,42,.55) 55%,rgba(15,23,42,.2) 100%)}
+.hero .hin{position:relative;padding:22px 20px;color:#fff}
+.hero h2{margin:0 0 4px;font-size:24px;font-weight:800;letter-spacing:.5px}
+.hero .hmeta{font-size:12.5px;opacity:.92;margin-bottom:8px}
+.hero .hintro{font-size:13px;opacity:.95;line-height:1.75;max-width:640px}
+.hero .hchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hero .hchip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+  border-radius:20px;padding:4px 12px;font-size:12px;backdrop-filter:blur(4px)}
+
+/* ---- KPI ---- */
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{flex:1;min-width:112px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.kpi b{display:block;font-size:18px;color:var(--ind)}
+.kpi span{font-size:12px;color:var(--mut)}
+
+/* ---- 天数 tab ---- */
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 14px}
 .tab{padding:7px 15px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px}
 .tab.act{background:var(--blue);color:#fff;border-color:var(--blue)}
-.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.kpi{flex:1;min-width:120px;background:#f8fafc;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
-.kpi b{display:block;font-size:18px;color:var(--ind)}
-.kpi span{font-size:12px;color:var(--mut)}
+
+/* ---- 每日时间轴 ---- */
 .tl{position:relative;margin-left:8px}
-.ti{display:flex;gap:12px;padding:10px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
+.ti{display:flex;gap:12px;padding:12px 0;border-bottom:1px dashed var(--line);align-items:flex-start}
 .ti:last-child{border-bottom:0}
 .dot{width:12px;height:12px;border-radius:50%;background:var(--blue);margin-top:5px;flex:none;box-shadow:0 0 0 4px #dbeafe}
-.time{font-weight:700;font-size:13px;color:#111;width:46px;flex:none}
+.time{font-weight:700;font-size:13px;color:#111;width:48px;flex:none;padding-top:1px}
 .body{flex:1;min-width:0}
-.nm{font-weight:700;font-size:15px}
-.meta{font-size:12px;color:var(--mut);margin-top:2px}
-.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px;vertical-align:middle}
-.b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:#b45309}
-.meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:8px 12px;margin:6px 0;font-size:13px;color:#9a3412}
-.note{font-size:12px;color:#475569;margin-top:3px}
+.nm{font-weight:700;font-size:15px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sph{width:60px;height:44px;border-radius:8px;object-fit:cover;flex:none;border:1px solid var(--line)}
+.meta{font-size:12px;color:var(--mut);margin-top:3px}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px}
+.b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:var(--warn)}
+.meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:9px 13px;margin:8px 0;font-size:13px;color:#9a3412}
+.transit{font-size:12px;color:#64748b;margin:2px 0 0;padding-left:2px;display:flex;align-items:center;gap:5px}
+.note{font-size:12px;color:#475569;margin-top:5px;background:#f8fafc;border-left:3px solid #cbd5e1;
+  padding:6px 10px;border-radius:0 8px 8px 0;line-height:1.65}
+.dayend{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--mut)}
+
+/* ---- 预算 / 清单 / 住宿 ---- */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.blk{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.blk h4{margin:0 0 8px;font-size:13.5px;color:#0f172a;display:flex;align-items:center;gap:6px}
+.blk ul{margin:0;padding-left:18px;font-size:12.5px;color:#475569;line-height:1.85}
+.blk .price{display:flex;justify-content:space-between;font-size:12.5px;padding:3px 0;color:#475569}
+.blk .price b{color:#0f172a}
+.blk .price.total{border-top:1px dashed #cbd5e1;margin-top:6px;padding-top:7px;font-weight:700}
 .hotel{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hotel a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 16px;text-decoration:none;color:var(--blue);font-weight:600}
+.hotel a:hover{border-color:var(--blue)}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:24px;line-height:1.7}
 .foot a{color:var(--blue);text-decoration:none}
-.warn{font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:8px}
+.warn{font-size:12px;color:var(--warn);background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:10px}
+.empty{text-align:center;color:var(--mut);font-size:13px;padding:26px 0}
 </style>
 </head>
 <body>
@@ -64,7 +98,7 @@ h1{font-size:22px;margin:6px 0 2px}
 
 <div class="wrap">
   <h1>✈️ 自动行程攻略</h1>
-  <div class="sub">选城市、天数和偏好，自动把景点按地理就近分到每天、排出当天动线，并附酒店预订入口。</div>
+  <div class="sub">选城市、天数和偏好，自动把景点按地理就近分到每天、排出当天动线，并给出交通、餐饮与预算明细。</div>
 
   <div class="panel">
     <div class="row">
@@ -74,11 +108,14 @@ h1{font-size:22px;margin:6px 0 2px}
       <div class="fld">天数
         <input id="days" type="number" min="1" max="7" value="3" style="width:74px">
       </div>
-      <div class="fld">出发日期（用于酒店预订）
+      <div class="fld">出发日期（用于住宿与天气提示）
         <input id="date" type="date">
       </div>
+      <div class="fld">每天预算（元，不含住宿与交通）
+        <input id="budget" type="number" min="0" step="10" value="300" style="width:96px">
+      </div>
     </div>
-    <div class="fld" style="margin-top:12px">偏好（影响景点优先级）
+    <div class="fld" style="margin-top:12px">偏好（影响景点优先级与排序）
       <div class="tags" id="prefs"></div>
     </div>
     <button class="btn" id="go">生成行程</button>
@@ -97,7 +134,8 @@ h1{font-size:22px;margin:6px 0 2px}
 const CITIES = __CITIES__;
 
 const ALL_TAGS = ["自然","历史","美食","亲子","免费","购物","宗教","演出","夜游","必去"];
-const MEAL_PER_DAY = 120; // 餐饮估算（元/天）
+const MEAL_PER_DAY = 120;      // 餐饮估算（元/天）
+const CITY_IMG = __CITY_IMG__; // 城市 -> 横幅图（与主站景点抽屉共用同一批实景图）
 
 function haversine(a,b){
   const R=6371,toR=x=>x*Math.PI/180;
@@ -107,13 +145,14 @@ function haversine(a,b){
 }
 function transitMin(a,b){ return Math.round(haversine(a,b)/4*60)+8; } // 步行+缓冲估算
 function fmt(min){ const h=Math.floor(min/60),m=min%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
 /* 地理最近邻串线：从最北的点出发，把景点串成一条尽量顺路的线。
-   之后沿这条线均匀切段，就能得到“每天景点数均衡 + 地理相邻”的分天方案。 */
+   之后沿这条线均匀切段，就能得到"每天景点数均衡 + 地理相邻"的分天方案。 */
 function nnPath(pts){
   if(!pts.length) return [];
   let pool=pts.slice();
-  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);   // 从最北的点开始
+  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);
   pool.splice(pool.indexOf(cur),1);
   const out=[cur];
   while(pool.length){
@@ -124,28 +163,38 @@ function nnPath(pts){
   return out;
 }
 
-function buildDay(group, idx){
-  if(!group.length) return {day:idx+1,items:[],cost:0};
+function buildDay(group, idx, ctx){
+  if(!group.length) return {day:idx+1,items:[],cost:0,walk:0,theme:''};
+  // 1) 组内动线：从最靠近本组重心的点出发，最近邻串线
   const cen={lat:group.reduce((s,p)=>s+p.lat,0)/group.length, lng:group.reduce((s,p)=>s+p.lng,0)/group.length};
-  // nearest-neighbor order from centroid
-  let pool=group.slice(), order=[];
-  let cur=pool.reduce((a,b)=> haversine(a,cen)<haversine(b,cen)?a:b);
-  pool.splice(pool.indexOf(cur),1); order.push(cur);
-  while(pool.length){ let ni=0,nd=1e9; pool.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}}); cur=pool.splice(ni,1)[0]; order.push(cur); }
-  // meal spot in this group
-  const meal=group.find(s=>s.tags&&s.tags.includes('美食'));
-  let t=9*60, items=[], cost=0, prev=null;
+  const order=nnPath(group);
+  // 2) 时间轴：09:00 出发，按停留时长累加，路上时间按地理距离估算
+  let t=9*60, items=[], cost=0, walk=0, prev=null;
   order.forEach((s,i)=>{
-    if(i>0){ const m=transitMin(prev,s); items[items.length-1].transit=m; t+=m; }
-    items.push({t, spot:s, dur:s.dur, transit:0});
-    cost+= (s.ticket||0);
+    if(i>0){
+      const km=haversine(prev,s);
+      const m=transitMin(prev,s);
+      walk+=km;
+      items.push({transit:m, km:km, from:prev.n, to:s.n});
+      t+=m;
+    }
+    items.push({t, spot:s});
+    cost+=(s.ticket||0);
     t+=s.dur; prev=s;
   });
-  // insert lunch around 12:00
-  let li=items.findIndex(it=>it.t>=12*60);
-  const lunchNote = meal? ('午餐可在「'+meal.n+'」附近解决') : '午餐自理';
+  // 3) 插入用餐：找第一个 12:00 之后的节点
+  const li=items.findIndex(it=>it.t!==undefined && it.t>=12*60);
+  const mealSpot=group.find(s=>(s.tags||[]).includes('美食')) || order[Math.floor(order.length/2)];
+  const lunchNote='午餐：'+(mealSpot?('在「'+mealSpot.n+'」附近解决'):'午餐自理');
+  const dinnerNote='晚餐：'+((order[order.length-1].tags||[]).includes('美食')
+      ? ('推荐「'+order[order.length-1].n+'」一带'):'建议在酒店附近解决');
   items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
-  return {day:idx+1, items, cost};
+  // 4) 当日主题：取评分最高的必去/自然/历史标签
+  let theme='城市漫游';
+  const best=order.slice().sort((a,b)=>(b.dur||0)-(a.dur||0))[0];
+  const tg=(best.tags||[])[0];
+  if(tg) theme=tg+' · '+best.n;
+  return {day:idx+1, items, cost, walk, theme, dinnerNote};
 }
 
 function plan(data, days, prefs){
@@ -162,50 +211,114 @@ function plan(data, days, prefs){
     const a=Math.floor(i*order.length/K), b=Math.floor((i+1)*order.length/K);
     groups.push(order.slice(a,b));
   }
-  return groups.map((g,i)=>buildDay(g,i));
+  return groups.map((g,i)=>buildDay(g,i,data));
 }
 
-function render(data, days, dateStr){
+/* 依据偏好生成行前清单 */
+function checklist(prefs, city, days, dateStr){
+  const li=[];
+  li.push('车票：本机查好去程 / 返程的最便宜组合，<b>提前 15 天</b>放票即抢');
+  li.push('身份证：预约类景点（故宫、布达拉宫、鼓浪屿等）需实名预约');
+  li.push('天气：出发前 3 天再确认<b>降水与气温</b>，' + city + (dateStr?('（'+dateStr+' 出发）'):'') + '山区与高原温差大，带一件薄外套');
+  if(prefs.has('自然')) li.push('自然景点多：防晒霜、驱蚊液、登山鞋');
+  if(prefs.has('历史')) li.push('历史人文为主：博物馆多<b>周一闭馆</b>，提前调开顺序');
+  if(prefs.has('美食')) li.push('美食偏好：夜市与小吃街集中在 18:00 后，留出晚餐时段');
+  if(prefs.has('亲子')) li.push('亲子出行：儿童票按身高/年龄核，带常用药与推车');
+  if(prefs.has('宗教')) li.push('寺庙 / 清真寺：注意着装（勿短裤露肩），部分需脱鞋');
+  if(city==='拉萨'||city==='西宁'||city==='昆明'||city==='丽江'||city==='大理') li.push('高原地区：<b>布达拉宫需提前预约</b>，首日不安排剧烈活动');
+  if(city==='三亚'||city==='海口'||city==='厦门'||city==='青岛'||city==='威海') li.push('海滨城市：泳衣、防晒、拖鞋，旺季住宿需提前订');
+  li.push('行程节奏：每天 3 个景点 + 2 餐，若想更宽松可把天数调大一天');
+  return li;
+}
+
+function render(data, days, dateStr, budget){
   const prefs=new Set([...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t));
   const planOut=plan(data, days, prefs);
   const hotelPy=data.py||'';
   const ci=dateStr||'';
   const co=ci? shiftDate(ci,days):'';
   const hotelUrl='https://hotel.qunar.com/city/'+hotelPy+'/'+(ci?('?fromDate='+ci+'&toDate='+co):'');
+  const key = data.city;
+  const cover = CITY_IMG[key] ? '<img src="'+esc(CITY_IMG[key])+'" alt="'+esc(key)+'" onerror="this.style.display=\'none\'">' : '';
+
   let totalTicket=planOut.reduce((s,d)=>s+d.cost,0);
+  let spotCount=planOut.reduce((s,d)=>s+d.items.filter(i=>i.t!==undefined&&i.spot).length,0);
+  let totalWalk=planOut.reduce((s,d)=>s+d.walk,0);
   let h='';
-  // KPIs
+
+  // ---------- 城市封面 ----------
+  h+='<div class="hero">'+cover+'<div class="hbg"></div><div class="hin">'
+    +'<h2>'+esc(data.city)+'</h2>'
+    +'<div class="hmeta">建议 '+days+' 天 · 共 '+spotCount+' 个景点 · 每日约 '+(budget||MEAL_PER_DAY+60)+' 元（门票+餐饮）</div>'
+    +'<div class="hintro">'+esc(data.intro||'')+'</div>'
+    +'<div class="hchips">'
+    +'<span class="hchip">🗓 建议 '+esc(data.days_suggest||days)+' 天</span>'
+    +'<span class="hchip">🚄 到达后先看地图</span>'
+    +'<span class="hchip">💰 门票合计 ¥'+totalTicket+'</span>'
+    +'</div></div></div>';
+
+  // ---------- KPI ----------
   h+='<div class="kpis">'
     +'<div class="kpi"><b>'+planOut.length+'</b><span>规划天数</span></div>'
-    +'<div class="kpi"><b>'+planOut.reduce((s,d)=>s+d.items.filter(i=>!i.meal).length,0)+'</b><span>安排景点</span></div>'
-    +'<div class="kpi"><b>¥'+(totalTicket)+'</b><span>门票合计</span></div>'
+    +'<div class="kpi"><b>'+spotCount+'</b><span>安排景点</span></div>'
+    +'<div class="kpi"><b>¥'+totalTicket+'</b><span>门票合计</span></div>'
     +'<div class="kpi"><b>¥'+(MEAL_PER_DAY*days)+'</b><span>餐饮估算</span></div>'
+    +'<div class="kpi"><b>'+totalWalk.toFixed(1)+'km</b><span>市内总里程</span></div>'
     +'</div>';
-  // tabs
+
+  // ---------- 天数 tab ----------
   h+='<div class="tabs" id="tabs">';
   planOut.forEach((d,i)=> h+='<div class="tab'+(i===0?' act':'')+'" data-d="'+i+'">第'+(i+1)+'天</div>');
   h+='</div>';
-  // day panel
   h+='<div class="panel" id="daypanel"></div>';
-  // hotel
+
+  // ---------- 预算 / 清单 / 住宿 ----------
+  h+='<div class="grid2">';
+  // 预算明细
+  h+='<div class="blk"><h4>💰 预算明细（按 '+days+' 天、不含往返大交通与住宿）</h4>';
+  h+='<div class="price"><span>门票合计（'+spotCount+' 个景点）</span><b>¥'+totalTicket+'</b></div>';
+  h+='<div class="price"><span>餐饮估算（¥'+MEAL_PER_DAY+'/天）</span><b>¥'+(MEAL_PER_DAY*days)+'</b></div>';
+  h+='<div class="price"><span>市内交通（地铁/公交/打车）</span><b>¥'+(30*days)+'</b></div>';
+  h+='<div class="price total"><span>合计参考</span><b>¥'+(totalTicket+MEAL_PER_DAY*days+30*days)+'</b></div>';
+  h+='</div>';
+  // 行前清单
+  h+='<div class="blk"><h4>🎒 行前清单</h4><ul>'+checklist(prefs,key,days,ci).map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';
+  h+='</div>';
+
+  // ---------- 住宿 ----------
   h+='<div class="panel"><div class="hotel"><b>🏨 住宿</b>'
-    +'<a href="'+hotelUrl+'" target="_blank">在去哪儿查看 '+data.city+' 酒店 →</a>'
-    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'</span></div></div>';
+    +'<a href="'+hotelUrl+'" target="_blank" rel="noopener">在去哪儿查看 '+esc(data.city)+' 酒店 →</a>'
+    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'（共 '+days+' 晚）</span></div>'
+    +'<div class="warn">住宿建议选<b>地铁 1 号线或景区周边</b>，可减少每日通勤；热门城市旺季请提前 2 周预订。</div></div>';
+
   document.getElementById('out').innerHTML=h;
+
+  // ---------- 每日面板 ----------
   const draw=d=>{
     let p='<div class="tl">';
+    let lastTransit=null;
     d.items.forEach(it=>{
-      if(it.meal){ p+='<div class="meal">'+it.text+'</div>'; return; }
+      if(it.transit!==undefined){ lastTransit=it; return; }
+      if(it.meal){ p+='<div class="meal">'+esc(it.text)+'</div>'; return; }
       const s=it.spot;
-      const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+t+'</span>').join('');
-      const tr=it.transit? '<span class="badge b-tr">↔ '+it.transit+'min</span>':'';
-      p+='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
-        +'<div class="body"><div class="nm">'+s.n+'</div>'
-        +'<div class="meta">'+tags+tr+'⏱ '+Math.round(s.dur/60*10)/10+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+' · 🕒 '+(s.open||'')+'</div>'
-        +(s.note?'<div class="note">'+s.note+'</div>':'')+'</div></div>';
+      const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+esc(t)+'</span>').join('');
+      const tr=lastTransit? '<span class="badge b-tr">↔ '+lastTransit.transit+'min</span>':'';
+      const img = s.img? '<img class="sph" src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy" onerror="this.style.display=\'none\'">':'';
+      let p2='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
+        +'<div class="body"><div class="nm">'+img+esc(s.n)+'</div>'
+        +'<div class="meta">'+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
+        +(s.note?'<div class="note">💡 '+esc(s.note)+'</div>':'')+'</div></div>';
+      if(lastTransit){
+        p+='<div class="transit">🚶 从「'+esc(lastTransit.from)+'」到「'+esc(lastTransit.to)+'」约 '
+          +lastTransit.transit+' 分钟（'+(lastTransit.km*2).toFixed(1)+'km）</div>';
+        lastTransit=null;
+      }
+      p+=p2;
     });
     p+='</div>';
-    p+='<div class="meta" style="margin-top:8px">当日门票合计 ¥'+d.cost+'</div>';
+    p+='<div class="dayend">🎫 当日门票 <b>¥'+d.cost+'</b> · 市内步行约 <b>'+d.walk.toFixed(1)+'km</b>'
+      + (d.theme?(' · 主题：'+esc(d.theme)):'') + '</div>';
+    p+='<div class="transit" style="margin-top:6px">🍽 '+esc(d.dinnerNote||'晚餐自理')+'</div>';
     document.getElementById('daypanel').innerHTML=p;
   };
   draw(planOut[0]);
@@ -223,16 +336,18 @@ citySel.value=Object.keys(CITIES)[0];
 const prefsBox=document.getElementById('prefs');
 ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; e.dataset.t=t; e.textContent=t;
   e.onclick=()=>e.classList.toggle('on'); prefsBox.appendChild(e); });
+// 默认勾选几个常见偏好
+['必去','美食','自然'].forEach(t=>{ const e=prefsBox.querySelector('[data-t="'+t+'"]'); if(e) e.classList.add('on'); });
 // default date = today+14
 const def=new Date(); def.setDate(def.getDate()+14);
 document.getElementById('date').value=def.toISOString().slice(0,10);
 document.getElementById('go').onclick=()=>{
   const c=CITIES[citySel.value]; const days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
   document.getElementById('days').value=days;
-  render(c, days, document.getElementById('date').value);
+  render(c, days, document.getElementById('date').value, +document.getElementById('budget').value);
 };
 // first render
-render(CITIES[citySel.value], 3, document.getElementById('date').value);
+render(CITIES[citySel.value], 3, document.getElementById('date').value, 300);
 </script>
 </body>
 </html>

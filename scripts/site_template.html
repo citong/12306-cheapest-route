@@ -280,15 +280,7 @@ td .na{color:var(--red);font-weight:600}
 .attr-intro{font-size:13px;color:#6b7280;line-height:1.75;margin:10px 0 18px}
 .attr-h{font-size:11.5px;color:#9ca3af;font-weight:700;letter-spacing:.08em;
   margin:16px 0 6px;text-transform:uppercase}
-.attr-spot{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #f1f2f4}
-.attr-spot:last-child{border-bottom:none}
-.attr-spot .dotn{flex:none;width:27px;height:27px;border-radius:50%;
-  background:var(--green-soft);color:#10b981;font-weight:700;font-size:12.5px;
-  display:flex;align-items:center;justify-content:center}
-.attr-spot .sn{font-weight:600;font-size:14.5px;color:#111827}
-.attr-spot .sd{font-size:12.5px;color:#6b7280;line-height:1.65;margin-top:3px}
-.attr-tip{font-size:11.5px;color:#9ca3af;margin-top:18px;line-height:1.7;
-  border-top:1px dashed #e5e7eb;padding-top:12px}
+.attr-note{font-size:11.5px;color:#9ca3af;margin-top:14px;line-height:1.7}
 @media(max-width:640px){
   #attr{width:100%;max-width:100vw}
 }
@@ -398,27 +390,34 @@ td .na{color:var(--red);font-weight:600}
 .attr-facts .fact{display:inline-flex;align-items:center;gap:5px;background:var(--green-soft);
   color:var(--green-2);font-size:11.5px;font-weight:600;border-radius:20px;padding:4px 11px;line-height:1.35}
 .attr-facts .fact i{font-style:normal;font-size:12px}
-/* 图文景点卡片（有配图的热门城市） */
+/* 图文景点卡片（所有城市统一标准：有图用实景封面，无图回退 SVG 场景） */
 .spot2{background:#fff;border:1px solid #edf0f3;border-radius:14px;overflow:hidden;
   margin-bottom:13px;box-shadow:0 1px 5px rgba(15,23,42,.06);transition:transform .16s,box-shadow .16s}
 .spot2:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(15,23,42,.1)}
-.spot2 .s2img{position:relative;display:block;width:100%;height:120px;overflow:hidden;background:var(--grad)}
+.spot2 .s2img{position:relative;display:block;width:100%;height:132px;overflow:hidden;background:var(--grad)}
 .spot2 .s2img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-.spot2 .s2img.noimg{height:52px}
+/* 无配图时用 SVG 场景占位，缩到一条装饰带，结构保持一致 */
+.spot2 .s2img.noimg{height:56px}
+.spot2 .s2img.noimg svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.spot2 .s2img.noimg .s2scrim{background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.42) 100%)}
 .spot2 .s2scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.55) 100%)}
 .spot2 .s2n{position:absolute;left:12px;bottom:8px;color:#fff;font-weight:800;font-size:15.5px;
   letter-spacing:.3px;text-shadow:0 1px 6px rgba(0,0,0,.55);z-index:2}
+/* 序号徽标，与关闭/其他角标元素不重叠 */
+.spot2 .s2no{position:absolute;left:10px;top:10px;z-index:3;min-width:21px;height:21px;padding:0 6px;
+  border-radius:11px;background:rgba(255,255,255,.92);color:#0f766e;font-size:11.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.18)}
 .spot2 .s2b{padding:11px 13px 12px}
 .spot2 .s2b .sd{font-size:12.8px;color:#525b68;line-height:1.72;margin-top:0}
 .spot2 .s2meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
 .spot2 .chip{font-size:11px;color:#475569;background:#f3f5f8;border-radius:8px;
   padding:3px 9px;line-height:1.35;white-space:nowrap}
 .attr-banner .ab-city small{font-size:13px;font-weight:500}
-.attr-spot{align-items:center}
-.attr-spot .sth{flex:none;width:46px;height:46px;border-radius:12px;overflow:hidden;
-  box-shadow:0 1px 4px rgba(15,23,42,.12);margin-right:2px}
-.attr-spot .scol{flex:1;min-width:0}
-.attr-spot .sd{margin-top:2px}
+/* 实用贴士：高亮块，比底部免责说明更醒目 */
+.attr-tip{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534;font-size:12.5px;
+  border-radius:12px;padding:10px 12px;margin-top:16px;line-height:1.75}
+.attr-note{font-size:11.5px;color:#9ca3af;margin-top:10px;line-height:1.7;
+  padding-top:10px;border-top:1px dashed #e5e7eb}
 </style>
 </head>
 <body>
@@ -516,11 +515,6 @@ td .na{color:var(--red);font-weight:600}
     <div class="hint" id="hint"></div>
   </div>
 
-  <div class="popwrap">
-    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span></div>
-    <div class="pop" id="pop"></div>
-  </div>
-
   <div class="fresh hide" id="fresh"></div>
 
   <div class="prog" id="prog">
@@ -533,6 +527,11 @@ td .na{color:var(--red);font-weight:600}
   </div>
 
   <div id="out"></div>
+
+  <div class="popwrap">
+    <div class="sec-title"><h3>没想好去哪？挑一个</h3><span class="ln"></span><span class="sub">点卡片即填好目的地 · 还会弹出景点攻略</span></div>
+    <div class="pop" id="pop"></div>
+  </div>
 
   <div class="foot">
     <b>城市 / 省份搜索</b>：起点或终点填城市名（如「北京」）会展开该市主要车站，一次搜索覆盖全部组合，
@@ -700,33 +699,33 @@ function showAttr(k){
         + (e.city && e.city !== k ? ' <small>'+esc(e.city)+'</small>' : '')
         + '</div></div>';
   h += '<div class="attr-intro">'+esc(e.intro||'')+'</div>';
-  // 城市速览：建议天数 / 最佳季节 / 必吃美食（仅丰富的城市有）
+  // 城市速览：建议天数 / 最佳季节 / 必吃美食（所有城市统一标准）
   const facts = [];
   if(e.days)   facts.push('<span class="fact"><i>🗓️</i>'+esc(e.days)+'</span>');
   if(e.season) facts.push('<span class="fact"><i>🌤️</i>'+esc(e.season)+'</span>');
   if(e.food)   facts.push('<span class="fact"><i>🍜</i>'+esc(e.food)+'</span>');
   if(facts.length) h += '<div class="attr-facts">'+facts.join('')+'</div>';
   h += '<div class="attr-h">推荐打卡</div>';
+  // 统一图文卡片：有配图用实景封面，无配图回退 SVG 场景，结构与信息项完全一致
   (e.spots||[]).forEach((s,i)=>{
-    if(s.img){
-      let meta = '';
-      if(s.t) meta += '<span class="chip">🕐 '+esc(s.t)+'</span>';
-      if(s.p) meta += '<span class="chip">🎫 '+esc(s.p)+'</span>';
-      if(s.b) meta += '<span class="chip">⏰ '+esc(s.b)+'</span>';
-      h += '<div class="spot2"><div class="s2img">'
-         + '<img src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy"'
-         + ' onerror="this.parentNode.classList.add(\'noimg\');this.style.display=\'none\'">'
-         + '<span class="s2scrim"></span><span class="s2n">'+esc(s.n)+'</span></div>'
-         + '<div class="s2b"><div class="sd">'+esc(s.d||'')+'</div>'
-         + (meta ? '<div class="s2meta">'+meta+'</div>' : '')
-         + '</div></div>';
-    } else {
-      h += '<div class="attr-spot">'+ scene(i)
-         + '<div class="scol"><div class="sn">'+esc(s.n)+'</div>'
-         + '<div class="sd">'+esc(s.d||'')+'</div></div></div>';
-    }
+    let meta = '';
+    if(s.t) meta += '<span class="chip">🕐 '+esc(s.t)+'</span>';
+    if(s.p) meta += '<span class="chip">🎫 '+esc(s.p)+'</span>';
+    if(s.b) meta += '<span class="chip">⏰ '+esc(s.b)+'</span>';
+    const cover = s.img
+      ? '<img src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy"'
+        + ' onerror="this.parentNode.classList.add(\'noimg\');this.parentNode.insertAdjacentHTML(\'afterbegin\',sceneWide('+i+'));this.style.display=\'none\'">'
+      : sceneWide(i);
+    h += '<div class="spot2"><div class="s2img'+(s.img?'':' noimg')+'">'
+       + cover + '<span class="s2scrim"></span>'
+       + '<span class="s2no">'+(i+1)+'</span>'
+       + '<span class="s2n">'+esc(s.n)+'</span></div>'
+       + '<div class="s2b"><div class="sd">'+esc(s.d||'')+'</div>'
+       + (meta ? '<div class="s2meta">'+meta+'</div>' : '')
+       + '</div></div>';
   });
-  h += '<div class="attr-tip">目的地卡片为内置旅行信息，图片为示意配图；开放时间、门票以景区官方为准。</div>';
+  if(e.tip) h += '<div class="attr-tip">💡 '+esc(e.tip)+'</div>';
+  h += '<div class="attr-note">目的地卡片为内置旅行信息，配图为当地实景示意；开放时间、门票以景区官方为准。</div>';
   $('attr-body').innerHTML = h;
   $('attr').classList.add('on');
   $('attr').setAttribute('aria-hidden','false');
@@ -1637,17 +1636,20 @@ function skylineHue(hue){
     <circle cx="176" cy="20" r="9" fill="rgba(255,255,255,.85)"/>
   </svg>`;
 }
-/* 景点缩略图：4 种场景循环 */
-function scene(i){
+
+/* 无配图时的兜底场景插画：宽幅版（适配 .s2img.noimg 的装饰带） */
+function sceneWide(i){
   const v=i%4;
   const bg=['#dbeafe','#dcfce7','#fef3c7','#fae8ff'][v];
   const fg=['#3b82f6','#10b981','#f59e0b','#a855f7'][v];
   let m='';
-  if(v===0){ m=`<polygon points="0,46 14,20 24,40 34,16 46,46" fill="${fg}" opacity=".85"/><polygon points="0,46 10,30 18,46" fill="${fg}" opacity=".5"/>`; }
-  else if(v===1){ m=`<rect x="20" y="10" width="6" height="36" fill="${fg}"/><polygon points="13,16 33,16 23,5" fill="${fg}"/><rect x="16" y="22" width="14" height="5" fill="${fg}"/><rect x="15" y="32" width="16" height="5" fill="${fg}"/>`; }
-  else if(v===2){ m=`<rect x="0" y="30" width="46" height="16" fill="${fg}" opacity=".32"/><path d="M2 30 q11 -9 22 0 t22 0" stroke="${fg}" stroke-width="2" fill="none"/><rect x="22" y="13" width="2" height="17" fill="${fg}"/><rect x="14" y="20" width="2" height="10" fill="${fg}" opacity=".6"/>`; }
-  else { m=`<rect x="14" y="12" width="18" height="34" fill="${fg}"/><polygon points="10,12 36,12 23,2" fill="${fg}"/><rect x="20" y="22" width="6" height="14" fill="${bg}"/>`; }
-  return `<svg class="sth" viewBox="0 0 46 46"><rect width="46" height="46" fill="${bg}"/>${m}<circle cx="36" cy="10" r="5" fill="#fde68a"/></svg>`;
+  if(v===0){ m=`<polygon points="0,60 30,22 52,48 76,16 104,60" fill="${fg}" opacity=".8"/><polygon points="0,60 22,40 40,60" fill="${fg}" opacity=".45"/>`; }
+  else if(v===1){ m=`<rect x="56" y="16" width="10" height="44" fill="${fg}"/><polygon points="44,26 78,26 61,10" fill="${fg}"/><rect x="49" y="34" width="24" height="7" fill="${fg}"/><rect x="47" y="47" width="28" height="7" fill="${fg}"/>`; }
+  else if(v===2){ m=`<rect x="0" y="42" width="120" height="18" fill="${fg}" opacity=".3"/><path d="M2 42 q14 -11 28 0 t28 0 t28 0 t28 0" stroke="${fg}" stroke-width="2" fill="none"/><rect x="58" y="20" width="3" height="22" fill="${fg}"/><rect x="46" y="30" width="3" height="12" fill="${fg}" opacity=".55"/>`; }
+  else { m=`<rect x="42" y="18" width="36" height="42" fill="${fg}"/><polygon points="34,18 86,18 60,6" fill="${fg}"/><rect x="52" y="32" width="12" height="18" fill="${bg}"/>`; }
+  return `<svg class="sth" viewBox="0 0 120 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">`
+       + `<rect width="120" height="60" fill="${bg}"/>${m}`
+       + `<circle cx="104" cy="14" r="7" fill="#fde68a"/></svg>`;
 }
 
 const GUIDE = [
