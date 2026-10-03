@@ -6,59 +6,66 @@
 <title>车站地图 · 12306 最便宜路线</title>
 <style>
 :root{
-  --bg:#f5f6f8; --card:#fff; --ink:#111827; --sub:#6b7280; --line:#e5e7eb;
-  --green:#16a34a; --green-soft:#dcfce7; --blue:#2563eb; --amber:#d97706; --red:#dc2626;
+  --bg:#eef1f6; --card:#fff; --ink:#0f172a; --sub:#64748b; --line:#e7ebf1;
+  --green:#10b981; --green-2:#059669; --green-soft:#d1fae5; --blue:#3b82f6;
+  --amber:#f59e0b; --red:#ef4444;
+  --radius:14px; --shadow-sm:0 1px 3px rgba(15,23,42,.06); --shadow:0 6px 22px rgba(15,23,42,.08);
+  --grad:linear-gradient(135deg,#34d399,#10b981 50%,#059669);
 }
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);
   font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
-  font-size:14px;line-height:1.6}
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:var(--blue);text-decoration:none}
-header{background:#fff;border-bottom:1px solid var(--line);min-height:56px;
-  display:flex;align-items:center;gap:10px;padding:8px 16px;position:sticky;top:0;z-index:1060;
-  flex-wrap:wrap}
-.logo{font-size:16px;font-weight:700;white-space:nowrap}
+header{background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(12px);
+  border-bottom:1px solid var(--line);min-height:56px;
+  display:flex;align-items:center;gap:10px;padding:9px 16px;position:sticky;top:0;z-index:1060;
+  flex-wrap:wrap;box-shadow:0 6px 20px rgba(15,23,42,.05)}
+.logo{font-size:16.5px;font-weight:800;white-space:nowrap;
+  background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .q{display:flex;gap:8px;align-items:center;position:relative}
-.q input{border:1px solid var(--line);border-radius:9px;padding:7px 11px;font-size:14px;
-  font-family:inherit;width:200px;color:var(--ink);background:#fff}
-.q input:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
-.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:9px;
-  padding:7px 14px;font-size:13.5px;cursor:pointer;font-family:inherit;white-space:nowrap}
-.btn:hover{border-color:var(--green);color:var(--green)}
-.btn.main{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
-.btn.main:hover{filter:brightness(.94);color:#fff}
+.q input{border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;
+  font-family:inherit;width:200px;color:var(--ink);background:#fbfcfe;transition:.15s}
+.q input:hover{border-color:#cbd5e1}
+.q input:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 4px var(--green-soft)}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;
+  padding:8px 15px;font-size:13.5px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:.15s}
+.btn:hover{border-color:var(--green);color:var(--green-2)}
+.btn.main{background:var(--grad);border-color:transparent;color:#fff;font-weight:700;
+  box-shadow:0 4px 12px rgba(16,185,129,.32)}
+.btn.main:hover{filter:brightness(1.05);color:#fff}
 .hint{font-size:12.5px;color:var(--sub);margin-left:auto}
 
 .sug{position:absolute;top:100%;left:0;width:290px;background:#fff;border:1px solid var(--line);
-  border-radius:10px;margin-top:4px;max-height:250px;overflow:auto;z-index:1070;
-  box-shadow:0 8px 24px rgba(16,24,40,.12);display:none}
+  border-radius:12px;margin-top:6px;max-height:250px;overflow:auto;z-index:1070;
+  box-shadow:0 10px 30px rgba(15,23,42,.14);display:none}
 .sug.on{display:block}
-.sug .g{font-size:11.5px;color:#9ca3af;padding:5px 12px 2px;font-weight:600}
-.sug div.i{padding:6px 12px;cursor:pointer;font-size:13.5px;display:flex;gap:8px}
-.sug div.i:hover{background:var(--bg)}
+.sug .g{font-size:11.5px;color:#9ca3af;padding:6px 12px 3px;font-weight:600}
+.sug div.i{padding:7px 12px;cursor:pointer;font-size:13.5px;display:flex;gap:8px}
+.sug div.i:hover{background:#f6f8fb}
 .sug div.i span{margin-left:auto;color:#9ca3af;font-size:11.5px}
 
-#wrap{display:flex;height:calc(100vh - 56px)}
-#side{width:238px;flex:none;background:#fff;border-right:1px solid var(--line);
-  overflow:auto;padding:12px}
-#side h3{margin:2px 0 8px;font-size:13px;color:var(--sub);font-weight:600}
-.st{display:flex;align-items:center;gap:7px;padding:5px 7px;border-radius:7px;
-  cursor:pointer;font-size:13.5px}
-.st:hover{background:var(--bg)}
-.st b{width:8px;height:8px;border-radius:50%;flex:none}
+#wrap{display:flex;height:calc(100vh - 57px)}
+#side{width:240px;flex:none;background:#fff;border-right:1px solid var(--line);
+  overflow:auto;padding:14px;box-shadow:2px 0 14px rgba(15,23,42,.04)}
+#side h3{margin:2px 0 9px;font-size:13px;color:var(--sub);font-weight:700;letter-spacing:.2px}
+.st{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:8px;
+  cursor:pointer;font-size:13.5px;transition:background .12s}
+.st:hover{background:#f1f5f9}
+.st b{width:9px;height:9px;border-radius:50%;flex:none}
 .st.g b{background:var(--green)} .st.r b{background:var(--red)}
 .st.b b{background:var(--blue)} .st.o b{background:var(--amber)}
 .st.g2 b{background:#d1d5db}
-.st.fail{opacity:.55}
-.st span{margin-left:auto;font-size:11.5px;color:#9ca3af}
+.st.fail{opacity:.5}
+.st span{margin-left:auto;font-size:11.5px;color:#9ca3af;font-variant-numeric:tabular-nums}
 .st .rt{margin-left:6px;font-size:11px;color:var(--blue)}
-#map{flex:1;height:100%;min-width:0;background:#eaf0f5}
-.note{padding:8px 10px;background:var(--bg);border:1px solid var(--line);
-  border-radius:9px;font-size:12.5px;color:var(--sub);margin-bottom:10px}
+#map{flex:1;height:100%;min-width:0;background:#dfe7ee}
+.note{padding:9px 11px;background:#f6f8fb;border:1px solid var(--line);
+  border-radius:11px;font-size:12.5px;color:var(--sub);margin-bottom:11px;line-height:1.55}
 .note.err{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
 .legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--sub);
-  margin:0 0 10px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
-.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+  margin:0 0 11px;padding-bottom:9px;border-bottom:1px dashed var(--line)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 @media(max-width:720px){
   #wrap{flex-direction:column;height:auto}
   #side{width:auto;border-right:none;border-bottom:1px solid var(--line);max-height:36vh}
