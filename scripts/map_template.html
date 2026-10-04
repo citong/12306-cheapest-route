@@ -107,7 +107,7 @@ header{background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(12px
 </div>
 
 <script>
-const STOPS = __STOPS__;
+let STOPS   = __STOPS__;   // 运行时由 applySearch() 根据“刚刚搜索的行程”重写；无搜索则为空（默认不显示出发/到达）
 const ALL   = __ALL__;
 const CITY  = __CITY__;
 const PCITY = __PCITY__;
@@ -128,6 +128,41 @@ const MARKED = new Map();          // 站名 -> {lat,lng,kind,title}
 const FAILED = new Set();          // 定位失败的站名
 const LS = id => { try{ return localStorage.getItem(id); }catch(e){ return null; } };
 const LSset = (id,v) => { try{ localStorage.setItem(id,v); }catch(e){} };
+
+/* ---------- 运行时：出发/到达取自“刚刚搜索的行程” ----------
+   index.html 查询完成后会把本次行程写入 localStorage['irt_last_route']
+   （含 fromLabel / toLabel 等人读城市名）。本页据此把出发地(绿)、目的地(红)
+   标出来，并把这两个城市的【每个车站】都列上（多增加站点）。
+   若从未搜索过，则不显示出发/到达（默认只显示全国车站背景）。            */
+let RT_INFO = null;            // {last, fromN, toN}
+// 城市/车站 -> 该地全部车站（这样出发地/目的地城市会标出所有车站，而非只一个点）
+function expandCity(name){
+  if(!name) return [];
+  const out=[];
+  if(CITY && CITY[name]){ for(const s of (CITY[name]||[])) if(!out.includes(s)) out.push(s); }
+  else if(CITYREV && CITYREV[name]){            // name 是某车站：取其所属城市的所有车站
+    const c=CITYREV[name];
+    for(const s of (CITY[c]||[])) if(!out.includes(s)) out.push(s);
+  }
+  if(!out.length) out.push(name);
+  return out;
+}
+function loadLastRoute(){
+  try{ const raw=localStorage.getItem('irt_last_route'); if(raw) return JSON.parse(raw); }catch(e){}
+  return null;
+}
+// 根据刚刚在首页搜索的行程生成 出发地(绿)/目的地(红) 车站；无搜索则返回空
+function applySearch(){
+  const last=loadLastRoute();
+  if(!last || !(last.fromLabel||last.from) || !(last.toLabel||last.to)){
+    STOPS=[]; RT_INFO=null; return;
+  }
+  const fromN=last.fromLabel||last.from, toN=last.toLabel||last.to;
+  const stops=[];
+  for(const nm of expandCity(fromN)) stops.push({n:nm, k:'start'});
+  for(const nm of expandCity(toN))   stops.push({n:nm, k:'end'});
+  STOPS=stops; RT_INFO={last, fromN, toN};
+}
 
 /* WGS-84 -> GCJ-02（火星坐标系）转换，用于在高德底图上精确对齐 */
 function outOfChina(lng,lat){return !(lng>73.66&&lng<135.05&&lat>3.86&&lat<53.55);}
@@ -237,6 +272,7 @@ function boot(){
   $('bgbtn').onclick = toggleBG;
   bindSuggest();
 
+  applySearch();          // 依据刚刚搜索的行程，决定出发地/目的地（无搜索则不出）
   drawBG();
   $('bgbtn').textContent = bgOn ? '隐藏车站' : '全部车站';   // 初始已显示全部车站
   renderList();
@@ -248,6 +284,7 @@ function switchBase(){
   else { map.removeLayer(baseO); baseA.addTo(map); baseLayer='amap'; }
   $('hint').textContent = '底图：' + (baseLayer==='amap' ? '高德地图' : 'OpenStreetMap');
   draw();   // 切换坐标系后重画，保证圆点与底图对齐
+  drawRTLine();
   drawBG(); // 背景层坐标系也要跟着换
 }
 
@@ -275,7 +312,11 @@ function toggleBG(){
 /* ---------- 加载线路车站（并发 + 进度） ---------- */
 async function loadAll(){
   if(!STOPS.length){
-    note('本页没有内置线路数据。启动本地服务重新查询后，地图会标出该线路涉及的车站。');
+    note('还没有搜索过行程。先到 <a href="index.html">路线查询</a> 搜一次出发地 → 目的地，'
+       + '本图会自动标出你的<b style="color:#16a34a">出发地（绿）</b>与'
+       + '<b style="color:#dc2626">目的地（红）</b>，并把这两个城市的每个车站都列出来。'
+       + '（全国车站背景点始终显示，方便你浏览。）');
+    $('hint').textContent='提示：先到路线查询搜一次，地图自动标注出发地/目的地';
     return;
   }
   let done = 0;
@@ -293,10 +334,20 @@ async function loadAll(){
     }
   }
   await Promise.all([worker(), worker(), worker()]);
-  draw(); renderList(); fitAll();
-  let msg = '已标注 <b>' + MARKED.size + '/' + STOPS.length + '</b> 个车站。'
-    + '滚轮或双指可缩放，点圆点看站名。'
-    + (FAILED.size ? '<br>有 ' + FAILED.size + ' 个站没能定位（侧栏灰色，点一下可重试）。' : '');
+  draw(); drawRTLine(); renderList(); fitAll();
+  let msg;
+  if(RT_INFO){
+    const sc=[...MARKED.values()].filter(v=>v.kind==='start').length;
+    const ec=[...MARKED.values()].filter(v=>v.kind==='end').length;
+    msg='已根据你搜索的 <b>'+esc(RT_INFO.fromN)+' → '+esc(RT_INFO.toN)+'</b> 标注：'
+      + '<span style="color:#16a34a">出发地 '+sc+' 站</span>、'
+      + '<span style="color:#dc2626">目的地 '+ec+' 站</span>。'
+      + '绿点为出发地车站，红点为目的地车站，绿色虚线表示出发 → 目的方向。';
+  }else{
+    msg = '已标注 <b>' + MARKED.size + '/' + STOPS.length + '</b> 个车站。'
+      + '滚轮或双指可缩放，点圆点看站名。';
+  }
+  if(FAILED.size) msg += '<br>有 ' + FAILED.size + ' 个站没能定位（侧栏灰色，点一下可重试）。';
   note(msg);
   $('hint').textContent = '底图：高德地图（可切换 OSM）';
 }
@@ -373,6 +424,18 @@ function bindSuggest(){
 /* ---------- 绘制 ---------- */
 const COLORS = {start:'#16a34a', end:'#dc2626', via:'#2563eb', hit:'#d97706'};
 const RADII  = {start:7, end:7, via:5, hit:8};
+let rtLine = null;          // 出发地城市重心 → 目的地城市重心 的示意虚线
+function drawRTLine(){
+  if(rtLine){ rtLine.remove(); rtLine=null; }
+  if(!RT_INFO) return;
+  const starts=[...MARKED.values()].filter(v=>v.kind==='start');
+  const ends  =[...MARKED.values()].filter(v=>v.kind==='end');
+  if(!starts.length || !ends.length) return;
+  const cen=arr=>{ let la=0,ln=0; arr.forEach(v=>{la+=v.lat; ln+=v.lng;}); return [la/arr.length, ln/arr.length]; };
+  const a=cen(starts), b=cen(ends);
+  rtLine = L.polyline([toMap(a[0],a[1]), toMap(b[0],b[1])],
+    {color:'#16a34a', weight:3, opacity:.45, dashArray:'6 8'}).addTo(map);
+}
 function draw(){
   // 清旧
   if(window.__layer) __layer.remove();

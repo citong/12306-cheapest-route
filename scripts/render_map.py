@@ -45,7 +45,9 @@ def collect_stops(data):
 def main():
     with open(os.path.join(ROOT, "data.json"), encoding="utf-8") as f:
         data = json.load(f)
-    stops = collect_stops(data)
+    # 不再把固定线路写死进页面：出发地/目的地改为运行时读取
+    # localStorage['irt_last_route']（index.html 查询后写入），与“刚刚搜索的行程”保持一致。
+    stops = []
 
     names = []
     p = os.path.join(ROOT, "stations.json")
