@@ -113,6 +113,13 @@ h1{font-size:22px;margin:6px 0 2px}
 .pmeta{margin-left:auto;color:#64748b}
 .pmeta b{color:#1d4ed8}
 .badge.b-hit{background:#fff7ed;color:#c2410c;border-color:#fed7aa}
+
+/* ---- 行程分享 / 导出（P4） ---- */
+.tb{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+.tb .btn{margin-top:0}
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#0f172a;color:#fff;
+  padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.show{opacity:1}
 </style>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <script src="vendor/leaflet/leaflet.js"></script>
@@ -337,6 +344,7 @@ function checklist(prefs, city, days, dateStr){
 }
 
 let ACTIVE_PREFS=new Set();
+let LAST=null;   // P4：缓存当前行程，供导出/分享读取
 function render(data, days, dateStr, budget){
   const prefs=new Set([...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t));
   ACTIVE_PREFS=prefs;
@@ -363,6 +371,12 @@ function render(data, days, dateStr, budget){
     +'<span class="hchip">🚄 到达后先看地图</span>'
     +'<span class="hchip">💰 门票合计 ¥'+totalTicket+'</span>'
     +'</div></div></div>';
+
+  // ---------- 分享 / 导出（P4） ----------
+  h+='<div class="tb">'
+    +'<button class="btn sm" onclick="copyLink()">📋 复制行程链接</button>'
+    +'<button class="btn sm" onclick="exportImage()">🖼 导出行程图</button>'
+    +'</div>';
 
   // ---------- KPI ----------
   h+='<div class="kpis">'
@@ -414,6 +428,9 @@ function render(data, days, dateStr, budget){
     +'<a href="'+hotelUrl+'" target="_blank" rel="noopener">在去哪儿查看 '+esc(data.city)+' 酒店 →</a>'
     +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'（共 '+days+' 晚）</span></div>'
     +'<div class="warn">住宿建议选<b>地铁 1 号线或景区周边</b>，可减少每日通勤；热门城市旺季请提前 2 周预订。</div></div>';
+
+  // P4：缓存当前行程，供分享链接 / 导出图片读取
+  LAST={data,days,dateStr,budget,prefs,planOut,fromCity,tripDate,ci,co,hotelUrl,totalTicket,spotCount,totalWalk,key};
 
   document.getElementById('out').innerHTML=h;
 
@@ -488,6 +505,179 @@ function initDayMap(seq, d){
 }
 function shiftDate(s,n){ const d=new Date(s+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
 
+/* =================== P4：分享链接 + 导出图片 =================== */
+function readForm(){
+  const prefs=[...document.querySelectorAll('.tg.on')].map(e=>e.dataset.t).join(',');
+  return {
+    from:(document.getElementById('from').value||'').trim(),
+    city:document.getElementById('city').value,
+    days:document.getElementById('days').value,
+    date:document.getElementById('date').value,
+    budget:document.getElementById('budget').value,
+    prefs:prefs
+  };
+}
+function syncUrl(){
+  try{
+    const f=readForm();
+    const p=new URLSearchParams();
+    if(f.from && f.from!=='济南') p.set('from',f.from);
+    if(f.city) p.set('city',f.city);
+    if(f.days && +f.days!==3) p.set('days',f.days);
+    if(f.date) p.set('date',f.date);
+    if(f.budget && +f.budget!==300) p.set('budget',f.budget);
+    if(f.prefs) p.set('prefs',f.prefs);
+    const qs=p.toString();
+    history.replaceState(null,'', location.pathname+(qs?('?'+qs):''));
+  }catch(e){ /* file:// 等环境忽略 */ }
+}
+function copyLink(){
+  syncUrl();
+  const url=location.href;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>toast('链接已复制 ✓'), ()=>fallbackCopy(url));
+  } else fallbackCopy(url);
+}
+function fallbackCopy(text){
+  const ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); toast('链接已复制 ✓'); }
+  catch(e){ toast('复制失败，请手动复制地址栏链接'); }
+  document.body.removeChild(ta);
+}
+function applyParams(){
+  const p=new URLSearchParams(location.search);
+  if(p.has('from')) document.getElementById('from').value=p.get('from');
+  if(p.has('city') && CITIES[p.get('city')]) document.getElementById('city').value=p.get('city');
+  if(p.has('days')) document.getElementById('days').value=p.get('days');
+  if(p.has('date')) document.getElementById('date').value=p.get('date');
+  if(p.has('budget')) document.getElementById('budget').value=p.get('budget');
+  if(p.has('prefs')){
+    document.querySelectorAll('.tg.on').forEach(e=>e.classList.remove('on'));
+    p.get('prefs').split(',').filter(Boolean).forEach(t=>{
+      const e=prefsBox.querySelector('[data-t="'+t+'"]'); if(e) e.classList.add('on');
+    });
+  }
+}
+function roundRect(ctx,x,y,w,h,r){
+  if(ctx.roundRect){ ctx.beginPath(); ctx.roundRect(x,y,w,h,r); return; }
+  ctx.beginPath(); ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath();
+}
+function exportImage(){
+  if(!LAST){ toast('请先生成行程'); return; }
+  const S=2, W=720, PAD=26, inner=W-PAD*2;
+  const items=[];
+  const add=(h,draw)=>items.push({h,draw});
+  const c=LAST;
+  // 头部
+  add(128,(ctx,y)=>{
+    const g=ctx.createLinearGradient(0,y,W,y+128);
+    g.addColorStop(0,'#0f172a'); g.addColorStop(1,'#2563eb');
+    ctx.fillStyle=g; ctx.fillRect(0,y,W,128);
+    ctx.fillStyle='#fff'; ctx.textBaseline='top';
+    ctx.font='800 30px sans-serif'; ctx.fillText(c.data.city, PAD, y+26);
+    ctx.font='14px sans-serif'; ctx.fillStyle='rgba(255,255,255,.9)';
+    ctx.fillText(c.days+' 天 · '+c.spotCount+' 个景点 · '+(c.dateStr?c.dateStr+' 出发':''), PAD, y+66);
+    ctx.fillStyle='rgba(255,255,255,.7)'; ctx.font='12px sans-serif';
+    ctx.fillText('自动行程攻略 · 由 12306 最便宜路线生成', PAD, y+92);
+  });
+  // KPI
+  const kpis=[['规划天数',c.days+' 天'],['景点',c.spotCount+' 个'],['门票','¥'+c.totalTicket],
+              ['餐饮','¥'+(MEAL_PER_DAY*c.days)],['步行',c.totalWalk.toFixed(1)+'km']];
+  add(66,(ctx,y)=>{
+    const n=kpis.length, gap=8, bw=(inner-gap*(n-1))/n;
+    kpis.forEach((k,i)=>{
+      const x=PAD+i*(bw+gap);
+      ctx.fillStyle='#f1f5f9'; roundRect(ctx,x,y,bw,52,8); ctx.fill();
+      ctx.fillStyle='#0f172a'; ctx.textAlign='center'; ctx.textBaseline='top';
+      ctx.font='700 17px sans-serif'; ctx.fillText(k[1], x+bw/2, y+9);
+      ctx.fillStyle='#64748b'; ctx.font='11px sans-serif'; ctx.fillText(k[0], x+bw/2, y+34);
+      ctx.textAlign='left';
+    });
+  });
+  // 每天
+  c.planOut.forEach(d=>{
+    add(40,(ctx,y)=>{
+      ctx.fillStyle='#2563eb'; roundRect(ctx,PAD,y,4,22,2); ctx.fill();
+      ctx.fillStyle='#0f172a'; ctx.textBaseline='top'; ctx.font='700 17px sans-serif';
+      ctx.fillText('第'+d.day+'天'+(d.theme?(' · '+d.theme):''), PAD+12, y+2);
+    });
+    let lastTransit=null;
+    d.items.forEach(it=>{
+      if(it.transit!==undefined){ lastTransit=it; return; }
+      if(it.meal){
+        add(30,(ctx,y)=>{
+          ctx.fillStyle='#fff7ed'; roundRect(ctx,PAD,y,inner,26,8); ctx.fill();
+          ctx.fillStyle='#9a3412'; ctx.font='12px sans-serif'; ctx.textBaseline='top';
+          ctx.fillText(it.text.replace(/^🍜\s*/,''), PAD+10, y+6);
+        });
+        return;
+      }
+      const s=it.spot;
+      const durTxt=Math.round(s.dur/60*10)/10;
+      const meta=(durTxt>0?(durTxt+' 小时 '):'')+'· '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · '+s.open):'');
+      if(lastTransit){
+        add(22,(ctx,y)=>{
+          ctx.fillStyle='#64748b'; ctx.font='11px sans-serif'; ctx.textBaseline='top';
+          ctx.fillText('→ 从「'+lastTransit.from+'」到「'+lastTransit.to+'」约 '+lastTransit.transit+' 分钟（'+(lastTransit.km*2).toFixed(1)+'km）', PAD+12, y+4);
+        });
+        lastTransit=null;
+      }
+      add(46,(ctx,y)=>{
+        ctx.fillStyle='#2563eb'; ctx.beginPath(); ctx.arc(PAD+5,y+15,5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#0f172a'; ctx.font='700 14px sans-serif'; ctx.textBaseline='top';
+        ctx.fillText(fmt(it.t), PAD+18, y+1);
+        ctx.fillStyle='#111'; ctx.font='700 15px sans-serif';
+        ctx.fillText(s.n, PAD+70, y+1);
+        ctx.fillStyle='#64748b'; ctx.font='11.5px sans-serif';
+        ctx.fillText(meta, PAD+70, y+23);
+      });
+    });
+    add(30,(ctx,y)=>{
+      ctx.fillStyle='#64748b'; ctx.font='12px sans-serif'; ctx.textBaseline='top';
+      ctx.fillText('当日门票 ¥'+d.cost+' · 步行 '+d.walk.toFixed(1)+'km'+(d.dinnerNote?(' · '+d.dinnerNote):''), PAD+12, y+6);
+    });
+  });
+  // 预算 + 住宿
+  add(98,(ctx,y)=>{
+    ctx.fillStyle='#f8fafc'; roundRect(ctx,PAD,y,inner,86,12); ctx.fill();
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=1; roundRect(ctx,PAD,y,inner,86,12); ctx.stroke();
+    ctx.fillStyle='#0f172a'; ctx.font='700 14px sans-serif'; ctx.textBaseline='top';
+    ctx.fillText('预算参考（'+c.days+' 天，不含往返大交通与住宿）', PAD+14, y+13);
+    ctx.font='12.5px sans-serif'; ctx.fillStyle='#475569';
+    const lines=[
+      '门票 ¥'+c.totalTicket+' · 餐饮 ¥'+(MEAL_PER_DAY*c.days)+' · 市内交通 ¥'+(30*c.days),
+      '合计约 ¥'+(c.totalTicket+MEAL_PER_DAY*c.days+30*c.days),
+      '住宿：在去哪儿查看 '+c.data.city+' 酒店（入住 '+c.ci+' / 退房 '+c.co+'）'
+    ];
+    lines.forEach((t,i)=> ctx.fillText(t, PAD+14, y+40+i*16));
+  });
+  // 计算总高度并绘制
+  let totalH=PAD; items.forEach(it=> totalH+=it.h+10); totalH+=PAD;
+  const cv=document.createElement('canvas');
+  cv.width=W*S; cv.height=Math.round(totalH*S);
+  const ctx=cv.getContext('2d'); ctx.scale(S,S);
+  ctx.fillStyle='#eef2f7'; ctx.fillRect(0,0,W,totalH);
+  let y=PAD; items.forEach(it=>{ it.draw(ctx,y); y+=it.h+10; });
+  cv.toBlob(b=>{
+    if(!b){ toast('导出失败，请重试'); return; }
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download=c.data.city+'_'+c.days+'天行程.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    toast('行程图已导出 ✓');
+  },'image/png');
+}
+function toast(msg){
+  let t=document.getElementById('__toast');
+  if(!t){ t=document.createElement('div'); t.id='__toast'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._tm); t._tm=setTimeout(()=>t.classList.remove('show'),1800);
+}
+
 // init
 const citySel=document.getElementById('city');
 Object.keys(CITIES).forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=CITIES[c].city; citySel.appendChild(o); });
@@ -499,6 +689,7 @@ function refresh(){
   let days=Math.max(1,Math.min(7,+document.getElementById('days').value||3));
   document.getElementById('days').value=days;
   render(c, days, document.getElementById('date').value, +document.getElementById('budget').value);
+  syncUrl();
 }
 ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; e.dataset.t=t; e.textContent=t;
   e.onclick=()=>{ e.classList.toggle('on'); refresh(); }; prefsBox.appendChild(e); });
@@ -507,6 +698,7 @@ ALL_TAGS.forEach(t=>{ const e=document.createElement('span'); e.className='tg'; 
 // default date = today+14
 const def=new Date(); def.setDate(def.getDate()+14);
 document.getElementById('date').value=def.toISOString().slice(0,10);
+applyParams();   // P4：若带 ?city=&days=&prefs= 等参数，按链接预填
 // 城市 / 天数 / 日期 / 预算 / 出发地 变化即重算
 ['city','days','date','budget','from'].forEach(id=>{
   const el=document.getElementById(id);
@@ -514,7 +706,7 @@ document.getElementById('date').value=def.toISOString().slice(0,10);
 });
 document.getElementById('go').onclick=refresh;
 // first render
-render(CITIES[citySel.value], 3, document.getElementById('date').value, 300);
+refresh();   // P4：首屏渲染并同步 URL（applyParams 已在上方预填链接参数）
 </script>
 </body>
 </html>
