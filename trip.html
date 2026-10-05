@@ -273,49 +273,80 @@ function wgs84ToGcj02(lng,lat){
   return [lng+dLng, lat+dLat];
 }
 
-/* 地理最近邻串线：从最北的点出发，把景点串成一条尽量顺路的线。
-   之后沿这条线均匀切段，就能得到"每天景点数均衡 + 地理相邻"的分天方案。 */
-function nnPath(pts){
-  if(!pts.length) return [];
-  let pool=pts.slice();
-  let cur=pool.reduce((a,b)=> a.lat>b.lat?a:b);
-  pool.splice(pool.indexOf(cur),1);
-  const out=[cur];
-  while(pool.length){
-    let ni=0,nd=1e9;
-    pool.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}});
-    cur=pool.splice(ni,1)[0]; out.push(cur);
+/* ---------- 地理聚类（k-medoids 简化版）----------
+   把选中的景点分成 days 个地理相邻的区域，每天集中玩一片，
+   避免跨城/跨区来回折返，也自然形成"早上片区A、下午片区B"的节奏。 */
+function kmeansGroups(pts, k){
+  k=Math.min(Math.max(k,1), pts.length);
+  if(k<=1) return [pts.slice()];
+  // 最远点采样选种子，保证初始中心分散
+  let centers=[pts[0]];
+  while(centers.length<k){
+    let best=pts[0], bd=-1;
+    for(const p of pts){ let d=Infinity; for(const c of centers) d=Math.min(d,haversine(p,c)); if(d>bd){bd=d;best=p;} }
+    if(best===centers[centers.length-1]) break;   // 已收敛，提前结束
+    centers.push(best);
+  }
+  k=centers.length;
+  let assign;
+  for(let it=0; it<12; it++){
+    assign=pts.map(p=>{ let bi=0,bd=Infinity; centers.forEach((c,i)=>{const d=haversine(p,c); if(d<bd){bd=d;bi=i;}}); return bi; });
+    const g=Array.from({length:k},()=>[]);
+    pts.forEach((p,i)=>g[assign[i]].push(p));
+    centers=g.map((grp,i)=> grp.length? {lat:grp.reduce((s,p)=>s+p.lat,0)/grp.length, lng:grp.reduce((s,p)=>s+p.lng,0)/grp.length} : centers[i]);
+  }
+  const g=Array.from({length:k},()=>[]);
+  pts.forEach((p,i)=>g[assign[i]].push(p));
+  // 兜底：若有空簇，从最大簇挪一个点过来，保证每天都有内容
+  while(g.some(x=>x.length===0)){
+    const emptyIdx=g.findIndex(x=>x.length===0);
+    const bigIdx=g.reduce((bi,b,i,a)=> b.length>a[bi].length? i:bi, 0);
+    if(g[bigIdx].length<=1) break;
+    g[emptyIdx].push(g[bigIdx].pop());
+  }
+  return g;
+}
+
+/* 组内按"最靠近重心"的点出发、最近邻串成顺路动线 */
+function orderByNN(group){
+  if(!group.length) return [];
+  const cen={lat:group.reduce((s,p)=>s+p.lat,0)/group.length, lng:group.reduce((s,p)=>s+p.lng,0)/group.length};
+  let cur=group.reduce((a,b)=> haversine(b,cen)<haversine(a,cen)?b:a);
+  const rest=group.filter(p=>p!==cur); const out=[cur];
+  while(rest.length){
+    let ni=0,nd=Infinity;
+    rest.forEach((p,i)=>{const d=haversine(p,cur); if(d<nd){nd=d;ni=i;}});
+    cur=rest.splice(ni,1)[0]; out.push(cur);
   }
   return out;
 }
 
-function buildDay(group, idx, ctx){
-  if(!group.length) return {day:idx+1,items:[],cost:0,walk:0,theme:''};
-  // 1) 组内动线：从最靠近本组重心的点出发，最近邻串线
-  const cen={lat:group.reduce((s,p)=>s+p.lat,0)/group.length, lng:group.reduce((s,p)=>s+p.lng,0)/group.length};
-  const order=nnPath(group);
-  // 2) 时间轴：09:00 出发，按停留时长累加，路上时间按地理距离估算
-  let t=9*60, items=[], cost=0, walk=0, prev=null;
-  order.forEach((s,i)=>{
-    if(i>0){
-      const km=haversine(prev,s);
-      const m=transitMin(prev,s);
-      walk+=km;
-      items.push({transit:m, km:km, from:prev.n, to:s.n});
-      t+=m;
+const DAY_START=9*60;       // 09:00 出发
+const DAY_BUDGET=540;       // 单日可游玩时长上限（分钟，约 9 小时，不含用餐/交通）
+const TRAVEL_EST=25;        // 景点间交通估算（分钟）
+
+function buildDay(group, idx){
+  if(!group.length) return {day:idx+1,items:[],cost:0,walk:0,theme:'',dinnerNote:''};
+  const order=orderByNN(group);
+  // 时间轴：09:00 起，按时长累加，路上按地理距离估算；
+  // 关键修复：单日总时长超过 DAY_BUDGET 就停止往当天塞，保证当天在 ~18:00 前收尾。
+  let t=DAY_START, items=[], cost=0, walk=0, prev=null;
+  for(const s of order){
+    if(prev){
+      if(t + transitMin(prev,s) + (s.dur||60) > DAY_START + DAY_BUDGET + 60) break; // 超出当日预算则截断
+      const km=haversine(prev,s), m=transitMin(prev,s);
+      walk+=km; items.push({transit:m, km, from:prev.n, to:s.n}); t+=m;
     }
-    items.push({t, spot:s});
-    cost+=(s.ticket||0);
-    t+=s.dur; prev=s;
-  });
-  // 3) 插入用餐：找第一个 12:00 之后的节点
+    items.push({t, spot:s}); cost+=(s.ticket||0); t+=(s.dur||60); prev=s;
+  }
+  // 用餐：越过 12:00 插午餐；结束早于 18:00 则在 18:00 附近提示晚餐
   const li=items.findIndex(it=>it.t!==undefined && it.t>=12*60);
   const mealSpot=group.find(s=>(s.tags||[]).includes('美食')) || order[Math.floor(order.length/2)];
   const lunchNote='午餐：'+(mealSpot?('在「'+mealSpot.n+'」附近解决'):'午餐自理');
+  items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
   const dinnerNote='晚餐：'+((order[order.length-1].tags||[]).includes('美食')
       ? ('推荐「'+order[order.length-1].n+'」一带'):'建议在酒店附近解决');
-  items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
-  // 4) 当日主题：取评分最高的必去/自然/历史标签
+  // 当日主题：取停留最久景点的首个标签
   let theme='城市漫游';
   const best=order.slice().sort((a,b)=>(b.dur||0)-(a.dur||0))[0];
   const tg=(best.tags||[])[0];
@@ -332,24 +363,23 @@ function plan(data, days, prefs){
     s._score=s._hit*3+((tags.includes('必去'))?2:0)+1;
   });
   all.sort((a,b)=>b._score-a._score);
-  const cap=Math.min(days*3, all.length);                 // 上限：每天最多 3 个
-  const floor=Math.min(all.length, Math.max(days, 3));    // 下限：每天至少 1 个，别把行程抽空
-  // 偏好真正参与筛选：选了偏好就只看命中项，不够再用高分项补齐
-  let sel = prefs.size ? all.filter(s=>s._hit>0) : all.slice();
-  if(sel.length<floor){
-    sel=sel.concat(all.filter(s=>s._hit===0).slice(0, floor-sel.length));
+  const MAX_PER_DAY=4;
+  // 偏好真正参与筛选：选了偏好先看命中项，不够再用高分项补齐
+  let pool = prefs.size ? all.filter(s=>s._hit>0) : all.slice();
+  if(pool.length < Math.min(days, all.length)) pool=pool.concat(all.filter(s=>s._hit===0));
+  // 选池：受"总时长预算"与"每天上限"双约束，避免一天塞太多导致跨夜
+  let budgetLeft=days*DAY_BUDGET, sel=[];
+  for(const s of pool){
+    const need=(s.dur||60)+TRAVEL_EST;
+    if(sel.length>=days*MAX_PER_DAY) break;                  // 硬上限：每天最多 4 个
+    if(sel.length>=days && need>budgetLeft) break;            // 已保证每天≥1 后，按总时长封顶
+    sel.push(s); budgetLeft-=need;
   }
-  sel=sel.slice(0, Math.max(floor, Math.min(cap, sel.length)));
-  const K=Math.min(days, sel.length);
-  // 先按地理最近邻串成一条顺路的线，再均匀切成 K 段连续线路：
-  // 每天景点数尽量均衡（±1），且同一天内景点地理相邻、不绕路。
-  const order=nnPath(sel);
-  const groups=[];
-  for(let i=0;i<K;i++){
-    const a=Math.floor(i*order.length/K), b=Math.floor((i+1)*order.length/K);
-    groups.push(order.slice(a,b));
-  }
-  return groups.map((g,i)=>buildDay(g,i,data));
+  const minN=Math.min(days, all.length);
+  if(sel.length<minN){ for(const s of all){ if(!sel.includes(s)){ sel.push(s); if(sel.length>=minN) break; } } }
+  // 按地理聚类分成 days 个片区，每天集中玩一片
+  const groups=kmeansGroups(sel, days);
+  return groups.map((g,i)=>buildDay(g,i)).filter(d=>d.items.length>0);
 }
 
 /* 依据偏好生成行前清单 */
