@@ -65,6 +65,7 @@ h1{font-size:22px;margin:6px 0 2px}
 .meta{font-size:12px;color:var(--mut);margin-top:3px}
 .badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;margin-right:5px}
 .b-t{background:#ecfdf5;color:var(--ok)} .b-tr{background:#fef3c7;color:var(--warn)}
+.badge.b-ev{background:#312e81;color:#c7d2fe;border-color:#4338ca} .ti.ev .dot{background:#6366f1;box-shadow:0 0 0 4px #e0e7ff} .ti.ev .time{color:#4338ca}
 .meal{background:#fff7ed;border:1px dashed #fdba74;border-radius:10px;padding:9px 13px;margin:8px 0;font-size:13px;color:#9a3412}
 .transit{font-size:12px;color:#64748b;margin:2px 0 0;padding-left:2px;display:flex;align-items:center;gap:5px}
 .note{font-size:12px;color:#475569;margin-top:5px;background:#f8fafc;border-left:3px solid #cbd5e1;
@@ -332,35 +333,59 @@ function orderByNN(group){
 }
 
 const DAY_START=9*60;       // 09:00 出发
-const DAY_BUDGET=540;       // 单日可游玩时长上限（分钟，约 9 小时，不含用餐/交通）
+const DAY_BUDGET=540;       // 单日白天可游玩时长上限（分钟，约 9 小时，不含用餐/交通）
 const TRAVEL_EST=25;        // 景点间交通估算（分钟）
+const DINNER=18*60;         // 晚餐默认 18:00
 
-function buildDay(group, idx){
-  if(!group.length) return {day:idx+1,items:[],cost:0,walk:0,theme:'',dinnerNote:''};
-  const order=orderByNN(group);
-  // 时间轴：09:00 起，按时长累加，路上按地理距离估算；
-  // 关键修复：单日总时长超过 DAY_BUDGET 就停止往当天塞，保证当天在 ~18:00 前收尾。
+/* 工具：夜游/演出、开放时间窗口、重心、当日主题 */
+function isEvening(s){ const t=s.tags||[]; return t.includes('夜游')||t.includes('演出'); }
+function openWindow(s){
+  const m=String(s.open||'').match(/(\d{1,2}):(\d{2})\s*[-~]\s*(\d{1,2}):(\d{2})/);
+  if(!m) return null;
+  return [+m[1]*60+ +m[2], +m[3]*60+ +m[4]];
+}
+function centroid(g){ if(!g||!g.length) return null; return {lat:g.reduce((s,p)=>s+p.lat,0)/g.length, lng:g.reduce((s,p)=>s+p.lng,0)/g.length}; }
+const THEME_MAP={'自然':'自然风光','历史':'历史人文','美食':'美食探寻','亲子':'亲子时光','宗教':'禅意之旅','购物':'逛街购物','夜游':'夜色巡游','演出':'演艺观赏'};
+function dayTheme(spots){
+  const cnt={};
+  spots.forEach(s=>(s.tags||[]).forEach(t=>cnt[t]=(cnt[t]||0)+1));
+  let best=null,bn=0;
+  for(const t in cnt){ if(cnt[t]>bn){bn=cnt[t];best=t;} }
+  return best?(THEME_MAP[best]||best):'城市漫游';
+}
+
+function buildDay(group, idx, eveningSpot){
+  const order=orderByNN(group||[]);
+  // 时间轴：09:00 起，按停留时长累加，路上按地理距离估算；超出当日预算则停止往当天塞
   let t=DAY_START, items=[], cost=0, walk=0, prev=null;
   for(const s of order){
     if(prev){
-      if(t + transitMin(prev,s) + (s.dur||60) > DAY_START + DAY_BUDGET + 60) break; // 超出当日预算则截断
+      if(t + transitMin(prev,s) + (s.dur||60) > DAY_START + DAY_BUDGET + 60) break;
       const km=haversine(prev,s), m=transitMin(prev,s);
       walk+=km; items.push({transit:m, km, from:prev.n, to:s.n}); t+=m;
     }
     items.push({t, spot:s}); cost+=(s.ticket||0); t+=(s.dur||60); prev=s;
   }
-  // 用餐：越过 12:00 插午餐；结束早于 18:00 则在 18:00 附近提示晚餐
+  // 午餐：越过 12:00 插入
   const li=items.findIndex(it=>it.t!==undefined && it.t>=12*60);
   const mealSpot=group.find(s=>(s.tags||[]).includes('美食')) || order[Math.floor(order.length/2)];
   const lunchNote='午餐：'+(mealSpot?('在「'+mealSpot.n+'」附近解决'):'午餐自理');
   items.splice(li<0?items.length:li, 0, {meal:true, text:'🍜 '+lunchNote});
-  const dinnerNote='晚餐：'+((order[order.length-1].tags||[]).includes('美食')
-      ? ('推荐「'+order[order.length-1].n+'」一带'):'建议在酒店附近解决');
-  // 当日主题：取停留最久景点的首个标签
-  let theme='城市漫游';
-  const best=order.slice().sort((a,b)=>(b.dur||0)-(a.dur||0))[0];
-  const tg=(best.tags||[])[0];
-  if(tg) theme=tg+' · '+best.n;
+  // 夜游/演出：放到傍晚之后，晚餐后再前往（不再塞进白天时段）
+  let dinnerNote='建议在酒店附近解决';
+  if(eveningSpot){
+    const win=openWindow(eveningSpot);
+    const evStart = (win && win[0]>=17*60) ? win[0] : 19*60;   // 用真实夜间开放时间，否则默认 19:00
+    const dinnerT = Math.max(t, DINNER);
+    items.push({meal:true, text:'🍲 晚餐：'+(eveningSpot.tags.includes('美食')?('在「'+eveningSpot.n+'」一带解决'):'建议在酒店/商圈附近解决，再去看夜场')});
+    const evT = Math.max(evStart, dinnerT + 60);
+    items.push({t:evT, spot:eveningSpot, evening:true});
+    cost+=(eveningSpot.ticket||0);
+    dinnerNote='晚餐后前往「'+eveningSpot.n+'」'+(isEvening(eveningSpot)?'（夜游/演出）':'');
+  } else if(order.length){
+    dinnerNote='晚餐：'+((order[order.length-1].tags||[]).includes('美食')?('推荐「'+order[order.length-1].n+'」一带'):'建议在酒店附近解决');
+  }
+  const theme=dayTheme(order.concat(eveningSpot?[eveningSpot]:[]));
   return {day:idx+1, items, cost, walk, theme, dinnerNote};
 }
 
@@ -377,19 +402,32 @@ function plan(data, days, prefs){
   // 偏好真正参与筛选：选了偏好先看命中项，不够再用高分项补齐
   let pool = prefs.size ? all.filter(s=>s._hit>0) : all.slice();
   if(pool.length < Math.min(days, all.length)) pool=pool.concat(all.filter(s=>s._hit===0));
-  // 选池：受"总时长预算"与"每天上限"双约束，避免一天塞太多导致跨夜
+  // 夜游/演出单独成"夜场"，不占白天时段
+  const eveningPool = pool.filter(isEvening);
+  const dayPool = pool.filter(s=>!isEvening(s));
+  // 白天选池：受"总时长预算"与"每天上限"双约束
   let budgetLeft=days*DAY_BUDGET, sel=[];
-  for(const s of pool){
+  for(const s of dayPool){
     const need=(s.dur||60)+TRAVEL_EST;
     if(sel.length>=days*MAX_PER_DAY) break;                  // 硬上限：每天最多 4 个
     if(sel.length>=days && need>budgetLeft) break;            // 已保证每天≥1 后，按总时长封顶
     sel.push(s); budgetLeft-=need;
   }
-  const minN=Math.min(days, all.length);
-  if(sel.length<minN){ for(const s of all){ if(!sel.includes(s)){ sel.push(s); if(sel.length>=minN) break; } } }
+  const minN=Math.min(days, dayPool.length);
+  if(sel.length<minN){ for(const s of dayPool){ if(!sel.includes(s)){ sel.push(s); if(sel.length>=minN) break; } } }
+  // 夜场：每城最多取 days 个（每天至多 1 个），按分数
+  const eveningSel = eveningPool.slice(0, days);
   // 按地理聚类分成 days 个片区，每天集中玩一片
   const groups=kmeansGroups(sel, days);
-  return groups.map((g,i)=>buildDay(g,i)).filter(d=>d.items.length>0);
+  // 给每天分配一个夜游（就近 + 每天至多 1 个）
+  const dayEvening=groups.map(()=>null);
+  eveningSel.forEach(e=>{
+    let bi=-1,bd=1e9;
+    groups.forEach((g,gi)=>{ if(dayEvening[gi]) return; const c=centroid(g); if(!c) return; const d=haversine(e,c); if(d<bd){bd=d;bi=gi;} });
+    if(bi<0){ let b2=0,bd2=1e9; groups.forEach((g,gi)=>{ const c=centroid(g); if(!c) return; const d=haversine(e,c); if(d<bd2){bd2=d;b2=gi;} }); bi=b2; }
+    dayEvening[bi]=e;
+  });
+  return groups.map((g,i)=>buildDay(g,i,dayEvening[i])).filter(d=>d.items.length>0);
 }
 
 /* 依据偏好生成行前清单 */
@@ -539,11 +577,12 @@ function render(data, days, dateStr, budget){
       const s=it.spot;
       const tags=(s.tags||[]).map(t=>'<span class="badge b-t">'+esc(t)+'</span>').join('');
       const star=(s._star && ACTIVE_PREFS.size)?'<span class="badge b-hit">★ 偏好</span>':'';
+      const ev=(it.evening)?'<span class="badge b-ev">🌙 夜场</span>':'';
       const tr=lastTransit? '<span class="badge b-tr">↔ '+lastTransit.transit+'min</span>':'';
       const img = s.img? '<img class="sph" src="'+esc(s.img)+'" alt="'+esc(s.n)+'" loading="lazy" onerror="this.style.display=\'none\'">':'';
-      let p2='<div class="ti"><div class="dot"></div><div class="time">'+fmt(it.t)+'</div>'
+      let p2='<div class="ti'+(it.evening?' ev':'')+'"><div class="dot"></div><div class="time">'+(it.evening?'🌙 ':'')+fmt(it.t)+'</div>'
         +'<div class="body"><div class="nm">'+img+esc(s.n)+'</div>'
-        +'<div class="meta">'+star+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
+        +'<div class="meta">'+star+ev+tags+tr+'⏱ '+(Math.round(s.dur/60*10)/10)+'h · 🎫 '+(s.ticket?('¥'+s.ticket):'免费')+(s.open?(' · 🕒 '+esc(s.open)):'')+'</div>'
         +(s.note?'<div class="note">💡 '+esc(s.note)+'</div>':'')+'</div></div>';
       if(lastTransit){
         p+='<div class="transit">🚶 从「'+esc(lastTransit.from)+'」到「'+esc(lastTransit.to)+'」约 '
@@ -706,7 +745,7 @@ function exportImage(){
         add(30,(ctx,y)=>{
           ctx.fillStyle='#fff7ed'; roundRect(ctx,PAD,y,inner,26,8); ctx.fill();
           ctx.fillStyle='#9a3412'; ctx.font='12px sans-serif'; ctx.textBaseline='top';
-          ctx.fillText(it.text.replace(/^🍜\s*/,''), PAD+10, y+6);
+          ctx.fillText(it.text.replace(/^[🍜🍲]\s*/,''), PAD+10, y+6);
         });
         return;
       }
@@ -721,11 +760,11 @@ function exportImage(){
         lastTransit=null;
       }
       add(46,(ctx,y)=>{
-        ctx.fillStyle='#2563eb'; ctx.beginPath(); ctx.arc(PAD+5,y+15,5,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle=it.evening?'#6366f1':'#2563eb'; ctx.beginPath(); ctx.arc(PAD+5,y+15,5,0,Math.PI*2); ctx.fill();
         ctx.fillStyle='#0f172a'; ctx.font='700 14px sans-serif'; ctx.textBaseline='top';
-        ctx.fillText(fmt(it.t), PAD+18, y+1);
+        ctx.fillText((it.evening?'🌙 ':'')+fmt(it.t), PAD+18, y+1);
         ctx.fillStyle='#111'; ctx.font='700 15px sans-serif';
-        ctx.fillText(s.n, PAD+70, y+1);
+        ctx.fillText((it.evening?'🌙 ':'')+s.n, PAD+70, y+1);
         ctx.fillStyle='#64748b'; ctx.font='11.5px sans-serif';
         ctx.fillText(meta, PAD+70, y+23);
       });
