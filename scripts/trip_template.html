@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f172a">
 <title>行程攻略 · 12306 最便宜路线</title>
 <style>
 :root{--blue:#2563eb;--ind:#4f46e5;--bg:#f5f7fb;--card:#fff;--line:#e6e9f0;--mut:#6b7280;--ok:#16a34a;--warn:#b45309}
@@ -135,6 +136,14 @@ h1{font-size:22px;margin:6px 0 2px}
 .toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);background:#0f172a;color:#fff;
   padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;opacity:0;transition:opacity .25s;pointer-events:none}
 .toast.show{opacity:1}
+
+/* 回到顶部悬浮按钮 */
+#toTop{position:fixed;right:16px;bottom:18px;z-index:900;width:44px;height:44px;border:none;
+  border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--ind));color:#fff;font-size:20px;
+  cursor:pointer;line-height:1;box-shadow:0 6px 18px rgba(37,99,235,.4);opacity:0;
+  transform:translateY(12px) scale(.9);pointer-events:none;transition:opacity .25s,transform .25s}
+#toTop.show{opacity:1;transform:none;pointer-events:auto}
+#toTop:active{transform:scale(.92)}
 </style>
 <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <script src="vendor/leaflet/leaflet.js"></script>
@@ -183,6 +192,8 @@ h1{font-size:22px;margin:6px 0 2px}
     本页为离线规划演示，数据依据公开旅游资料，仅供参考。
   </div>
 </div>
+
+<button id="toTop" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
 
 <script>
 const CITIES = __CITIES__;
@@ -727,6 +738,17 @@ applyParams();   // P4：若带 ?city=&days=&prefs= 等参数，按链接预填
 document.getElementById('go').onclick=refresh;
 // first render
 refresh();   // P4：首屏渲染并同步 URL（applyParams 已在上方预填链接参数）
+
+/* 回到顶部悬浮按钮 */
+(function(){
+  const btn=document.getElementById('toTop'); if(!btn) return;
+  btn.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+  let ticking=false;
+  window.addEventListener('scroll', ()=>{
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{ btn.classList.toggle('show', window.scrollY>400); ticking=false; });
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>
