@@ -359,17 +359,19 @@ function render(data, days, dateStr, budget){
   let totalTicket=planOut.reduce((s,d)=>s+d.cost,0);
   let spotCount=planOut.reduce((s,d)=>s+d.items.filter(i=>i.t!==undefined&&i.spot).length,0);
   let totalWalk=planOut.reduce((s,d)=>s+d.walk,0);
+  const dailyCost = days>0 ? Math.round((totalTicket + MEAL_PER_DAY*days + 30*days)/days) : 0;
   let h='';
 
   // ---------- 城市封面 ----------
   h+='<div class="hero">'+cover+'<div class="hbg"></div><div class="hin">'
     +'<h2>'+esc(data.city)+'</h2>'
-    +'<div class="hmeta">建议 '+days+' 天 · 共 '+spotCount+' 个景点 · 每日约 '+(budget||MEAL_PER_DAY+60)+' 元（门票+餐饮）</div>'
+    +'<div class="hmeta">建议 '+days+' 天 · 共 '+spotCount+' 个景点 · 每日约 ¥'+dailyCost+'（门票+餐饮+市内交通）</div>'
     +'<div class="hintro">'+esc(data.intro||'')+'</div>'
     +'<div class="hchips">'
     +'<span class="hchip">🗓 建议 '+esc(data.days_suggest||days)+' 天</span>'
     +'<span class="hchip">🚄 到达后先看地图</span>'
     +'<span class="hchip">💰 门票合计 ¥'+totalTicket+'</span>'
+    + (budget&&+budget>0 ? ('<span class="hchip" style="'+((+budget>=dailyCost)?'background:rgba(16,185,129,.22)':'background:rgba(239,68,68,.2)')+'">💵 预算 ¥'+budget+'/天 · 预计 ¥'+dailyCost+'/天 '+((+budget>=dailyCost)?('结余 ¥'+(+budget-dailyCost)):'超支 ¥'+(dailyCost-+budget))+'</span>') : '')
     +'</div></div></div>';
 
   // ---------- 分享 / 导出（P4） ----------
