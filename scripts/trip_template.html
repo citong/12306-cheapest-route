@@ -426,18 +426,20 @@ function render(data, days, dateStr, budget){
   let spotCount=planOut.reduce((s,d)=>s+d.items.filter(i=>i.t!==undefined&&i.spot).length,0);
   let totalWalk=planOut.reduce((s,d)=>s+d.walk,0);
   const dailyCost = days>0 ? Math.round((totalTicket + MEAL_PER_DAY*days + 30*days)/days) : 0;
+  const dailyBase = days>0 ? Math.round((totalTicket + MEAL_PER_DAY*days)/days) : 0; // 不含交通，与"每天预算"口径一致
+  const plannedDays = planOut.length;
   let h='';
 
   // ---------- 城市封面 ----------
   h+='<div class="hero">'+cover+'<div class="hbg"></div><div class="hin">'
     +'<h2>'+esc(data.city)+'</h2>'
-    +'<div class="hmeta">建议 '+days+' 天 · 共 '+spotCount+' 个景点 · 每日约 ¥'+dailyCost+'（门票+餐饮+市内交通）</div>'
+    +'<div class="hmeta">'+(plannedDays!==days?('已为你规划 <b>'+plannedDays+'</b> 天（你选了 '+days+' 天）':'建议 '+days+' 天')+' · 共 '+spotCount+' 个景点 · 每日约 ¥'+dailyCost+'（门票+餐饮+市内交通）</div>'
     +'<div class="hintro">'+esc(data.intro||'')+'</div>'
     +'<div class="hchips">'
     +'<span class="hchip">🗓 建议 '+esc(data.days_suggest||days)+' 天</span>'
     +'<span class="hchip">🚄 到达后先看地图</span>'
     +'<span class="hchip">💰 门票合计 ¥'+totalTicket+'</span>'
-    + (budget&&+budget>0 ? ('<span class="hchip" style="'+((+budget>=dailyCost)?'background:rgba(16,185,129,.22)':'background:rgba(239,68,68,.2)')+'">💵 预算 ¥'+budget+'/天 · 预计 ¥'+dailyCost+'/天 '+((+budget>=dailyCost)?('结余 ¥'+(+budget-dailyCost)):'超支 ¥'+(dailyCost-+budget))+'</span>') : '')
+    + (budget&&+budget>0 ? ('<span class="hchip" style="'+((+budget>=dailyBase)?'background:rgba(16,185,129,.22)':'background:rgba(239,68,68,.2)')+'">💵 预算 ¥'+budget+'/天 · 预计 ¥'+dailyBase+'/天（不含交通）'+((+budget>=dailyBase)?(' · 结余 ¥'+(+budget-dailyBase)):' · 超支 ¥'+(dailyBase-+budget))+'</span>') : '')
     +'</div></div></div>';
 
   // ---------- 分享 / 导出（P4） ----------
@@ -466,6 +468,11 @@ function render(data, days, dateStr, budget){
         : '<span class="ptag pt-mut">未选（显示全部景点）</span>')
     +'<span class="pmeta">已按偏好优先保留：命中 <b>'+matched+'</b> / 本城 '+totalSpots+' 个景点'
     +(activePrefs.length?'，取消偏好可看全部':'，勾选偏好可筛选')+'</span></div>';
+
+  // 天数诚实提示：实际规划天数与所选天数不一致时说明原因
+  if(plannedDays!==days){
+    h+='<div class="warn" style="margin:0 0 12px">ℹ️ 你选择了 '+days+' 天，但「'+esc(data.city)+'」本次共规划出 <b>'+plannedDays+'</b> 天的内容（景点已按地理就近分片）。剩余天数可自由休整，或把天数调小后重新生成。</div>';
+  }
 
   // ---------- 去程卡片（P3） ----------
   const fromCity=(document.getElementById('from').value||'济南').trim();
@@ -672,7 +679,7 @@ function exportImage(){
     ctx.fillText('自动行程攻略 · 由 12306 最便宜路线生成', PAD, y+92);
   });
   // KPI
-  const kpis=[['规划天数',c.days+' 天'],['景点',c.spotCount+' 个'],['门票','¥'+c.totalTicket],
+  const kpis=[['规划天数',c.planOut.length+' 天'],['景点',c.spotCount+' 个'],['门票','¥'+c.totalTicket],
               ['餐饮','¥'+(MEAL_PER_DAY*c.days)],['步行',c.totalWalk.toFixed(1)+'km']];
   add(66,(ctx,y)=>{
     const n=kpis.length, gap=8, bw=(inner-gap*(n-1))/n;
