@@ -300,8 +300,26 @@ td .na{color:var(--red);font-weight:600}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card,.kpi{animation:fade .4s ease both}
 @media(max-width:640px){
-  .row{gap:8px}.field{min-width:120px}.kpi .v{font-size:18px}
-  .hero{padding:16px}
+  .wrap{padding:16px 12px 56px}
+  .hd{gap:8px;padding:10px 12px}
+  .status{font-size:11px;margin-left:8px}
+  .hero{padding:16px;margin:14px 0 12px}
+  .kpi .v{font-size:18px}
+
+  /* 搜索区竖排：每个字段占满整行，交换/查询按钮通栏 */
+  .row{flex-direction:column;align-items:stretch;gap:10px}
+  .field{min-width:0!important;width:100%!important;max-width:none!important}
+  .field input,.field select{font-size:16px}      /* 防止 iOS 聚焦输入框时自动放大 */
+  .swap{width:100%;height:34px;margin:0;align-self:stretch}
+  .btn{align-self:stretch;width:100%}
+  .opt{font-size:12.5px;gap:10px}
+
+  /* 结果表格横向滚动，避免被 .route 的圆角裁切而看不到票价/余票 */
+  .rb{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .rb table{min-width:540px}
+  .card table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+  .pc .pd{min-height:36px}
 }
 
 /* ===== 富内容：首屏 / 指南 / 能力 / 热门目的地 / FAQ / 景点图 ===== */
