@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#059669">
 <title>12306 最便宜路线 · 多段换乘穷举</title>
 <style>
 :root{
@@ -441,6 +442,22 @@ td .na{color:var(--red);font-weight:600}
   border-radius:12px;padding:10px 12px;margin-top:16px;line-height:1.75}
 .attr-note{font-size:11.5px;color:#9ca3af;margin-top:10px;line-height:1.7;
   padding-top:10px;border-top:1px dashed #e5e7eb}
+
+/* ===== 深度优化：结果表格横向滚动提示 + 回到顶部 ===== */
+.rb{position:relative}
+.rb .xhint{display:none}
+@media(max-width:640px){
+  .rb.xscroll .xhint{display:block;position:absolute;right:8px;bottom:5px;z-index:6;
+    background:rgba(15,23,42,.72);color:#fff;font-size:11px;padding:2px 9px;border-radius:11px;pointer-events:none}
+  .rb.xscroll::after{content:"";position:absolute;top:0;right:0;width:28px;height:100%;
+    background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,.9));pointer-events:none;border-radius:0 12px 12px 0}
+}
+#toTop{position:fixed;right:16px;bottom:18px;z-index:900;width:44px;height:44px;border:none;
+  border-radius:50%;background:var(--grad);color:#fff;font-size:20px;cursor:pointer;line-height:1;
+  box-shadow:0 6px 18px rgba(16,185,129,.42);opacity:0;transform:translateY(12px) scale(.9);
+  pointer-events:none;transition:opacity .25s,transform .25s}
+#toTop.show{opacity:1;transform:none;pointer-events:auto}
+#toTop:active{transform:scale(.92)}
 </style>
 </head>
 <body>
@@ -574,6 +591,8 @@ td .na{color:var(--red);font-weight:600}
   <button class="attr-x" id="attr-x" type="button" title="关闭（Esc）">✕</button>
   <div id="attr-body"></div>
 </aside>
+
+<button id="toTop" type="button" title="回到顶部" aria-label="回到顶部">↑</button>
 
 <script>
 const BUNDLE = __DATA__;
@@ -1399,6 +1418,7 @@ function render(){
   bind();
   applyFilter();
   freshness();
+  markXScroll();
 }
 
 /* ---------- 席别明细（点开才展开） ---------- */
@@ -1587,10 +1607,27 @@ function routeCard(r){
       ${tags.join('')}
       <span class="price">${money(price)}</span>
     </div>
-    <div class="rb" id="rb-${r.id}">${body}</div>
+    <div class="rb" id="rb-${r.id}">${body}<span class="xhint">滑动看全部 ›</span></div>
   </div>`;
 }
-function tog(id){ const b=$('rb-'+id); if(b) b.classList.toggle('on'); }
+function tog(id){ const b=$('rb-'+id); if(b){ b.classList.toggle('on'); markXScroll(); } }
+/* 标记横向可滚动的结果表格（窄屏），用于显示「滑动看全部」提示 */
+function markXScroll(){
+  document.querySelectorAll('#out .rb').forEach(b=>{
+    if(getComputedStyle(b).display === 'none'){ b.classList.remove('xscroll'); return; }
+    requestAnimationFrame(()=>{ b.classList.toggle('xscroll', b.scrollWidth - b.clientWidth > 4); });
+  });
+}
+/* 回到顶部悬浮按钮 */
+function initBackTop(){
+  const btn=$('toTop'); if(!btn) return;
+  btn.addEventListener('click', ()=> window.scrollTo({top:0,behavior:'smooth'}));
+  let ticking=false;
+  window.addEventListener('scroll', ()=>{
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{ btn.classList.toggle('show', window.scrollY>400); ticking=false; });
+  }, {passive:true});
+}
 
 function bind(){
   document.querySelectorAll('.chip[data-t]').forEach(c=>{
@@ -1882,6 +1919,7 @@ function boot(){
     const m = BUNDLE && BUNDLE.meta;
     if(!LIVE && m){ RESULT=BUNDLE; RESULT.meta = mkMeta(m); render(); }
   });
+  initBackTop();
   // 每 8 秒自检一次：查询服务恢复后自动切回实时模式，无需手动刷新页面
   setInterval(()=>{ detect(); }, 8000);
 }
