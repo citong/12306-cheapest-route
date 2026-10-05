@@ -435,7 +435,7 @@ function render(data, days, dateStr, budget){
   document.getElementById('out').innerHTML=h;
 
   // ---------- 每日面板 ----------
-  let dayMapSeq=0;
+  let dayMapSeq=0, dayMap=null;
   const draw=d=>{
     let p='<div class="daysmall" id="daysmall"><span class="mlabel">📍 当日路线地图</span>'
         +'<div class="merr">地图瓦片需联网加载（高德），当前网络不可用</div></div>';
@@ -474,12 +474,15 @@ function render(data, days, dateStr, budget){
 function initDayMap(seq, d){
   const el=document.getElementById('daysmall');
   if(!el) return;
+  // 切换天数时先销毁上一天的地图实例，避免反复切换累积多个 Leaflet 地图（泄漏 / 多余瓦片请求）
+  if(dayMap){ try{ dayMap.remove(); }catch(e){} dayMap=null; }
   if(!window.L){ const e2=el.querySelector('.merr'); if(e2) e2.style.display='flex'; return; }
   const pts=d.items.filter(it=>it.spot && it.spot.lat!=null && it.spot.lng!=null).map(it=>it.spot);
   if(pts.length===0){ el.querySelector('.merr').style.display='flex'; return; }
   const ll=pts.map((s,i)=>{ const g=wgs84ToGcj02(s.lng,s.lat); return {ll:[g[1],g[0]], n:s.n, i}; });
   const map=L.map(el,{zoomControl:true,scrollWheelZoom:false,attributionControl:false})
     .setView(ll[0].ll, 12);
+  dayMap=map;
   const amap=L.tileLayer(
     'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
     {maxZoom:18, subdomains:'1234', attribution:'© 高德地图'});
