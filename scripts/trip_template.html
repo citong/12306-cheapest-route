@@ -88,6 +88,7 @@ h1{font-size:22px;margin:6px 0 2px}
   .btn{width:100%;text-align:center}
   .tb{flex-direction:column}
   .tb .btn{width:100%;text-align:center;margin-top:0}
+  .htiers{grid-template-columns:1fr}
 }
 .blk{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
 .blk h4{margin:0 0 8px;font-size:13.5px;color:#0f172a;display:flex;align-items:center;gap:6px}
@@ -98,6 +99,15 @@ h1{font-size:22px;margin:6px 0 2px}
 .hotel{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .hotel a{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 16px;text-decoration:none;color:var(--blue);font-weight:600}
 .hotel a:hover{border-color:var(--blue)}
+/* 住宿推荐：分档卡片 + 选址理由 */
+.htiers{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 4px}
+.htier{display:flex;flex-direction:column;gap:3px;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px;text-decoration:none;color:#0f172a;transition:border-color .15s,box-shadow .15s}
+.htier:hover{border-color:var(--blue);box-shadow:0 3px 10px rgba(37,99,235,.14)}
+.htier b{font-size:14px}
+.htier span{font-size:14px;color:var(--blue);font-weight:800}
+.htier small{font-size:11px;color:var(--mut)}
+.hmeta2{font-size:12px;color:#475569;line-height:1.7;background:#f8fafc;border-left:3px solid #cbd5e1;
+  padding:9px 11px;border-radius:0 8px 8px 0;margin-top:6px}
 .foot{color:var(--mut);font-size:12px;text-align:center;margin-top:24px;line-height:1.7}
 .foot a{color:var(--blue);text-decoration:none}
 .warn{font-size:12px;color:var(--warn);background:#fffbeb;border:1px solid #fde68a;border-radius:9px;padding:8px 11px;margin-top:10px}
@@ -481,11 +491,28 @@ function render(data, days, dateStr, budget){
   h+='<div class="blk"><h4>🎒 行前清单</h4><ul>'+checklist(prefs,key,days,ci).map(x=>'<li>'+x+'</li>').join('')+'</ul></div>';
   h+='</div>';
 
-  // ---------- 住宿 ----------
-  h+='<div class="panel"><div class="hotel"><b>🏨 住宿</b>'
-    +'<a href="'+hotelUrl+'" target="_blank" rel="noopener">在去哪儿查看 '+esc(data.city)+' 酒店 →</a>'
-    +'<span class="meta" style="color:var(--mut);font-size:12px">入住 '+ci+' / 退房 '+co+'（共 '+days+' 晚）</span></div>'
-    +'<div class="warn">住宿建议选<b>地铁 1 号线或景区周边</b>，可减少每日通勤；热门城市旺季请提前 2 周预订。</div></div>';
+  // ---------- 住宿推荐（应用：按行程景点重心推荐住宿片区 + 分档） ----------
+  const planSpots=planOut.flatMap(d=>d.items.filter(i=>i.spot).map(i=>i.spot));
+  let recHtml='';
+  if(planSpots.length && hotelPy){
+    const cx=planSpots.reduce((s,p)=>s+p.lat,0)/planSpots.length;
+    const cy=planSpots.reduce((s,p)=>s+p.lng,0)/planSpots.length;
+    const dists=planSpots.map(p=>haversine(p,{lat:cx,lng:cy}));
+    const avgKm=dists.reduce((a,b)=>a+b,0)/dists.length;
+    const near3=dists.filter(d=>d<=3).length;
+    const tiers=[['经济型','¥150–300',150,300],['舒适型','¥300–600',300,600],['高档型','¥600+',600,null]];
+    recHtml='<div class="htiers">'+tiers.map(t=>{
+      const qs=(ci?('?fromDate='+ci+'&toDate='+co):'?')+(t[3]!=null?('&minPrice='+t[2]+'&maxPrice='+t[3]):('&minPrice='+t[2]));
+      const u='https://hotel.qunar.com/city/'+hotelPy+'/'+qs;
+      return '<a class="htier" href="'+u+'" target="_blank" rel="noopener"><b>'+t[0]+'</b><span>'+t[1]+'</span><small>查看房源 →</small></a>';
+    }).join('')+'</div>'
+    +'<div class="hmeta2">📍 推荐住在<b>景点最集中的片区</b>（本次 '+planSpots.length+' 个景点，平均距住宿点约 '+avgKm.toFixed(1)+'km，其中 '+near3+' 个在 3km 内）。在平台上优先选"近地铁 / 景区"的房源即可。</div>';
+  }
+  h+='<div class="panel"><div class="hotel"><b>🏨 住宿推荐</b>'
+    +(ci?('<span class="meta">入住 '+ci+' / 退房 '+co+'（'+days+' 晚）</span>'):'')
+    +'</div>'+recHtml
+    +(planSpots.length&&hotelPy?'':'<div class="warn">暂无该城市住宿数据，可手动在去哪儿 / 携程搜索 '+esc(data.city)+' 酒店。</div>')
+    +'<div class="warn">热门城市旺季请提前 2 周预订；下单前确认是否近地铁 / 景区，减少每日通勤。</div></div>';
 
   // P4：缓存当前行程，供分享链接 / 导出图片读取
   LAST={data,days,dateStr,budget,prefs,planOut,fromCity,tripDate,ci,co,hotelUrl,totalTicket,spotCount,totalWalk,key};
