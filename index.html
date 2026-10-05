@@ -322,6 +322,8 @@ td .na{color:var(--red);font-weight:600}
 .pop-refresh{margin-left:auto;flex:none;border:1px solid var(--green-line);background:var(--green-soft);color:var(--green-2);font-family:inherit;font-size:12.5px;font-weight:700;border-radius:9px;padding:5px 13px;cursor:pointer;transition:.15s;white-space:nowrap}
 .pop-refresh:hover{background:var(--green);color:#fff;border-color:var(--green)}
 .pop-refresh:active{transform:scale(.96)}
+.pop-refresh.spin{animation:popspin .4s ease}
+@keyframes popspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .sec-title h3{margin:0;font-size:16px;font-weight:800;letter-spacing:-.2px}
 .sec-title .ln{flex:1;height:1px;background:var(--line)}
 .sec-title .sub{font-size:12px;color:var(--sub)}
@@ -580,6 +582,7 @@ function provOf(n){
 // 页面由本地服务托管时走同源；部署在 Pages 上时回落到 127.0.0.1:8787
 const API = (location.port === '8787') ? location.origin : "http://127.0.0.1:8787";
 let LIVE = false, ES = null;
+let prevLive = null;        // 上一轮 detect 的实时状态，仅在状态切换时重绘勾选区，避免每 8s 打断用户选站
 let RESULT = null;      // {meta, direct, routes, best}
 let EST = null;         // {want, ref}：预售期外，用 ref 日的实查结果预估 want 日
 let FILTER = {trans:'', sort:'price', feasible:false, q:'', seats:false};
@@ -1063,7 +1066,11 @@ async function detect(){
     });
     $('date').value = m.date; updDate();
   }
-  renderPick('from'); renderPick('to'); updProv();
+  // 仅在首次或实时状态切换时重绘勾选区：否则每 8s 的 detect 会把用户正在展开的选站面板重置掉
+  if(prevLive === null || prevLive !== LIVE){
+    renderPick('from'); renderPick('to'); updProv();
+  }
+  prevLive = LIVE;
   $('eta').textContent = LIVE ? '' : '';
   freshness();
 }
@@ -1771,7 +1778,7 @@ function refreshPop(){
   shufflePop();
   buildPop();
   const btn=$('popRefresh');
-  if(btn){ btn.style.transform='rotate(360deg)'; setTimeout(()=>{ if(btn) btn.style.transform=''; },180); }
+  if(btn){ btn.classList.remove('spin'); void btn.offsetWidth; btn.classList.add('spin'); }
 }
 function hideIntro(){ const e=$('intro'); if(e) e.style.display='none'; }
 function showIntro(){ const e=$('intro'); if(e) e.style.display=''; }
