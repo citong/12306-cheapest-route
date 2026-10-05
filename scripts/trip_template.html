@@ -455,7 +455,7 @@ function render(data, days, dateStr, budget){
         +(s.note?'<div class="note">💡 '+esc(s.note)+'</div>':'')+'</div></div>';
       if(lastTransit){
         p+='<div class="transit">🚶 从「'+esc(lastTransit.from)+'」到「'+esc(lastTransit.to)+'」约 '
-          +lastTransit.transit+' 分钟（'+(lastTransit.km*2).toFixed(1)+'km）</div>';
+          +lastTransit.transit+' 分钟（'+(lastTransit.km).toFixed(1)+'km）</div>';
         lastTransit=null;
       }
       p+=p2;
@@ -624,7 +624,7 @@ function exportImage(){
       if(lastTransit){
         add(22,(ctx,y)=>{
           ctx.fillStyle='#64748b'; ctx.font='11px sans-serif'; ctx.textBaseline='top';
-          ctx.fillText('→ 从「'+lastTransit.from+'」到「'+lastTransit.to+'」约 '+lastTransit.transit+' 分钟（'+(lastTransit.km*2).toFixed(1)+'km）', PAD+12, y+4);
+          ctx.fillText('→ 从「'+lastTransit.from+'」到「'+lastTransit.to+'」约 '+lastTransit.transit+' 分钟（'+(lastTransit.km).toFixed(1)+'km）', PAD+12, y+4);
         });
         lastTransit=null;
       }
