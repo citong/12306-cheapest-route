@@ -458,6 +458,16 @@ td .na{color:var(--red);font-weight:600}
   pointer-events:none;transition:opacity .25s,transform .25s}
 #toTop.show{opacity:1;transform:none;pointer-events:auto}
 #toTop:active{transform:scale(.92)}
+/* ---------- 多程路线 ---------- */
+.btn.ghost{background:#fff;color:var(--green);border:1px solid var(--green);font-weight:600;padding:0 14px}
+.btn.ghost.on{background:var(--green);color:#fff}
+.multi-field{display:none}
+.row.multi #field-from,.row.multi #field-to,.row.multi #swap,.row.multi #rnd{display:none}
+.row.multi .multi-field{display:flex}
+.row.multi #mstops{font-size:16px}
+.mc-leg-h{display:flex;align-items:center;gap:8px;font-weight:700;margin:20px 0 0;font-size:15px}
+.mc-leg-h .mc-idx{background:var(--green);color:#fff;border-radius:6px;padding:2px 8px;font-size:12px}
+.mc-note{margin-top:16px}
 </style>
 </head>
 <body>
@@ -517,15 +527,17 @@ td .na{color:var(--red);font-weight:600}
 
   <div class="hero">
     <div class="row">
-      <div class="field"><label>出发<span class="prov" id="kind-from"></span></label>
+      <div class="field" id="field-from"><label>出发<span class="prov" id="kind-from"></span></label>
         <input id="from" autocomplete="off" placeholder="车站 / 城市 / 省份，如 北京">
         <div class="sug" id="sug-from"></div></div>
       <button class="swap" id="swap" title="交换起终点">⇄</button>
-      <div class="field"><label>到达<span class="prov" id="prov-to"></span>
+      <div class="field" id="field-to"><label>到达<span class="prov" id="prov-to"></span>
         <span class="prov" id="kind-to"></span></label>
         <input id="to" class="hasrnd" autocomplete="off" placeholder="车站 / 城市 / 省份，如 云南">
         <button class="rnd" id="rnd" type="button" title="随机换一个目的地">⟳</button>
         <div class="sug" id="sug-to"></div></div>
+      <div class="field multi-field" style="flex:3;min-width:240px"><label>途经城市<span class="prov">用 → 分隔</span></label>
+        <input id="mstops" autocomplete="off" placeholder="杭州 → 苏州 → 南京"></div>
       <div class="field" style="max-width:158px"><label>出发日期
         <span class="prov" id="presale"></span></label>
         <input id="date" type="date">
@@ -535,6 +547,7 @@ td .na{color:var(--red);font-weight:600}
     <div class="pick" id="pick-from"></div>
     <div class="pick" id="pick-to"></div>
     <div class="opt">
+      <button class="btn ghost" id="mode-multi" type="button" title="多程路线：把多个城市串成一条线，逐段查最便宜车次">↔ 多程</button>
       <label>车型
         <select id="types">
           <option value="ZTK">普速 Z/T/K（最便宜）</option>
@@ -1213,6 +1226,12 @@ function pauseQuery(){
   }
 }
 $('pstop').onclick = ()=>{
+  if(MULTI.active){
+    MULTI.abort = true;
+    if(MULTI.es){ try{ MULTI.es.close(); }catch(e){} MULTI.es = null; }
+    setProg(true, '正在停止…', '已查到的路段会立即汇总成行程');
+    return;
+  }
   if($('pstop').classList.contains('res')){      // 已是暂停态 → 同条件重跑
     if(LASTQ) run(LASTQ.f, LASTQ.t, LASTQ.d);
     return;
@@ -1227,6 +1246,7 @@ function labelOf(id){
   return (SEL[id].label || $(id).value.trim() || '').replace(/\|/g, ' / ');
 }
 $('go').onclick = ()=>{
+  if(MULTI.active){ runMulti(); return; }
   const f=joinStations('from'), t=joinStations('to'), d=$('date').value;
   if(!f||!t){ alert('请填写出发和到达'); return; }
   if(!d){ alert('请选择日期'); return; }
@@ -1331,6 +1351,137 @@ function offline(f,t,d){
       <p style="margin:6px 0 0">要查询 <b>${esc(f)} → ${esc(t)}</b>，请在本项目目录双击 <b>start.bat</b>
       启动本地服务，再刷新本页（页面会自动切换到实时模式）。</p></div>`;
   }
+}
+
+/* ---------- 多程路线（串联多个城市） ---------- */
+let MULTI = {active:false, es:null, abort:false};
+const MC_SEP = /[\s→\-–—,，、]+/;
+/* 复用 applySel 的车站展开逻辑，但不碰 UI：返回 pipe 分隔的车站串 */
+function stationsFor(kind, name){
+  if(kind === 'station') return name;
+  if(kind === 'city') return (CITY[name]||[]).slice(0, CITY_PICK).join('|');
+  const cities = (PCITY[name]||[]), st = [];
+  for(const c of cities.slice(0,2)) for(const s of (CITY[c]||[]).slice(0,2)) if(!st.includes(s)) st.push(s);
+  return st.slice(0, CITY_PICK).join('|');
+}
+/* 把「杭州 → 苏州 → 南京」拆成有序站点列表；无法识别的返回 {error} */
+function parseStops(txt){
+  const raw = (txt||'').split(MC_SEP).map(s=>s.trim()).filter(Boolean);
+  const out = [];
+  for(const w of raw){
+    const c = classify(w);
+    if(!c) return {error:'无法识别「'+w+'」，请填车站 / 城市 / 省份'};
+    out.push({name:w, kind:c.kind, stations:stationsFor(c.kind, w)});
+  }
+  return out;
+}
+function toggleMulti(){
+  MULTI.active = !MULTI.active;
+  const row = document.querySelector('.row');
+  if(row) row.classList.toggle('multi', MULTI.active);
+  const btn = $('mode-multi'); if(btn) btn.classList.toggle('on', MULTI.active);
+  if(MULTI.active){
+    if(!$('mstops').value) $('mstops').value = '杭州 → 苏州 → 南京';
+    $('hint').innerHTML = '多程模式：把途经城市用 → 连起来，逐段查最便宜车次并汇总全程方案。';
+  }else{
+    detect();   // 还原单程模式的提示文案（不会重绘选站面板，因为实时状态未变）
+  }
+}
+/* 单段查询：自己开一个 EventSource，返回 Promise<RESULT>，不污染单程 run 的全局状态。
+   顺序执行而非并发，是为了不把 12306 打限流（与 run 的设计一致）。 */
+function legQuery(f, t, want){
+  return new Promise((resolve)=>{
+    const types=$('types').value, hops=$('hops').value;
+    const url = `${API}/api/query?from=${encodeURIComponent(f)}&to=${encodeURIComponent(t)}&date=${want}`
+      + `&types=${encodeURIComponent(types)}&hops=${encodeURIComponent(hops)}&top=40`
+      + `&qid=${Date.now().toString(36)+Math.random().toString(36).slice(2,7)}`;
+    const partial=[]; let res=null;
+    const es=new EventSource(url); MULTI.es=es;
+    const done=()=>{ try{es.close();}catch(e){} if(MULTI.es===es) MULTI.es=null; resolve(res); };
+    es.addEventListener('direct', e=>{ const d=JSON.parse(e.data); res={meta:{},direct:d,routes:partial,best:null}; });
+    es.addEventListener('route', e=>{
+      const r=JSON.parse(e.data); r.id=partial.length+1; partial.push(r);
+      partial.sort((a,b)=>(a.total_price==null?1e9:a.total_price)-(b.total_price==null?1e9:b.total_price));
+      if(!res) res={meta:{},direct:{trains:[],min_price:null},routes:partial,best:null};
+      res.routes=partial; res.best=partial[0];
+    });
+    es.addEventListener('result', e=>{ res=JSON.parse(e.data); done(); });   // 服务端自带该段的 from/to/date，直接采用
+    es.addEventListener('end', ()=>done());
+    es.addEventListener('error', e=>{ if(e.data){ try{ const d=JSON.parse(e.data); if(d&&d.msg) console.warn('多程单段出错:',d.msg); }catch(_){} } if(MULTI.abort) done(); });
+    es.onerror=()=>{ if(MULTI.abort) done(); };
+  });
+}
+async function runMulti(){
+  const stops = parseStops($('mstops').value);
+  if(stops.error){ alert(stops.error); return; }
+  if(stops.length < 2){ alert('请至少填写 2 个城市，用 → 分隔，例如 杭州 → 苏州 → 南京'); return; }
+  if(!LIVE){
+    $('out').innerHTML = `<div class="card"><h2>多程规划需要实时服务</h2>
+      <div class="meta">离线状态下只有单条内置线路，无法串联多城。</div>
+      <p style="margin:6px 0 0">请在本项目目录双击 <b>start.bat</b> 启动本地服务，再刷新本页（页面会自动切回实时模式）。</p></div>`;
+    return;
+  }
+  MULTI.abort = false;
+  hideIntro(); markIntroSeen();
+  $('out').innerHTML = '';
+  // 预售期外的日期：整条链统一改用「同星期几、已开售」的参照日实查
+  let d = $('date').value, est = null;
+  const st = saleState($('date').value);
+  if(st && st.s === 'far'){ const r = refDate($('date').value); if(r){ d = r; est = {want:$('date').value, ref:r}; } }
+  const legs = [];
+  for(let i=0;i<stops.length-1;i++) legs.push({from:stops[i], to:stops[i+1]});
+  $('go').disabled = true;
+  setProg(true, `正在规划多程路线（共 ${legs.length} 段）…`, '逐段查询 12306，请稍候');
+  const results = [];
+  for(let i=0;i<legs.length;i++){
+    if(MULTI.abort) break;
+    const L = legs[i];
+    setProg(true, `第 ${i+1}/${legs.length} 段：${esc(L.from.name)} → ${esc(L.to.name)}`, '边查边出结果');
+    const r = await legQuery(L.from.stations, L.to.stations, d);
+    if(MULTI.abort) break;
+    results.push({from:L.from.name, to:L.to.name, result:r});
+  }
+  $('go').disabled = false;
+  renderMulti(results, est);
+}
+function renderMulti(results, est){
+  setProg(false);
+  if(!results.length){
+    $('out').innerHTML = `<div class="card"><h2>😕 没有规划出任何路段</h2><div class="meta">查询被中止或未返回结果，请重试。</div></div>`;
+    return;
+  }
+  let total=0, tr=0, span=0;
+  results.forEach(r=>{
+    const b = r.result && r.result.routes && r.result.routes[0];
+    if(b){ total += (b.plan_price || b.total_price || 0); tr += (b.transfers||0); span += (b.span_minutes||0); }
+  });
+  const kpis = [
+    ['行程段数', results.length, '', '串联城市'],
+    ['全程最便宜', total, 'green', '各段最便宜累加'],
+    ['总换乘', tr, '', '含所有中转'],
+    ['全程耗时', span, '', '各段在途+等待'],
+  ];
+  let html = '<div class="kpis">' + kpis.map(([k,v,c,u])=>{
+    const vs = (k==='全程最便宜') ? money(v) : (k==='全程耗时' ? (v==null?'—':v) : v);
+    return `<div class="kpi ${c}"><div class="k">${k}</div><div class="v">${vs}</div><div class="u">${esc(u||'')}</div></div>`;
+  }).join('') + '</div>';
+  if(est){
+    html += '<div class="est"><div class="hd">📅 '+esc(est.want)+' 尚未开售，以下各段均按 '+esc(est.ref)+' 实际车次预估</div>'
+          + '12306 预售期约 <b>'+PRESALE+' 天</b>，车次、时刻与票价通常稳定可作参考，但<b>余票与执行票价一定不同</b>，请在放票后重查。</div>';
+  }
+  results.forEach((r,i)=>{
+    const b = r.result && r.result.routes && r.result.routes[0];
+    const dm = r.result && r.result.direct ? r.result.direct.min_price : null;
+    html += '<div class="mc-leg-h"><span class="mc-idx">第 '+(i+1)+' 段</span> '+esc(r.from)+' → '+esc(r.to)+'</div>';
+    if(b){
+      const saved = RESULT; RESULT = r.result; html += bestCard(b, dm); RESULT = saved;
+    }else{
+      html += '<div class="card"><h2>'+esc(r.from)+' → '+esc(r.to)+'</h2><div class="meta">该段没有查到车次，可能是日期未放票或被限流。</div></div>';
+    }
+  });
+  html += '<div class="fresh warn mc-note"><b class="k"></b><div>多程按<b>同一出发日期</b>规划各段最便宜车次（本工具按单日查询）。若分段在不同日期出行，请分别用上方「单程」查询，或调整日期后重查。</div></div>';
+  RESULT = results[results.length-1].result;
+  $('out').innerHTML = html; bind(); applyFilter(); freshness(); markXScroll();
 }
 
 /* ---------- 渲染 ---------- */
@@ -1903,6 +2054,7 @@ function boot(){
   updDate();
   buildGuide(); buildFeats(); buildPop();
   const pr=$('popRefresh'); if(pr) pr.onclick = refreshPop;
+  const mm=$('mode-multi'); if(mm) mm.onclick = toggleMulti;
   bindAttrClose(); bindIntroToggle();
   // 首次进入才展示「三步搞定 / 核心能力 / FAQ」；看过一次后自动收起
   if(introSeen()) hideIntro();
