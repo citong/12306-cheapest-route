@@ -471,7 +471,7 @@ function render(data, days, dateStr, budget){
   // ---------- 城市封面 ----------
   h+='<div class="hero">'+cover+'<div class="hbg"></div><div class="hin">'
     +'<h2>'+esc(data.city)+'</h2>'
-    +'<div class="hmeta">'+(plannedDays!==days?('已为你规划 <b>'+plannedDays+'</b> 天（你选了 '+days+' 天）':'建议 '+days+' 天')+' · 共 '+spotCount+' 个景点 · 每日约 ¥'+dailyCost+'（门票+餐饮+市内交通）</div>'
+    +'<div class="hmeta">'+(plannedDays!==days?('已为你规划 <b>'+plannedDays+'</b> 天（你选了 '+days+' 天）'):'建议 '+days+' 天')+' · 共 '+spotCount+' 个景点 · 每日约 ¥'+dailyCost+'（门票+餐饮+市内交通）</div>'
     +'<div class="hintro">'+esc(data.intro||'')+'</div>'
     +'<div class="hchips">'
     +'<span class="hchip">🗓 建议 '+esc(data.days_suggest||days)+' 天</span>'
